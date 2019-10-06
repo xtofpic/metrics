@@ -135,7 +135,7 @@ This library provide types and conversion for the following metrics:
 
 #### Installing the library
 
-The metric library is a header's only library.  Simply copy metric's needed (.hpp file) into your code.
+The Metrics library is a header's only library. Just copy the necessary metrics (.hpp file) into your code.
 
 
 ### Examples
