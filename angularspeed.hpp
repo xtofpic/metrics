@@ -45,7 +45,7 @@ namespace std {
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 struct common_type< metric::angularspeed<_Rep1, _Period1>,
-metric::angularspeed<_Rep2, _Period2> >
+                    metric::angularspeed<_Rep2, _Period2> >
 {
             typedef metric::angularspeed<typename common_type<_Rep1, _Rep2>::type,
                 ratio< GCD<_Period1::num, _Period2::num>::value,
@@ -149,8 +149,8 @@ class angularspeed
     struct __no_overflow
     {
     private:
-        static const intmax_t __gcd_n1_n2 = std::__static_gcd<_R1::num, _R2::num>::value;
-        static const intmax_t __gcd_d1_d2 = std::__static_gcd<_R1::den, _R2::den>::value;
+        static const intmax_t __gcd_n1_n2 = GCD<_R1::num, _R2::num>::value;
+        static const intmax_t __gcd_d1_d2 = GCD<_R1::den, _R2::den>::value;
         static const intmax_t __n1 = _R1::num / __gcd_n1_n2;
         static const intmax_t __d1 = _R1::den / __gcd_d1_d2;
         static const intmax_t __n2 = _R2::num / __gcd_n1_n2;

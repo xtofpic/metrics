@@ -24,8 +24,8 @@ template <intmax_t _Num, intmax_t _Den> struct __is_ratio<std::ratio<_Num, _Den>
 } // namespace std
 #else
 #define METRICCONSTEXPR
-#define GCD __static_gcd
-#define LCM __static_lcm
+#define GCD std::__static_gcd
+#define LCM std::__static_lcm
 #endif
 //  End of a mettre dans un config.hpp
 
