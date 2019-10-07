@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-//===---------------------------- energy ------------------------------------===//
+//===---------------------------- tests -----------------------------------===//
 //
 // Copyright (c) 2018, 2019, Christophe Pijcke
 //
@@ -24,8 +24,6 @@
 #include "volume.hpp"
 #include "volumetricflow.hpp"
 #include "angularspeed.hpp"
-
-// TODO:  add horses power to forces.
 
 
 int main(int argc, char* argv[])
