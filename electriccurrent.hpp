@@ -15,6 +15,7 @@
 #ifndef METRICS_ELECTRICCURRENT_HPP
 #define METRICS_ELECTRICCURRENT_HPP
 
+#include "metric_config.hpp"
 
 namespace metric {
 
@@ -45,10 +46,11 @@ namespace std {
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 struct common_type< metric::electriccurrent<_Rep1, _Period1>,
-                    metric::electriccurrent<_Rep2, _Period2> >
-{   
-	    typedef metric::electriccurrent<typename common_type<_Rep1, _Rep2>::type,
-	                         typename __ratio_gcd<_Period1, _Period2>::type> type;
+metric::electriccurrent<_Rep2, _Period2> >
+{
+            typedef metric::electriccurrent<typename common_type<_Rep1, _Rep2>::type,
+                ratio< GCD<_Period1::num, _Period2::num>::value,
+                       LCM<_Period1::den, _Period2::den>::value> > type;
 };
 
 } // namespace std
@@ -68,7 +70,7 @@ struct __electriccurrent_cast;
 template <class _FromElectricCurrent, class _ToElectricCurrent, class _Period>
 struct __electriccurrent_cast<_FromElectricCurrent, _ToElectricCurrent, _Period, true, true>
 {   
-    inline constexpr 
+    inline METRICCONSTEXPR
     _ToElectricCurrent operator()(const _FromElectricCurrent& __fd) const
     {   
         return _ToElectricCurrent(static_cast<typename _ToElectricCurrent::rep>(__fd.count()));
@@ -78,7 +80,7 @@ struct __electriccurrent_cast<_FromElectricCurrent, _ToElectricCurrent, _Period,
 template <class _FromElectricCurrent, class _ToElectricCurrent, class _Period>
 struct __electriccurrent_cast<_FromElectricCurrent, _ToElectricCurrent, _Period, true, false>
 {   
-    inline constexpr 
+    inline METRICCONSTEXPR
     _ToElectricCurrent operator()(const _FromElectricCurrent& __fd) const
     {   
         typedef typename std::common_type<typename _ToElectricCurrent::rep, typename _FromElectricCurrent::rep, intmax_t>::type _Ct;
@@ -90,7 +92,7 @@ struct __electriccurrent_cast<_FromElectricCurrent, _ToElectricCurrent, _Period,
 template <class _FromElectricCurrent, class _ToElectricCurrent, class _Period>
 struct __electriccurrent_cast<_FromElectricCurrent, _ToElectricCurrent, _Period, false, true>
 {   
-    inline constexpr 
+    inline METRICCONSTEXPR
     _ToElectricCurrent operator()(const _FromElectricCurrent& __fd) const
     {   
         typedef typename std::common_type<typename _ToElectricCurrent::rep, typename _FromElectricCurrent::rep, intmax_t>::type _Ct;
@@ -102,7 +104,7 @@ struct __electriccurrent_cast<_FromElectricCurrent, _ToElectricCurrent, _Period,
 template <class _FromElectricCurrent, class _ToElectricCurrent, class _Period>
 struct __electriccurrent_cast<_FromElectricCurrent, _ToElectricCurrent, _Period, false, false>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     _ToElectricCurrent operator()(const _FromElectricCurrent& __fd) const
     {
         typedef typename std::common_type<typename _ToElectricCurrent::rep, typename _FromElectricCurrent::rep, intmax_t>::type _Ct;
@@ -115,7 +117,7 @@ struct __electriccurrent_cast<_FromElectricCurrent, _ToElectricCurrent, _Period,
 
 template <class _ToElectricCurrent, class _Rep, class _Period>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::enable_if
 <
     __is_electriccurrent<_ToElectricCurrent>::value,
@@ -131,9 +133,9 @@ template <class _Rep>
 struct electriccurrent_values
 {
 public:
-    inline static constexpr _Rep zero() {return _Rep(0);}
-    inline static constexpr _Rep max()  {return std::numeric_limits<_Rep>::max();}
-    inline static constexpr _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
+    inline static METRICCONSTEXPR _Rep zero() {return _Rep(0);}
+    inline static METRICCONSTEXPR _Rep max()  {return std::numeric_limits<_Rep>::max();}
+    inline static METRICCONSTEXPR _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
 };
 
 
@@ -181,11 +183,11 @@ private:
     rep __rep_;
 public:
 
-    inline constexpr
+    inline METRICCONSTEXPR
     electriccurrent() = default;
 
     template <class _Rep2>
-        inline constexpr
+        inline METRICCONSTEXPR
         explicit electriccurrent(const _Rep2& __r,
             typename std::enable_if
             <
@@ -197,7 +199,7 @@ public:
 
     // conversions
     template <class _Rep2, class _Period2>
-        inline constexpr
+        inline METRICCONSTEXPR
         electriccurrent(const electriccurrent<_Rep2, _Period2>& __d,
             typename std::enable_if
             <
@@ -210,12 +212,12 @@ public:
 
     // observer
 
-    inline constexpr rep count() const {return __rep_;}
+    inline METRICCONSTEXPR rep count() const {return __rep_;}
 
     // arithmetic
 
-    inline constexpr electriccurrent  operator+() const {return *this;}
-    inline constexpr electriccurrent  operator-() const {return electriccurrent(-__rep_);}
+    inline METRICCONSTEXPR electriccurrent  operator+() const {return *this;}
+    inline METRICCONSTEXPR electriccurrent  operator-() const {return electriccurrent(-__rep_);}
     inline const electriccurrent& operator++()      {++__rep_; return *this;}
     inline const electriccurrent  operator++(int)   {return electriccurrent(__rep_++);}
     inline const electriccurrent& operator--()      {--__rep_; return *this;}
@@ -231,9 +233,9 @@ public:
 
     // special values
 
-    inline static constexpr electriccurrent zero() {return electriccurrent(electriccurrent_values<rep>::zero());}
-    inline static constexpr electriccurrent min()  {return electriccurrent(electriccurrent_values<rep>::min());}
-    inline static constexpr electriccurrent max()  {return electriccurrent(electriccurrent_values<rep>::max());}
+    inline static METRICCONSTEXPR electriccurrent zero() {return electriccurrent(electriccurrent_values<rep>::zero());}
+    inline static METRICCONSTEXPR electriccurrent min()  {return electriccurrent(electriccurrent_values<rep>::min());}
+    inline static METRICCONSTEXPR electriccurrent max()  {return electriccurrent(electriccurrent_values<rep>::max());}
 };
 
 
@@ -250,7 +252,7 @@ typedef electriccurrent<     long, std::mega > megaampere;
 template <class _LhsElectricCurrent, class _RhsElectricCurrent>
 struct __electriccurrent_eq
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsElectricCurrent& __lhs, const _RhsElectricCurrent& __rhs) const
         {
             typedef typename std::common_type<_LhsElectricCurrent, _RhsElectricCurrent>::type _Ct;
@@ -261,14 +263,14 @@ struct __electriccurrent_eq
 template <class _LhsElectricCurrent>
 struct __electriccurrent_eq<_LhsElectricCurrent, _LhsElectricCurrent>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsElectricCurrent& __lhs, const _LhsElectricCurrent& __rhs) const
         {return __lhs.count() == __rhs.count();}
 };
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator==(const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<_Rep2, _Period2>& __rhs)
 {
@@ -279,7 +281,7 @@ operator==(const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator!=(const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<_Rep2, _Period2>& __rhs)
 {
@@ -291,7 +293,7 @@ operator!=(const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<
 template <class _LhsElectricCurrent, class _RhsElectricCurrent>
 struct __electriccurrent_lt
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsElectricCurrent& __lhs, const _RhsElectricCurrent& __rhs) const
         {
             typedef typename std::common_type<_LhsElectricCurrent, _RhsElectricCurrent>::type _Ct;
@@ -302,14 +304,14 @@ struct __electriccurrent_lt
 template <class _LhsElectricCurrent>
 struct __electriccurrent_lt<_LhsElectricCurrent, _LhsElectricCurrent>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsElectricCurrent& __lhs, const _LhsElectricCurrent& __rhs) const
         {return __lhs.count() < __rhs.count();}
 };
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator< (const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<_Rep2, _Period2>& __rhs)
 {
@@ -320,7 +322,7 @@ operator< (const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator> (const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<_Rep2, _Period2>& __rhs)
 {
@@ -331,7 +333,7 @@ operator> (const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator<=(const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<_Rep2, _Period2>& __rhs)
 {
@@ -342,7 +344,7 @@ operator<=(const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator>=(const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<_Rep2, _Period2>& __rhs)
 {
@@ -353,7 +355,7 @@ operator>=(const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<electriccurrent<_Rep1, _Period1>, electriccurrent<_Rep2, _Period2> >::type
 operator+(const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<_Rep2, _Period2>& __rhs)
 {
@@ -365,7 +367,7 @@ operator+(const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<_
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<electriccurrent<_Rep1, _Period1>, electriccurrent<_Rep2, _Period2> >::type
 operator-(const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<_Rep2, _Period2>& __rhs)
 {
@@ -377,7 +379,7 @@ operator-(const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<_
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::enable_if
 <
     std::is_convertible<_Rep2, typename std::common_type<_Rep1, _Rep2>::type>::value,
@@ -392,7 +394,7 @@ operator*(const electriccurrent<_Rep1, _Period>& __d, const _Rep2& __s)
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::enable_if
 <
     std::is_convertible<_Rep1, typename std::common_type<_Rep1, _Rep2>::type>::value,
@@ -431,7 +433,7 @@ struct __electriccurrent_divide_result<electriccurrent<_Rep1, _Period>, _Rep2, f
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename __electriccurrent_divide_result<electriccurrent<_Rep1, _Period>, _Rep2>::type
 operator/(const electriccurrent<_Rep1, _Period>& __d, const _Rep2& __s)
 {
@@ -442,7 +444,7 @@ operator/(const electriccurrent<_Rep1, _Period>& __d, const _Rep2& __s)
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<_Rep1, _Rep2>::type
 operator/(const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<_Rep2, _Period2>& __rhs)
 {
@@ -454,7 +456,7 @@ operator/(const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<_
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename __electriccurrent_divide_result<electriccurrent<_Rep1, _Period>, _Rep2>::type
 operator%(const electriccurrent<_Rep1, _Period>& __d, const _Rep2& __s)
 {
@@ -465,7 +467,7 @@ operator%(const electriccurrent<_Rep1, _Period>& __d, const _Rep2& __s)
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<electriccurrent<_Rep1, _Period1>, electriccurrent<_Rep2, _Period2> >::type
 operator%(const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<_Rep2, _Period2>& __rhs)
 {

@@ -15,6 +15,7 @@
 #ifndef METRICS_VOLUMETRICFLOW_HPP
 #define METRICS_VOLUMETRICFLOW_HPP
 
+#include "metric_config.hpp"
 
 namespace metric {
 
@@ -45,10 +46,11 @@ namespace std {
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 struct common_type< metric::volumetricflow<_Rep1, _Period1>,
-                    metric::volumetricflow<_Rep2, _Period2> >
-{   
-	    typedef metric::volumetricflow<typename common_type<_Rep1, _Rep2>::type,
-	                         typename __ratio_gcd<_Period1, _Period2>::type> type;
+metric::volumetricflow<_Rep2, _Period2> >
+{
+            typedef metric::volumetricflow<typename common_type<_Rep1, _Rep2>::type,
+                ratio< GCD<_Period1::num, _Period2::num>::value,
+                       LCM<_Period1::den, _Period2::den>::value> > type;
 };
 
 } // namespace std
@@ -68,7 +70,7 @@ struct __volumetricflow_cast;
 template <class _FromVolumetricFlow, class _ToVolumetricFlow, class _Period>
 struct __volumetricflow_cast<_FromVolumetricFlow, _ToVolumetricFlow, _Period, true, true>
 {   
-    inline constexpr 
+    inline METRICCONSTEXPR
     _ToVolumetricFlow operator()(const _FromVolumetricFlow& __fd) const
     {   
         return _ToVolumetricFlow(static_cast<typename _ToVolumetricFlow::rep>(__fd.count()));
@@ -78,7 +80,7 @@ struct __volumetricflow_cast<_FromVolumetricFlow, _ToVolumetricFlow, _Period, tr
 template <class _FromVolumetricFlow, class _ToVolumetricFlow, class _Period>
 struct __volumetricflow_cast<_FromVolumetricFlow, _ToVolumetricFlow, _Period, true, false>
 {   
-    inline constexpr 
+    inline METRICCONSTEXPR
     _ToVolumetricFlow operator()(const _FromVolumetricFlow& __fd) const
     {   
         typedef typename std::common_type<typename _ToVolumetricFlow::rep, typename _FromVolumetricFlow::rep, intmax_t>::type _Ct;
@@ -90,7 +92,7 @@ struct __volumetricflow_cast<_FromVolumetricFlow, _ToVolumetricFlow, _Period, tr
 template <class _FromVolumetricFlow, class _ToVolumetricFlow, class _Period>
 struct __volumetricflow_cast<_FromVolumetricFlow, _ToVolumetricFlow, _Period, false, true>
 {   
-    inline constexpr 
+    inline METRICCONSTEXPR
     _ToVolumetricFlow operator()(const _FromVolumetricFlow& __fd) const
     {   
         typedef typename std::common_type<typename _ToVolumetricFlow::rep, typename _FromVolumetricFlow::rep, intmax_t>::type _Ct;
@@ -102,7 +104,7 @@ struct __volumetricflow_cast<_FromVolumetricFlow, _ToVolumetricFlow, _Period, fa
 template <class _FromVolumetricFlow, class _ToVolumetricFlow, class _Period>
 struct __volumetricflow_cast<_FromVolumetricFlow, _ToVolumetricFlow, _Period, false, false>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     _ToVolumetricFlow operator()(const _FromVolumetricFlow& __fd) const
     {
         typedef typename std::common_type<typename _ToVolumetricFlow::rep, typename _FromVolumetricFlow::rep, intmax_t>::type _Ct;
@@ -115,7 +117,7 @@ struct __volumetricflow_cast<_FromVolumetricFlow, _ToVolumetricFlow, _Period, fa
 
 template <class _ToVolumetricFlow, class _Rep, class _Period>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::enable_if
 <
     __is_volumetricflow<_ToVolumetricFlow>::value,
@@ -131,9 +133,9 @@ template <class _Rep>
 struct volumetricflow_values
 {
 public:
-    inline static constexpr _Rep zero() {return _Rep(0);}
-    inline static constexpr _Rep max()  {return std::numeric_limits<_Rep>::max();}
-    inline static constexpr _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
+    inline static METRICCONSTEXPR _Rep zero() {return _Rep(0);}
+    inline static METRICCONSTEXPR _Rep max()  {return std::numeric_limits<_Rep>::max();}
+    inline static METRICCONSTEXPR _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
 };
 
 
@@ -181,11 +183,11 @@ private:
     rep __rep_;
 public:
 
-    inline constexpr
+    inline METRICCONSTEXPR
     volumetricflow() = default;
 
     template <class _Rep2>
-        inline constexpr
+        inline METRICCONSTEXPR
         explicit volumetricflow(const _Rep2& __r,
             typename std::enable_if
             <
@@ -197,7 +199,7 @@ public:
 
     // conversions
     template <class _Rep2, class _Period2>
-        inline constexpr
+        inline METRICCONSTEXPR
         volumetricflow(const volumetricflow<_Rep2, _Period2>& __d,
             typename std::enable_if
             <
@@ -210,12 +212,12 @@ public:
 
     // observer
 
-    inline constexpr rep count() const {return __rep_;}
+    inline METRICCONSTEXPR rep count() const {return __rep_;}
 
     // arithmetic
 
-    inline constexpr volumetricflow  operator+() const {return *this;}
-    inline constexpr volumetricflow  operator-() const {return volumetricflow(-__rep_);}
+    inline METRICCONSTEXPR volumetricflow  operator+() const {return *this;}
+    inline METRICCONSTEXPR volumetricflow  operator-() const {return volumetricflow(-__rep_);}
     inline const volumetricflow& operator++()      {++__rep_; return *this;}
     inline const volumetricflow  operator++(int)   {return volumetricflow(__rep_++);}
     inline const volumetricflow& operator--()      {--__rep_; return *this;}
@@ -231,9 +233,9 @@ public:
 
     // special values
 
-    inline static constexpr volumetricflow zero() {return volumetricflow(volumetricflow_values<rep>::zero());}
-    inline static constexpr volumetricflow min()  {return volumetricflow(volumetricflow_values<rep>::min());}
-    inline static constexpr volumetricflow max()  {return volumetricflow(volumetricflow_values<rep>::max());}
+    inline static METRICCONSTEXPR volumetricflow zero() {return volumetricflow(volumetricflow_values<rep>::zero());}
+    inline static METRICCONSTEXPR volumetricflow min()  {return volumetricflow(volumetricflow_values<rep>::min());}
+    inline static METRICCONSTEXPR volumetricflow max()  {return volumetricflow(volumetricflow_values<rep>::max());}
 };
 
 
@@ -252,7 +254,7 @@ typedef volumetricflow<long long                          > millilitre_day;
 template <class _LhsVolumetricFlow, class _RhsVolumetricFlow>
 struct __volumetricflow_eq
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsVolumetricFlow& __lhs, const _RhsVolumetricFlow& __rhs) const
         {
             typedef typename std::common_type<_LhsVolumetricFlow, _RhsVolumetricFlow>::type _Ct;
@@ -263,14 +265,14 @@ struct __volumetricflow_eq
 template <class _LhsVolumetricFlow>
 struct __volumetricflow_eq<_LhsVolumetricFlow, _LhsVolumetricFlow>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsVolumetricFlow& __lhs, const _LhsVolumetricFlow& __rhs) const
         {return __lhs.count() == __rhs.count();}
 };
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator==(const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_Rep2, _Period2>& __rhs)
 {
@@ -281,7 +283,7 @@ operator==(const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_R
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator!=(const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_Rep2, _Period2>& __rhs)
 {
@@ -293,7 +295,7 @@ operator!=(const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_R
 template <class _LhsVolumetricFlow, class _RhsVolumetricFlow>
 struct __volumetricflow_lt
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsVolumetricFlow& __lhs, const _RhsVolumetricFlow& __rhs) const
         {
             typedef typename std::common_type<_LhsVolumetricFlow, _RhsVolumetricFlow>::type _Ct;
@@ -304,14 +306,14 @@ struct __volumetricflow_lt
 template <class _LhsVolumetricFlow>
 struct __volumetricflow_lt<_LhsVolumetricFlow, _LhsVolumetricFlow>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsVolumetricFlow& __lhs, const _LhsVolumetricFlow& __rhs) const
         {return __lhs.count() < __rhs.count();}
 };
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator< (const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_Rep2, _Period2>& __rhs)
 {
@@ -322,7 +324,7 @@ operator< (const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_R
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator> (const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_Rep2, _Period2>& __rhs)
 {
@@ -333,7 +335,7 @@ operator> (const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_R
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator<=(const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_Rep2, _Period2>& __rhs)
 {
@@ -344,7 +346,7 @@ operator<=(const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_R
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator>=(const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_Rep2, _Period2>& __rhs)
 {
@@ -355,7 +357,7 @@ operator>=(const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_R
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<volumetricflow<_Rep1, _Period1>, volumetricflow<_Rep2, _Period2> >::type
 operator+(const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_Rep2, _Period2>& __rhs)
 {
@@ -367,7 +369,7 @@ operator+(const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_Re
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<volumetricflow<_Rep1, _Period1>, volumetricflow<_Rep2, _Period2> >::type
 operator-(const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_Rep2, _Period2>& __rhs)
 {
@@ -379,7 +381,7 @@ operator-(const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_Re
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::enable_if
 <
     std::is_convertible<_Rep2, typename std::common_type<_Rep1, _Rep2>::type>::value,
@@ -394,7 +396,7 @@ operator*(const volumetricflow<_Rep1, _Period>& __d, const _Rep2& __s)
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::enable_if
 <
     std::is_convertible<_Rep1, typename std::common_type<_Rep1, _Rep2>::type>::value,
@@ -433,7 +435,7 @@ struct __volumetricflow_divide_result<volumetricflow<_Rep1, _Period>, _Rep2, fal
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename __volumetricflow_divide_result<volumetricflow<_Rep1, _Period>, _Rep2>::type
 operator/(const volumetricflow<_Rep1, _Period>& __d, const _Rep2& __s)
 {
@@ -444,7 +446,7 @@ operator/(const volumetricflow<_Rep1, _Period>& __d, const _Rep2& __s)
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<_Rep1, _Rep2>::type
 operator/(const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_Rep2, _Period2>& __rhs)
 {
@@ -456,7 +458,7 @@ operator/(const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_Re
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename __volumetricflow_divide_result<volumetricflow<_Rep1, _Period>, _Rep2>::type
 operator%(const volumetricflow<_Rep1, _Period>& __d, const _Rep2& __s)
 {
@@ -467,7 +469,7 @@ operator%(const volumetricflow<_Rep1, _Period>& __d, const _Rep2& __s)
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<volumetricflow<_Rep1, _Period1>, volumetricflow<_Rep2, _Period2> >::type
 operator%(const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_Rep2, _Period2>& __rhs)
 {

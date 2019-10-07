@@ -15,6 +15,7 @@
 #ifndef METRICS_MASS_HPP
 #define METRICS_MASS_HPP
 
+#include "metric_config.hpp"
 
 namespace metric {
 
@@ -45,10 +46,11 @@ namespace std {
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 struct common_type< metric::mass<_Rep1, _Period1>,
-                    metric::mass<_Rep2, _Period2> >
-{   
-	    typedef metric::mass<typename common_type<_Rep1, _Rep2>::type,
-	                         typename __ratio_gcd<_Period1, _Period2>::type> type;
+metric::mass<_Rep2, _Period2> >
+{
+            typedef metric::mass<typename common_type<_Rep1, _Rep2>::type,
+                ratio< GCD<_Period1::num, _Period2::num>::value,
+                       LCM<_Period1::den, _Period2::den>::value> > type;
 };
 
 } // namespace std
@@ -68,7 +70,7 @@ struct __mass_cast;
 template <class _FromMass, class _ToMass, class _Period>
 struct __mass_cast<_FromMass, _ToMass, _Period, true, true>
 {   
-    inline constexpr 
+    inline METRICCONSTEXPR
     _ToMass operator()(const _FromMass& __fd) const
     {   
         return _ToMass(static_cast<typename _ToMass::rep>(__fd.count()));
@@ -78,7 +80,7 @@ struct __mass_cast<_FromMass, _ToMass, _Period, true, true>
 template <class _FromMass, class _ToMass, class _Period>
 struct __mass_cast<_FromMass, _ToMass, _Period, true, false>
 {   
-    inline constexpr 
+    inline METRICCONSTEXPR
     _ToMass operator()(const _FromMass& __fd) const
     {   
         typedef typename std::common_type<typename _ToMass::rep, typename _FromMass::rep, intmax_t>::type _Ct;
@@ -90,7 +92,7 @@ struct __mass_cast<_FromMass, _ToMass, _Period, true, false>
 template <class _FromMass, class _ToMass, class _Period>
 struct __mass_cast<_FromMass, _ToMass, _Period, false, true>
 {   
-    inline constexpr 
+    inline METRICCONSTEXPR
     _ToMass operator()(const _FromMass& __fd) const
     {   
         typedef typename std::common_type<typename _ToMass::rep, typename _FromMass::rep, intmax_t>::type _Ct;
@@ -102,7 +104,7 @@ struct __mass_cast<_FromMass, _ToMass, _Period, false, true>
 template <class _FromMass, class _ToMass, class _Period>
 struct __mass_cast<_FromMass, _ToMass, _Period, false, false>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     _ToMass operator()(const _FromMass& __fd) const
     {
         typedef typename std::common_type<typename _ToMass::rep, typename _FromMass::rep, intmax_t>::type _Ct;
@@ -115,7 +117,7 @@ struct __mass_cast<_FromMass, _ToMass, _Period, false, false>
 
 template <class _ToMass, class _Rep, class _Period>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::enable_if
 <
     __is_mass<_ToMass>::value,
@@ -131,9 +133,9 @@ template <class _Rep>
 struct mass_values
 {
 public:
-    inline static constexpr _Rep zero() {return _Rep(0);}
-    inline static constexpr _Rep max()  {return std::numeric_limits<_Rep>::max();}
-    inline static constexpr _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
+    inline static METRICCONSTEXPR _Rep zero() {return _Rep(0);}
+    inline static METRICCONSTEXPR _Rep max()  {return std::numeric_limits<_Rep>::max();}
+    inline static METRICCONSTEXPR _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
 };
 
 
@@ -181,11 +183,11 @@ private:
     rep __rep_;
 public:
 
-    inline constexpr
+    inline METRICCONSTEXPR
     mass() = default;
 
     template <class _Rep2>
-        inline constexpr
+        inline METRICCONSTEXPR
         explicit mass(const _Rep2& __r,
             typename std::enable_if
             <
@@ -197,7 +199,7 @@ public:
 
     // conversions
     template <class _Rep2, class _Period2>
-        inline constexpr
+        inline METRICCONSTEXPR
         mass(const mass<_Rep2, _Period2>& __d,
             typename std::enable_if
             <
@@ -210,12 +212,12 @@ public:
 
     // observer
 
-    inline constexpr rep count() const {return __rep_;}
+    inline METRICCONSTEXPR rep count() const {return __rep_;}
 
     // arithmetic
 
-    inline constexpr mass  operator+() const {return *this;}
-    inline constexpr mass  operator-() const {return mass(-__rep_);}
+    inline METRICCONSTEXPR mass  operator+() const {return *this;}
+    inline METRICCONSTEXPR mass  operator-() const {return mass(-__rep_);}
     inline const mass& operator++()      {++__rep_; return *this;}
     inline const mass  operator++(int)   {return mass(__rep_++);}
     inline const mass& operator--()      {--__rep_; return *this;}
@@ -231,9 +233,9 @@ public:
 
     // special values
 
-    inline static constexpr mass zero() {return mass(mass_values<rep>::zero());}
-    inline static constexpr mass min()  {return mass(mass_values<rep>::min());}
-    inline static constexpr mass max()  {return mass(mass_values<rep>::max());}
+    inline static METRICCONSTEXPR mass zero() {return mass(mass_values<rep>::zero());}
+    inline static METRICCONSTEXPR mass min()  {return mass(mass_values<rep>::min());}
+    inline static METRICCONSTEXPR mass max()  {return mass(mass_values<rep>::max());}
 };
 
 typedef mass<long long, std::nano > nanogram;
@@ -249,7 +251,7 @@ typedef mass<     long, std::mega > ton;
 template <class _LhsMass, class _RhsMass>
 struct __mass_eq
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsMass& __lhs, const _RhsMass& __rhs) const
         {
             typedef typename std::common_type<_LhsMass, _RhsMass>::type _Ct;
@@ -260,14 +262,14 @@ struct __mass_eq
 template <class _LhsMass>
 struct __mass_eq<_LhsMass, _LhsMass>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsMass& __lhs, const _LhsMass& __rhs) const
         {return __lhs.count() == __rhs.count();}
 };
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator==(const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rhs)
 {
@@ -278,7 +280,7 @@ operator==(const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rh
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator!=(const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rhs)
 {
@@ -290,7 +292,7 @@ operator!=(const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rh
 template <class _LhsMass, class _RhsMass>
 struct __mass_lt
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsMass& __lhs, const _RhsMass& __rhs) const
         {
             typedef typename std::common_type<_LhsMass, _RhsMass>::type _Ct;
@@ -301,14 +303,14 @@ struct __mass_lt
 template <class _LhsMass>
 struct __mass_lt<_LhsMass, _LhsMass>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsMass& __lhs, const _LhsMass& __rhs) const
         {return __lhs.count() < __rhs.count();}
 };
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator< (const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rhs)
 {
@@ -319,7 +321,7 @@ operator< (const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rh
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator> (const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rhs)
 {
@@ -330,7 +332,7 @@ operator> (const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rh
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator<=(const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rhs)
 {
@@ -341,7 +343,7 @@ operator<=(const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rh
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator>=(const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rhs)
 {
@@ -352,7 +354,7 @@ operator>=(const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rh
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<mass<_Rep1, _Period1>, mass<_Rep2, _Period2> >::type
 operator+(const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rhs)
 {
@@ -364,7 +366,7 @@ operator+(const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rhs
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<mass<_Rep1, _Period1>, mass<_Rep2, _Period2> >::type
 operator-(const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rhs)
 {
@@ -376,7 +378,7 @@ operator-(const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rhs
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::enable_if
 <
     std::is_convertible<_Rep2, typename std::common_type<_Rep1, _Rep2>::type>::value,
@@ -391,7 +393,7 @@ operator*(const mass<_Rep1, _Period>& __d, const _Rep2& __s)
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::enable_if
 <
     std::is_convertible<_Rep1, typename std::common_type<_Rep1, _Rep2>::type>::value,
@@ -430,7 +432,7 @@ struct __mass_divide_result<mass<_Rep1, _Period>, _Rep2, false>
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename __mass_divide_result<mass<_Rep1, _Period>, _Rep2>::type
 operator/(const mass<_Rep1, _Period>& __d, const _Rep2& __s)
 {
@@ -441,7 +443,7 @@ operator/(const mass<_Rep1, _Period>& __d, const _Rep2& __s)
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<_Rep1, _Rep2>::type
 operator/(const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rhs)
 {
@@ -453,7 +455,7 @@ operator/(const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rhs
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename __mass_divide_result<mass<_Rep1, _Period>, _Rep2>::type
 operator%(const mass<_Rep1, _Period>& __d, const _Rep2& __s)
 {
@@ -464,7 +466,7 @@ operator%(const mass<_Rep1, _Period>& __d, const _Rep2& __s)
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<mass<_Rep1, _Period1>, mass<_Rep2, _Period2> >::type
 operator%(const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rhs)
 {

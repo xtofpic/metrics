@@ -15,6 +15,7 @@
 #ifndef METRICS_SPEED_HPP
 #define METRICS_SPEED_HPP
 
+#include "metric_config.hpp"
 
 namespace metric {
 
@@ -45,10 +46,11 @@ namespace std {
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 struct common_type< metric::speed<_Rep1, _Period1>,
-                    metric::speed<_Rep2, _Period2> >
-{   
-	    typedef metric::speed<typename common_type<_Rep1, _Rep2>::type,
-	                         typename __ratio_gcd<_Period1, _Period2>::type> type;
+metric::speed<_Rep2, _Period2> >
+{
+            typedef metric::speed<typename common_type<_Rep1, _Rep2>::type,
+                ratio< GCD<_Period1::num, _Period2::num>::value,
+                       LCM<_Period1::den, _Period2::den>::value> > type;
 };
 
 } // namespace std
@@ -68,7 +70,7 @@ struct __speed_cast;
 template <class _FromSpeed, class _ToSpeed, class _Period>
 struct __speed_cast<_FromSpeed, _ToSpeed, _Period, true, true>
 {   
-    inline constexpr 
+    inline METRICCONSTEXPR
     _ToSpeed operator()(const _FromSpeed& __fd) const
     {   
         return _ToSpeed(static_cast<typename _ToSpeed::rep>(__fd.count()));
@@ -78,7 +80,7 @@ struct __speed_cast<_FromSpeed, _ToSpeed, _Period, true, true>
 template <class _FromSpeed, class _ToSpeed, class _Period>
 struct __speed_cast<_FromSpeed, _ToSpeed, _Period, true, false>
 {   
-    inline constexpr 
+    inline METRICCONSTEXPR
     _ToSpeed operator()(const _FromSpeed& __fd) const
     {   
         typedef typename std::common_type<typename _ToSpeed::rep, typename _FromSpeed::rep, intmax_t>::type _Ct;
@@ -90,7 +92,7 @@ struct __speed_cast<_FromSpeed, _ToSpeed, _Period, true, false>
 template <class _FromSpeed, class _ToSpeed, class _Period>
 struct __speed_cast<_FromSpeed, _ToSpeed, _Period, false, true>
 {   
-    inline constexpr 
+    inline METRICCONSTEXPR
     _ToSpeed operator()(const _FromSpeed& __fd) const
     {   
         typedef typename std::common_type<typename _ToSpeed::rep, typename _FromSpeed::rep, intmax_t>::type _Ct;
@@ -102,7 +104,7 @@ struct __speed_cast<_FromSpeed, _ToSpeed, _Period, false, true>
 template <class _FromSpeed, class _ToSpeed, class _Period>
 struct __speed_cast<_FromSpeed, _ToSpeed, _Period, false, false>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     _ToSpeed operator()(const _FromSpeed& __fd) const
     {
         typedef typename std::common_type<typename _ToSpeed::rep, typename _FromSpeed::rep, intmax_t>::type _Ct;
@@ -115,7 +117,7 @@ struct __speed_cast<_FromSpeed, _ToSpeed, _Period, false, false>
 
 template <class _ToSpeed, class _Rep, class _Period>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::enable_if
 <
     __is_speed<_ToSpeed>::value,
@@ -131,9 +133,9 @@ template <class _Rep>
 struct speed_values
 {
 public:
-    inline static constexpr _Rep zero() {return _Rep(0);}
-    inline static constexpr _Rep max()  {return std::numeric_limits<_Rep>::max();}
-    inline static constexpr _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
+    inline static METRICCONSTEXPR _Rep zero() {return _Rep(0);}
+    inline static METRICCONSTEXPR _Rep max()  {return std::numeric_limits<_Rep>::max();}
+    inline static METRICCONSTEXPR _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
 };
 
 
@@ -181,11 +183,11 @@ private:
     rep __rep_;
 public:
 
-    inline constexpr
+    inline METRICCONSTEXPR
     speed() = default;
 
     template <class _Rep2>
-        inline constexpr
+        inline METRICCONSTEXPR
         explicit speed(const _Rep2& __r,
             typename std::enable_if
             <
@@ -197,7 +199,7 @@ public:
 
     // conversions
     template <class _Rep2, class _Period2>
-        inline constexpr
+        inline METRICCONSTEXPR
         speed(const speed<_Rep2, _Period2>& __d,
             typename std::enable_if
             <
@@ -210,12 +212,12 @@ public:
 
     // observer
 
-    inline constexpr rep count() const {return __rep_;}
+    inline METRICCONSTEXPR rep count() const {return __rep_;}
 
     // arithmetic
 
-    inline constexpr speed  operator+() const {return *this;}
-    inline constexpr speed  operator-() const {return speed(-__rep_);}
+    inline METRICCONSTEXPR speed  operator+() const {return *this;}
+    inline METRICCONSTEXPR speed  operator-() const {return speed(-__rep_);}
     inline const speed& operator++()      {++__rep_; return *this;}
     inline const speed  operator++(int)   {return speed(__rep_++);}
     inline const speed& operator--()      {--__rep_; return *this;}
@@ -231,9 +233,9 @@ public:
 
     // special values
 
-    inline static constexpr speed zero() {return speed(speed_values<rep>::zero());}
-    inline static constexpr speed min()  {return speed(speed_values<rep>::min());}
-    inline static constexpr speed max()  {return speed(speed_values<rep>::max());}
+    inline static METRICCONSTEXPR speed zero() {return speed(speed_values<rep>::zero());}
+    inline static METRICCONSTEXPR speed min()  {return speed(speed_values<rep>::min());}
+    inline static METRICCONSTEXPR speed max()  {return speed(speed_values<rep>::max());}
 };
 
 
@@ -257,7 +259,7 @@ typedef speed<long long, std::ratio<    1,       1> > metre_day;
 template <class _LhsSpeed, class _RhsSpeed>
 struct __speed_eq
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsSpeed& __lhs, const _RhsSpeed& __rhs) const
         {
             typedef typename std::common_type<_LhsSpeed, _RhsSpeed>::type _Ct;
@@ -268,14 +270,14 @@ struct __speed_eq
 template <class _LhsSpeed>
 struct __speed_eq<_LhsSpeed, _LhsSpeed>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsSpeed& __lhs, const _LhsSpeed& __rhs) const
         {return __lhs.count() == __rhs.count();}
 };
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator==(const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __rhs)
 {
@@ -286,7 +288,7 @@ operator==(const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator!=(const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __rhs)
 {
@@ -298,7 +300,7 @@ operator!=(const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __
 template <class _LhsSpeed, class _RhsSpeed>
 struct __speed_lt
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsSpeed& __lhs, const _RhsSpeed& __rhs) const
         {
             typedef typename std::common_type<_LhsSpeed, _RhsSpeed>::type _Ct;
@@ -309,14 +311,14 @@ struct __speed_lt
 template <class _LhsSpeed>
 struct __speed_lt<_LhsSpeed, _LhsSpeed>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsSpeed& __lhs, const _LhsSpeed& __rhs) const
         {return __lhs.count() < __rhs.count();}
 };
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator< (const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __rhs)
 {
@@ -327,7 +329,7 @@ operator< (const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator> (const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __rhs)
 {
@@ -338,7 +340,7 @@ operator> (const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator<=(const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __rhs)
 {
@@ -349,7 +351,7 @@ operator<=(const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator>=(const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __rhs)
 {
@@ -360,7 +362,7 @@ operator>=(const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<speed<_Rep1, _Period1>, speed<_Rep2, _Period2> >::type
 operator+(const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __rhs)
 {
@@ -372,7 +374,7 @@ operator+(const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __r
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<speed<_Rep1, _Period1>, speed<_Rep2, _Period2> >::type
 operator-(const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __rhs)
 {
@@ -384,7 +386,7 @@ operator-(const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __r
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::enable_if
 <
     std::is_convertible<_Rep2, typename std::common_type<_Rep1, _Rep2>::type>::value,
@@ -399,7 +401,7 @@ operator*(const speed<_Rep1, _Period>& __d, const _Rep2& __s)
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::enable_if
 <
     std::is_convertible<_Rep1, typename std::common_type<_Rep1, _Rep2>::type>::value,
@@ -438,7 +440,7 @@ struct __speed_divide_result<speed<_Rep1, _Period>, _Rep2, false>
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename __speed_divide_result<speed<_Rep1, _Period>, _Rep2>::type
 operator/(const speed<_Rep1, _Period>& __d, const _Rep2& __s)
 {
@@ -449,7 +451,7 @@ operator/(const speed<_Rep1, _Period>& __d, const _Rep2& __s)
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<_Rep1, _Rep2>::type
 operator/(const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __rhs)
 {
@@ -461,7 +463,7 @@ operator/(const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __r
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename __speed_divide_result<speed<_Rep1, _Period>, _Rep2>::type
 operator%(const speed<_Rep1, _Period>& __d, const _Rep2& __s)
 {
@@ -472,7 +474,7 @@ operator%(const speed<_Rep1, _Period>& __d, const _Rep2& __s)
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<speed<_Rep1, _Period1>, speed<_Rep2, _Period2> >::type
 operator%(const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __rhs)
 {

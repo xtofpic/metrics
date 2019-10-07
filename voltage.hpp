@@ -15,6 +15,7 @@
 #ifndef METRICS_VOLTAGE_HPP
 #define METRICS_VOLTAGE_HPP
 
+#include "metric_config.hpp"
 
 namespace metric {
 
@@ -45,10 +46,11 @@ namespace std {
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 struct common_type< metric::voltage<_Rep1, _Period1>,
-                    metric::voltage<_Rep2, _Period2> >
-{   
-	    typedef metric::voltage<typename common_type<_Rep1, _Rep2>::type,
-	                         typename __ratio_gcd<_Period1, _Period2>::type> type;
+metric::voltage<_Rep2, _Period2> >
+{
+            typedef metric::voltage<typename common_type<_Rep1, _Rep2>::type,
+                ratio< GCD<_Period1::num, _Period2::num>::value,
+                       LCM<_Period1::den, _Period2::den>::value> > type;
 };
 
 } // namespace std
@@ -68,7 +70,7 @@ struct __voltage_cast;
 template <class _FromVoltage, class _ToVoltage, class _Period>
 struct __voltage_cast<_FromVoltage, _ToVoltage, _Period, true, true>
 {   
-    inline constexpr 
+    inline METRICCONSTEXPR
     _ToVoltage operator()(const _FromVoltage& __fd) const
     {   
         return _ToVoltage(static_cast<typename _ToVoltage::rep>(__fd.count()));
@@ -78,7 +80,7 @@ struct __voltage_cast<_FromVoltage, _ToVoltage, _Period, true, true>
 template <class _FromVoltage, class _ToVoltage, class _Period>
 struct __voltage_cast<_FromVoltage, _ToVoltage, _Period, true, false>
 {   
-    inline constexpr 
+    inline METRICCONSTEXPR
     _ToVoltage operator()(const _FromVoltage& __fd) const
     {   
         typedef typename std::common_type<typename _ToVoltage::rep, typename _FromVoltage::rep, intmax_t>::type _Ct;
@@ -90,7 +92,7 @@ struct __voltage_cast<_FromVoltage, _ToVoltage, _Period, true, false>
 template <class _FromVoltage, class _ToVoltage, class _Period>
 struct __voltage_cast<_FromVoltage, _ToVoltage, _Period, false, true>
 {   
-    inline constexpr 
+    inline METRICCONSTEXPR
     _ToVoltage operator()(const _FromVoltage& __fd) const
     {   
         typedef typename std::common_type<typename _ToVoltage::rep, typename _FromVoltage::rep, intmax_t>::type _Ct;
@@ -102,7 +104,7 @@ struct __voltage_cast<_FromVoltage, _ToVoltage, _Period, false, true>
 template <class _FromVoltage, class _ToVoltage, class _Period>
 struct __voltage_cast<_FromVoltage, _ToVoltage, _Period, false, false>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     _ToVoltage operator()(const _FromVoltage& __fd) const
     {
         typedef typename std::common_type<typename _ToVoltage::rep, typename _FromVoltage::rep, intmax_t>::type _Ct;
@@ -115,7 +117,7 @@ struct __voltage_cast<_FromVoltage, _ToVoltage, _Period, false, false>
 
 template <class _ToVoltage, class _Rep, class _Period>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::enable_if
 <
     __is_voltage<_ToVoltage>::value,
@@ -131,9 +133,9 @@ template <class _Rep>
 struct voltage_values
 {
 public:
-    inline static constexpr _Rep zero() {return _Rep(0);}
-    inline static constexpr _Rep max()  {return std::numeric_limits<_Rep>::max();}
-    inline static constexpr _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
+    inline static METRICCONSTEXPR _Rep zero() {return _Rep(0);}
+    inline static METRICCONSTEXPR _Rep max()  {return std::numeric_limits<_Rep>::max();}
+    inline static METRICCONSTEXPR _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
 };
 
 
@@ -181,11 +183,11 @@ private:
     rep __rep_;
 public:
 
-    inline constexpr
+    inline METRICCONSTEXPR
     voltage() = default;
 
     template <class _Rep2>
-        inline constexpr
+        inline METRICCONSTEXPR
         explicit voltage(const _Rep2& __r,
             typename std::enable_if
             <
@@ -197,7 +199,7 @@ public:
 
     // conversions
     template <class _Rep2, class _Period2>
-        inline constexpr
+        inline METRICCONSTEXPR
         voltage(const voltage<_Rep2, _Period2>& __d,
             typename std::enable_if
             <
@@ -210,12 +212,12 @@ public:
 
     // observer
 
-    inline constexpr rep count() const {return __rep_;}
+    inline METRICCONSTEXPR rep count() const {return __rep_;}
 
     // arithmetic
 
-    inline constexpr voltage  operator+() const {return *this;}
-    inline constexpr voltage  operator-() const {return voltage(-__rep_);}
+    inline METRICCONSTEXPR voltage  operator+() const {return *this;}
+    inline METRICCONSTEXPR voltage  operator-() const {return voltage(-__rep_);}
     inline const voltage& operator++()      {++__rep_; return *this;}
     inline const voltage  operator++(int)   {return voltage(__rep_++);}
     inline const voltage& operator--()      {--__rep_; return *this;}
@@ -231,9 +233,9 @@ public:
 
     // special values
 
-    inline static constexpr voltage zero() {return voltage(voltage_values<rep>::zero());}
-    inline static constexpr voltage min()  {return voltage(voltage_values<rep>::min());}
-    inline static constexpr voltage max()  {return voltage(voltage_values<rep>::max());}
+    inline static METRICCONSTEXPR voltage zero() {return voltage(voltage_values<rep>::zero());}
+    inline static METRICCONSTEXPR voltage min()  {return voltage(voltage_values<rep>::min());}
+    inline static METRICCONSTEXPR voltage max()  {return voltage(voltage_values<rep>::max());}
 };
 
 
@@ -251,7 +253,7 @@ typedef voltage<long long, std::mega > megavolt;
 template <class _LhsVoltage, class _RhsVoltage>
 struct __voltage_eq
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsVoltage& __lhs, const _RhsVoltage& __rhs) const
         {
             typedef typename std::common_type<_LhsVoltage, _RhsVoltage>::type _Ct;
@@ -262,14 +264,14 @@ struct __voltage_eq
 template <class _LhsVoltage>
 struct __voltage_eq<_LhsVoltage, _LhsVoltage>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsVoltage& __lhs, const _LhsVoltage& __rhs) const
         {return __lhs.count() == __rhs.count();}
 };
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator==(const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>& __rhs)
 {
@@ -280,7 +282,7 @@ operator==(const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator!=(const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>& __rhs)
 {
@@ -292,7 +294,7 @@ operator!=(const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>
 template <class _LhsVoltage, class _RhsVoltage>
 struct __voltage_lt
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsVoltage& __lhs, const _RhsVoltage& __rhs) const
         {
             typedef typename std::common_type<_LhsVoltage, _RhsVoltage>::type _Ct;
@@ -303,14 +305,14 @@ struct __voltage_lt
 template <class _LhsVoltage>
 struct __voltage_lt<_LhsVoltage, _LhsVoltage>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsVoltage& __lhs, const _LhsVoltage& __rhs) const
         {return __lhs.count() < __rhs.count();}
 };
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator< (const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>& __rhs)
 {
@@ -321,7 +323,7 @@ operator< (const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator> (const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>& __rhs)
 {
@@ -332,7 +334,7 @@ operator> (const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator<=(const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>& __rhs)
 {
@@ -343,7 +345,7 @@ operator<=(const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator>=(const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>& __rhs)
 {
@@ -354,7 +356,7 @@ operator>=(const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<voltage<_Rep1, _Period1>, voltage<_Rep2, _Period2> >::type
 operator+(const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>& __rhs)
 {
@@ -366,7 +368,7 @@ operator+(const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>&
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<voltage<_Rep1, _Period1>, voltage<_Rep2, _Period2> >::type
 operator-(const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>& __rhs)
 {
@@ -378,7 +380,7 @@ operator-(const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>&
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::enable_if
 <
     std::is_convertible<_Rep2, typename std::common_type<_Rep1, _Rep2>::type>::value,
@@ -393,7 +395,7 @@ operator*(const voltage<_Rep1, _Period>& __d, const _Rep2& __s)
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::enable_if
 <
     std::is_convertible<_Rep1, typename std::common_type<_Rep1, _Rep2>::type>::value,
@@ -432,7 +434,7 @@ struct __voltage_divide_result<voltage<_Rep1, _Period>, _Rep2, false>
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename __voltage_divide_result<voltage<_Rep1, _Period>, _Rep2>::type
 operator/(const voltage<_Rep1, _Period>& __d, const _Rep2& __s)
 {
@@ -443,7 +445,7 @@ operator/(const voltage<_Rep1, _Period>& __d, const _Rep2& __s)
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<_Rep1, _Rep2>::type
 operator/(const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>& __rhs)
 {
@@ -455,7 +457,7 @@ operator/(const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>&
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename __voltage_divide_result<voltage<_Rep1, _Period>, _Rep2>::type
 operator%(const voltage<_Rep1, _Period>& __d, const _Rep2& __s)
 {
@@ -466,7 +468,7 @@ operator%(const voltage<_Rep1, _Period>& __d, const _Rep2& __s)
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<voltage<_Rep1, _Period1>, voltage<_Rep2, _Period2> >::type
 operator%(const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>& __rhs)
 {

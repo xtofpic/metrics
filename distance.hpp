@@ -15,6 +15,7 @@
 #ifndef METRICS_DISTANCE_HPP
 #define METRICS_DISTANCE_HPP
 
+#include "metric_config.hpp"
 
 namespace metric {
 
@@ -45,10 +46,11 @@ namespace std {
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 struct common_type< metric::distance<_Rep1, _Period1>,
-                    metric::distance<_Rep2, _Period2> >
+metric::distance<_Rep2, _Period2> >
 {
-	    typedef metric::distance<typename common_type<_Rep1, _Rep2>::type,
-	                         typename __ratio_gcd<_Period1, _Period2>::type> type;
+            typedef metric::distance<typename common_type<_Rep1, _Rep2>::type,
+                ratio< GCD<_Period1::num, _Period2::num>::value,
+                       LCM<_Period1::den, _Period2::den>::value> > type;
 };
 
 } // namespace std
@@ -68,7 +70,7 @@ struct __distance_cast;
 template <class _FromDistance, class _ToDistance, class _Period>
 struct __distance_cast<_FromDistance, _ToDistance, _Period, true, true>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     _ToDistance operator()(const _FromDistance& __fd) const
     {
         return _ToDistance(static_cast<typename _ToDistance::rep>(__fd.count()));
@@ -78,7 +80,7 @@ struct __distance_cast<_FromDistance, _ToDistance, _Period, true, true>
 template <class _FromDistance, class _ToDistance, class _Period>
 struct __distance_cast<_FromDistance, _ToDistance, _Period, true, false>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     _ToDistance operator()(const _FromDistance& __fd) const
     {
         typedef typename std::common_type<typename _ToDistance::rep, typename _FromDistance::rep, intmax_t>::type _Ct;
@@ -90,7 +92,7 @@ struct __distance_cast<_FromDistance, _ToDistance, _Period, true, false>
 template <class _FromDistance, class _ToDistance, class _Period>
 struct __distance_cast<_FromDistance, _ToDistance, _Period, false, true>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     _ToDistance operator()(const _FromDistance& __fd) const
     {
         typedef typename std::common_type<typename _ToDistance::rep, typename _FromDistance::rep, intmax_t>::type _Ct;
@@ -102,7 +104,7 @@ struct __distance_cast<_FromDistance, _ToDistance, _Period, false, true>
 template <class _FromDistance, class _ToDistance, class _Period>
 struct __distance_cast<_FromDistance, _ToDistance, _Period, false, false>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     _ToDistance operator()(const _FromDistance& __fd) const
     {
         typedef typename std::common_type<typename _ToDistance::rep, typename _FromDistance::rep, intmax_t>::type _Ct;
@@ -115,7 +117,7 @@ struct __distance_cast<_FromDistance, _ToDistance, _Period, false, false>
 
 template <class _ToDistance, class _Rep, class _Period>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::enable_if
 <
     __is_distance<_ToDistance>::value,
@@ -131,9 +133,9 @@ template <class _Rep>
 struct distance_values
 {
 public:
-    inline static constexpr _Rep zero() {return _Rep(0);}
-    inline static constexpr _Rep max()  {return std::numeric_limits<_Rep>::max();}
-    inline static constexpr _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
+    inline static METRICCONSTEXPR _Rep zero() {return _Rep(0);}
+    inline static METRICCONSTEXPR _Rep max()  {return std::numeric_limits<_Rep>::max();}
+    inline static METRICCONSTEXPR _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
 };
 
 
@@ -181,11 +183,11 @@ private:
     rep __rep_;
 public:
 
-    inline constexpr
+    inline METRICCONSTEXPR
     distance() = default;
 
     template <class _Rep2>
-        inline constexpr
+        inline METRICCONSTEXPR
         explicit distance(const _Rep2& __r,
             typename std::enable_if
             <
@@ -197,7 +199,7 @@ public:
 
     // conversions
     template <class _Rep2, class _Period2>
-        inline constexpr
+        inline METRICCONSTEXPR
         distance(const distance<_Rep2, _Period2>& __d,
             typename std::enable_if
             <
@@ -210,12 +212,12 @@ public:
 
     // observer
 
-    inline constexpr rep count() const {return __rep_;}
+    inline METRICCONSTEXPR rep count() const {return __rep_;}
 
     // arithmetic
 
-    inline constexpr distance  operator+() const {return *this;}
-    inline constexpr distance  operator-() const {return distance(-__rep_);}
+    inline METRICCONSTEXPR distance  operator+() const {return *this;}
+    inline METRICCONSTEXPR distance  operator-() const {return distance(-__rep_);}
     inline const distance& operator++()      {++__rep_; return *this;}
     inline const distance  operator++(int)   {return distance(__rep_++);}
     inline const distance& operator--()      {--__rep_; return *this;}
@@ -231,9 +233,9 @@ public:
 
     // special values
 
-    inline static constexpr distance zero() {return distance(distance_values<rep>::zero());}
-    inline static constexpr distance min()  {return distance(distance_values<rep>::min());}
-    inline static constexpr distance max()  {return distance(distance_values<rep>::max());}
+    inline static METRICCONSTEXPR distance zero() {return distance(distance_values<rep>::zero());}
+    inline static METRICCONSTEXPR distance min()  {return distance(distance_values<rep>::min());}
+    inline static METRICCONSTEXPR distance max()  {return distance(distance_values<rep>::max());}
 };
 
 
@@ -252,7 +254,7 @@ typedef distance<     long, std::mega > megametre;
 template <class _LhsDistance, class _RhsDistance>
 struct __distance_eq
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsDistance& __lhs, const _RhsDistance& __rhs) const
         {
             typedef typename std::common_type<_LhsDistance, _RhsDistance>::type _Ct;
@@ -263,14 +265,14 @@ struct __distance_eq
 template <class _LhsDistance>
 struct __distance_eq<_LhsDistance, _LhsDistance>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsDistance& __lhs, const _LhsDistance& __rhs) const
         {return __lhs.count() == __rhs.count();}
 };
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator==(const distance<_Rep1, _Period1>& __lhs, const distance<_Rep2, _Period2>& __rhs)
 {
@@ -281,7 +283,7 @@ operator==(const distance<_Rep1, _Period1>& __lhs, const distance<_Rep2, _Period
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator!=(const distance<_Rep1, _Period1>& __lhs, const distance<_Rep2, _Period2>& __rhs)
 {
@@ -293,7 +295,7 @@ operator!=(const distance<_Rep1, _Period1>& __lhs, const distance<_Rep2, _Period
 template <class _LhsDistance, class _RhsDistance>
 struct __distance_lt
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsDistance& __lhs, const _RhsDistance& __rhs) const
         {
             typedef typename std::common_type<_LhsDistance, _RhsDistance>::type _Ct;
@@ -304,14 +306,14 @@ struct __distance_lt
 template <class _LhsDistance>
 struct __distance_lt<_LhsDistance, _LhsDistance>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsDistance& __lhs, const _LhsDistance& __rhs) const
         {return __lhs.count() < __rhs.count();}
 };
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator< (const distance<_Rep1, _Period1>& __lhs, const distance<_Rep2, _Period2>& __rhs)
 {
@@ -322,7 +324,7 @@ operator< (const distance<_Rep1, _Period1>& __lhs, const distance<_Rep2, _Period
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator> (const distance<_Rep1, _Period1>& __lhs, const distance<_Rep2, _Period2>& __rhs)
 {
@@ -333,7 +335,7 @@ operator> (const distance<_Rep1, _Period1>& __lhs, const distance<_Rep2, _Period
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator<=(const distance<_Rep1, _Period1>& __lhs, const distance<_Rep2, _Period2>& __rhs)
 {
@@ -344,7 +346,7 @@ operator<=(const distance<_Rep1, _Period1>& __lhs, const distance<_Rep2, _Period
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator>=(const distance<_Rep1, _Period1>& __lhs, const distance<_Rep2, _Period2>& __rhs)
 {
@@ -355,7 +357,7 @@ operator>=(const distance<_Rep1, _Period1>& __lhs, const distance<_Rep2, _Period
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<distance<_Rep1, _Period1>, distance<_Rep2, _Period2> >::type
 operator+(const distance<_Rep1, _Period1>& __lhs, const distance<_Rep2, _Period2>& __rhs)
 {
@@ -367,7 +369,7 @@ operator+(const distance<_Rep1, _Period1>& __lhs, const distance<_Rep2, _Period2
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<distance<_Rep1, _Period1>, distance<_Rep2, _Period2> >::type
 operator-(const distance<_Rep1, _Period1>& __lhs, const distance<_Rep2, _Period2>& __rhs)
 {
@@ -379,7 +381,7 @@ operator-(const distance<_Rep1, _Period1>& __lhs, const distance<_Rep2, _Period2
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::enable_if
 <
     std::is_convertible<_Rep2, typename std::common_type<_Rep1, _Rep2>::type>::value,
@@ -394,7 +396,7 @@ operator*(const distance<_Rep1, _Period>& __d, const _Rep2& __s)
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::enable_if
 <
     std::is_convertible<_Rep1, typename std::common_type<_Rep1, _Rep2>::type>::value,
@@ -433,7 +435,7 @@ struct __distance_divide_result<distance<_Rep1, _Period>, _Rep2, false>
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename __distance_divide_result<distance<_Rep1, _Period>, _Rep2>::type
 operator/(const distance<_Rep1, _Period>& __d, const _Rep2& __s)
 {
@@ -444,7 +446,7 @@ operator/(const distance<_Rep1, _Period>& __d, const _Rep2& __s)
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<_Rep1, _Rep2>::type
 operator/(const distance<_Rep1, _Period1>& __lhs, const distance<_Rep2, _Period2>& __rhs)
 {
@@ -456,7 +458,7 @@ operator/(const distance<_Rep1, _Period1>& __lhs, const distance<_Rep2, _Period2
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename __distance_divide_result<distance<_Rep1, _Period>, _Rep2>::type
 operator%(const distance<_Rep1, _Period>& __d, const _Rep2& __s)
 {
@@ -467,7 +469,7 @@ operator%(const distance<_Rep1, _Period>& __d, const _Rep2& __s)
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<distance<_Rep1, _Period1>, distance<_Rep2, _Period2> >::type
 operator%(const distance<_Rep1, _Period1>& __lhs, const distance<_Rep2, _Period2>& __rhs)
 {

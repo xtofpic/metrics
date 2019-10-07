@@ -15,6 +15,7 @@
 #ifndef METRICS_POWER_HPP
 #define METRICS_POWER_HPP
 
+#include "metric_config.hpp"
 
 namespace metric {
 
@@ -45,10 +46,11 @@ namespace std {
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 struct common_type< metric::power<_Rep1, _Period1>,
-                    metric::power<_Rep2, _Period2> >
-{   
-	    typedef metric::power<typename common_type<_Rep1, _Rep2>::type,
-	                         typename __ratio_gcd<_Period1, _Period2>::type> type;
+metric::power<_Rep2, _Period2> >
+{
+            typedef metric::power<typename common_type<_Rep1, _Rep2>::type,
+                ratio< GCD<_Period1::num, _Period2::num>::value,
+                       LCM<_Period1::den, _Period2::den>::value> > type;
 };
 
 } // namespace std
@@ -68,7 +70,7 @@ struct __power_cast;
 template <class _FromPower, class _ToPower, class _Period>
 struct __power_cast<_FromPower, _ToPower, _Period, true, true>
 {   
-    inline constexpr 
+    inline METRICCONSTEXPR
     _ToPower operator()(const _FromPower& __fd) const
     {   
         return _ToPower(static_cast<typename _ToPower::rep>(__fd.count()));
@@ -78,7 +80,7 @@ struct __power_cast<_FromPower, _ToPower, _Period, true, true>
 template <class _FromPower, class _ToPower, class _Period>
 struct __power_cast<_FromPower, _ToPower, _Period, true, false>
 {   
-    inline constexpr 
+    inline METRICCONSTEXPR
     _ToPower operator()(const _FromPower& __fd) const
     {   
         typedef typename std::common_type<typename _ToPower::rep, typename _FromPower::rep, intmax_t>::type _Ct;
@@ -90,7 +92,7 @@ struct __power_cast<_FromPower, _ToPower, _Period, true, false>
 template <class _FromPower, class _ToPower, class _Period>
 struct __power_cast<_FromPower, _ToPower, _Period, false, true>
 {   
-    inline constexpr 
+    inline METRICCONSTEXPR
     _ToPower operator()(const _FromPower& __fd) const
     {   
         typedef typename std::common_type<typename _ToPower::rep, typename _FromPower::rep, intmax_t>::type _Ct;
@@ -102,7 +104,7 @@ struct __power_cast<_FromPower, _ToPower, _Period, false, true>
 template <class _FromPower, class _ToPower, class _Period>
 struct __power_cast<_FromPower, _ToPower, _Period, false, false>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     _ToPower operator()(const _FromPower& __fd) const
     {
         typedef typename std::common_type<typename _ToPower::rep, typename _FromPower::rep, intmax_t>::type _Ct;
@@ -115,7 +117,7 @@ struct __power_cast<_FromPower, _ToPower, _Period, false, false>
 
 template <class _ToPower, class _Rep, class _Period>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::enable_if
 <
     __is_power<_ToPower>::value,
@@ -131,9 +133,9 @@ template <class _Rep>
 struct power_values
 {
 public:
-    inline static constexpr _Rep zero() {return _Rep(0);}
-    inline static constexpr _Rep max()  {return std::numeric_limits<_Rep>::max();}
-    inline static constexpr _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
+    inline static METRICCONSTEXPR _Rep zero() {return _Rep(0);}
+    inline static METRICCONSTEXPR _Rep max()  {return std::numeric_limits<_Rep>::max();}
+    inline static METRICCONSTEXPR _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
 };
 
 
@@ -181,11 +183,11 @@ private:
     rep __rep_;
 public:
 
-    inline constexpr
+    inline METRICCONSTEXPR
     power() = default;
 
     template <class _Rep2>
-        inline constexpr
+        inline METRICCONSTEXPR
         explicit power(const _Rep2& __r,
             typename std::enable_if
             <
@@ -197,7 +199,7 @@ public:
 
     // conversions
     template <class _Rep2, class _Period2>
-        inline constexpr
+        inline METRICCONSTEXPR
         power(const power<_Rep2, _Period2>& __d,
             typename std::enable_if
             <
@@ -210,12 +212,12 @@ public:
 
     // observer
 
-    inline constexpr rep count() const {return __rep_;}
+    inline METRICCONSTEXPR rep count() const {return __rep_;}
 
     // arithmetic
 
-    inline constexpr power  operator+() const {return *this;}
-    inline constexpr power  operator-() const {return power(-__rep_);}
+    inline METRICCONSTEXPR power  operator+() const {return *this;}
+    inline METRICCONSTEXPR power  operator-() const {return power(-__rep_);}
     inline const power& operator++()      {++__rep_; return *this;}
     inline const power  operator++(int)   {return power(__rep_++);}
     inline const power& operator--()      {--__rep_; return *this;}
@@ -231,9 +233,9 @@ public:
 
     // special values
 
-    inline static constexpr power zero() {return power(power_values<rep>::zero());}
-    inline static constexpr power min()  {return power(power_values<rep>::min());}
-    inline static constexpr power max()  {return power(power_values<rep>::max());}
+    inline static METRICCONSTEXPR power zero() {return power(power_values<rep>::zero());}
+    inline static METRICCONSTEXPR power min()  {return power(power_values<rep>::min());}
+    inline static METRICCONSTEXPR power max()  {return power(power_values<rep>::max());}
 };
 
 
@@ -252,7 +254,7 @@ typedef power<long long, std::giga > gigawatt;
 template <class _LhsPower, class _RhsPower>
 struct __power_eq
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsPower& __lhs, const _RhsPower& __rhs) const
         {
             typedef typename std::common_type<_LhsPower, _RhsPower>::type _Ct;
@@ -263,14 +265,14 @@ struct __power_eq
 template <class _LhsPower>
 struct __power_eq<_LhsPower, _LhsPower>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsPower& __lhs, const _LhsPower& __rhs) const
         {return __lhs.count() == __rhs.count();}
 };
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator==(const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __rhs)
 {
@@ -281,7 +283,7 @@ operator==(const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator!=(const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __rhs)
 {
@@ -293,7 +295,7 @@ operator!=(const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __
 template <class _LhsPower, class _RhsPower>
 struct __power_lt
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsPower& __lhs, const _RhsPower& __rhs) const
         {
             typedef typename std::common_type<_LhsPower, _RhsPower>::type _Ct;
@@ -304,14 +306,14 @@ struct __power_lt
 template <class _LhsPower>
 struct __power_lt<_LhsPower, _LhsPower>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsPower& __lhs, const _LhsPower& __rhs) const
         {return __lhs.count() < __rhs.count();}
 };
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator< (const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __rhs)
 {
@@ -322,7 +324,7 @@ operator< (const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator> (const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __rhs)
 {
@@ -333,7 +335,7 @@ operator> (const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator<=(const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __rhs)
 {
@@ -344,7 +346,7 @@ operator<=(const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator>=(const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __rhs)
 {
@@ -355,7 +357,7 @@ operator>=(const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<power<_Rep1, _Period1>, power<_Rep2, _Period2> >::type
 operator+(const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __rhs)
 {
@@ -367,7 +369,7 @@ operator+(const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __r
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<power<_Rep1, _Period1>, power<_Rep2, _Period2> >::type
 operator-(const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __rhs)
 {
@@ -379,7 +381,7 @@ operator-(const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __r
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::enable_if
 <
     std::is_convertible<_Rep2, typename std::common_type<_Rep1, _Rep2>::type>::value,
@@ -394,7 +396,7 @@ operator*(const power<_Rep1, _Period>& __d, const _Rep2& __s)
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::enable_if
 <
     std::is_convertible<_Rep1, typename std::common_type<_Rep1, _Rep2>::type>::value,
@@ -433,7 +435,7 @@ struct __power_divide_result<power<_Rep1, _Period>, _Rep2, false>
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename __power_divide_result<power<_Rep1, _Period>, _Rep2>::type
 operator/(const power<_Rep1, _Period>& __d, const _Rep2& __s)
 {
@@ -444,7 +446,7 @@ operator/(const power<_Rep1, _Period>& __d, const _Rep2& __s)
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<_Rep1, _Rep2>::type
 operator/(const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __rhs)
 {
@@ -456,7 +458,7 @@ operator/(const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __r
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename __power_divide_result<power<_Rep1, _Period>, _Rep2>::type
 operator%(const power<_Rep1, _Period>& __d, const _Rep2& __s)
 {
@@ -467,7 +469,7 @@ operator%(const power<_Rep1, _Period>& __d, const _Rep2& __s)
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<power<_Rep1, _Period1>, power<_Rep2, _Period2> >::type
 operator%(const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __rhs)
 {

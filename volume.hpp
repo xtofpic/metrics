@@ -15,6 +15,7 @@
 #ifndef METRICS_VOLUME_HPP
 #define METRICS_VOLUME_HPP
 
+#include "metric_config.hpp"
 
 namespace metric {
 
@@ -45,10 +46,11 @@ namespace std {
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 struct common_type< metric::volume<_Rep1, _Period1>,
-                    metric::volume<_Rep2, _Period2> >
-{   
-	    typedef metric::volume<typename common_type<_Rep1, _Rep2>::type,
-	                         typename __ratio_gcd<_Period1, _Period2>::type> type;
+metric::volume<_Rep2, _Period2> >
+{
+            typedef metric::volume<typename common_type<_Rep1, _Rep2>::type,
+                ratio< GCD<_Period1::num, _Period2::num>::value,
+                       LCM<_Period1::den, _Period2::den>::value> > type;
 };
 
 } // namespace std
@@ -68,7 +70,7 @@ struct __volume_cast;
 template <class _FromVolume, class _ToVolume, class _Period>
 struct __volume_cast<_FromVolume, _ToVolume, _Period, true, true>
 {   
-    inline constexpr 
+    inline METRICCONSTEXPR
     _ToVolume operator()(const _FromVolume& __fd) const
     {   
         return _ToVolume(static_cast<typename _ToVolume::rep>(__fd.count()));
@@ -78,7 +80,7 @@ struct __volume_cast<_FromVolume, _ToVolume, _Period, true, true>
 template <class _FromVolume, class _ToVolume, class _Period>
 struct __volume_cast<_FromVolume, _ToVolume, _Period, true, false>
 {   
-    inline constexpr 
+    inline METRICCONSTEXPR
     _ToVolume operator()(const _FromVolume& __fd) const
     {   
         typedef typename std::common_type<typename _ToVolume::rep, typename _FromVolume::rep, intmax_t>::type _Ct;
@@ -90,7 +92,7 @@ struct __volume_cast<_FromVolume, _ToVolume, _Period, true, false>
 template <class _FromVolume, class _ToVolume, class _Period>
 struct __volume_cast<_FromVolume, _ToVolume, _Period, false, true>
 {   
-    inline constexpr 
+    inline METRICCONSTEXPR
     _ToVolume operator()(const _FromVolume& __fd) const
     {   
         typedef typename std::common_type<typename _ToVolume::rep, typename _FromVolume::rep, intmax_t>::type _Ct;
@@ -102,7 +104,7 @@ struct __volume_cast<_FromVolume, _ToVolume, _Period, false, true>
 template <class _FromVolume, class _ToVolume, class _Period>
 struct __volume_cast<_FromVolume, _ToVolume, _Period, false, false>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     _ToVolume operator()(const _FromVolume& __fd) const
     {
         typedef typename std::common_type<typename _ToVolume::rep, typename _FromVolume::rep, intmax_t>::type _Ct;
@@ -115,7 +117,7 @@ struct __volume_cast<_FromVolume, _ToVolume, _Period, false, false>
 
 template <class _ToVolume, class _Rep, class _Period>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::enable_if
 <
     __is_volume<_ToVolume>::value,
@@ -131,9 +133,9 @@ template <class _Rep>
 struct volume_values
 {
 public:
-    inline static constexpr _Rep zero() {return _Rep(0);}
-    inline static constexpr _Rep max()  {return std::numeric_limits<_Rep>::max();}
-    inline static constexpr _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
+    inline static METRICCONSTEXPR _Rep zero() {return _Rep(0);}
+    inline static METRICCONSTEXPR _Rep max()  {return std::numeric_limits<_Rep>::max();}
+    inline static METRICCONSTEXPR _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
 };
 
 
@@ -181,11 +183,11 @@ private:
     rep __rep_;
 public:
 
-    inline constexpr
+    inline METRICCONSTEXPR
     volume() = default;
 
     template <class _Rep2>
-        inline constexpr
+        inline METRICCONSTEXPR
         explicit volume(const _Rep2& __r,
             typename std::enable_if
             <
@@ -197,7 +199,7 @@ public:
 
     // conversions
     template <class _Rep2, class _Period2>
-        inline constexpr
+        inline METRICCONSTEXPR
         volume(const volume<_Rep2, _Period2>& __d,
             typename std::enable_if
             <
@@ -210,12 +212,12 @@ public:
 
     // observer
 
-    inline constexpr rep count() const {return __rep_;}
+    inline METRICCONSTEXPR rep count() const {return __rep_;}
 
     // arithmetic
 
-    inline constexpr volume  operator+() const {return *this;}
-    inline constexpr volume  operator-() const {return volume(-__rep_);}
+    inline METRICCONSTEXPR volume  operator+() const {return *this;}
+    inline METRICCONSTEXPR volume  operator-() const {return volume(-__rep_);}
     inline const volume& operator++()      {++__rep_; return *this;}
     inline const volume  operator++(int)   {return volume(__rep_++);}
     inline const volume& operator--()      {--__rep_; return *this;}
@@ -231,9 +233,9 @@ public:
 
     // special values
 
-    inline static constexpr volume zero() {return volume(volume_values<rep>::zero());}
-    inline static constexpr volume min()  {return volume(volume_values<rep>::min());}
-    inline static constexpr volume max()  {return volume(volume_values<rep>::max());}
+    inline static METRICCONSTEXPR volume zero() {return volume(volume_values<rep>::zero());}
+    inline static METRICCONSTEXPR volume min()  {return volume(volume_values<rep>::min());}
+    inline static METRICCONSTEXPR volume max()  {return volume(volume_values<rep>::max());}
 };
 
 
@@ -251,7 +253,7 @@ typedef volume<long long, std::mega > megalitre;
 template <class _LhsVolume, class _RhsVolume>
 struct __volume_eq
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsVolume& __lhs, const _RhsVolume& __rhs) const
         {
             typedef typename std::common_type<_LhsVolume, _RhsVolume>::type _Ct;
@@ -262,14 +264,14 @@ struct __volume_eq
 template <class _LhsVolume>
 struct __volume_eq<_LhsVolume, _LhsVolume>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsVolume& __lhs, const _LhsVolume& __rhs) const
         {return __lhs.count() == __rhs.count();}
 };
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator==(const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& __rhs)
 {
@@ -280,7 +282,7 @@ operator==(const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& 
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator!=(const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& __rhs)
 {
@@ -292,7 +294,7 @@ operator!=(const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& 
 template <class _LhsVolume, class _RhsVolume>
 struct __volume_lt
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsVolume& __lhs, const _RhsVolume& __rhs) const
         {
             typedef typename std::common_type<_LhsVolume, _RhsVolume>::type _Ct;
@@ -303,14 +305,14 @@ struct __volume_lt
 template <class _LhsVolume>
 struct __volume_lt<_LhsVolume, _LhsVolume>
 {
-    inline constexpr
+    inline METRICCONSTEXPR
     bool operator()(const _LhsVolume& __lhs, const _LhsVolume& __rhs) const
         {return __lhs.count() < __rhs.count();}
 };
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator< (const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& __rhs)
 {
@@ -321,7 +323,7 @@ operator< (const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& 
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator> (const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& __rhs)
 {
@@ -332,7 +334,7 @@ operator> (const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& 
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator<=(const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& __rhs)
 {
@@ -343,7 +345,7 @@ operator<=(const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& 
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 bool
 operator>=(const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& __rhs)
 {
@@ -354,7 +356,7 @@ operator>=(const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& 
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<volume<_Rep1, _Period1>, volume<_Rep2, _Period2> >::type
 operator+(const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& __rhs)
 {
@@ -366,7 +368,7 @@ operator+(const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& _
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<volume<_Rep1, _Period1>, volume<_Rep2, _Period2> >::type
 operator-(const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& __rhs)
 {
@@ -378,7 +380,7 @@ operator-(const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& _
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::enable_if
 <
     std::is_convertible<_Rep2, typename std::common_type<_Rep1, _Rep2>::type>::value,
@@ -393,7 +395,7 @@ operator*(const volume<_Rep1, _Period>& __d, const _Rep2& __s)
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::enable_if
 <
     std::is_convertible<_Rep1, typename std::common_type<_Rep1, _Rep2>::type>::value,
@@ -432,7 +434,7 @@ struct __volume_divide_result<volume<_Rep1, _Period>, _Rep2, false>
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename __volume_divide_result<volume<_Rep1, _Period>, _Rep2>::type
 operator/(const volume<_Rep1, _Period>& __d, const _Rep2& __s)
 {
@@ -443,7 +445,7 @@ operator/(const volume<_Rep1, _Period>& __d, const _Rep2& __s)
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<_Rep1, _Rep2>::type
 operator/(const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& __rhs)
 {
@@ -455,7 +457,7 @@ operator/(const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& _
 
 template <class _Rep1, class _Period, class _Rep2>
 inline
-constexpr
+METRICCONSTEXPR
 typename __volume_divide_result<volume<_Rep1, _Period>, _Rep2>::type
 operator%(const volume<_Rep1, _Period>& __d, const _Rep2& __s)
 {
@@ -466,7 +468,7 @@ operator%(const volume<_Rep1, _Period>& __d, const _Rep2& __s)
 
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
-constexpr
+METRICCONSTEXPR
 typename std::common_type<volume<_Rep1, _Period1>, volume<_Rep2, _Period2> >::type
 operator%(const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& __rhs)
 {
