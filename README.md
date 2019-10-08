@@ -9,7 +9,7 @@ C++ library to handle metric type and conversion
 Metrics library provides strongly typed types to make interfaces and API precise.
 It also provide implicit conversions on similar type.
 
-Actually, this library is used/tested on macosx/clang only.
+Actually, this library is used/tested on macosx/clang and visual studio only.
 
 
 ### Description
