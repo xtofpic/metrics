@@ -245,6 +245,15 @@ typedef frequency<long long, std::kilo > kilohertz;
 typedef frequency<long     , std::mega > megahertz;
 typedef frequency<long     , std::giga > gigahertz;
 
+namespace literals {
+
+constexpr millihertz operator ""_mHz(unsigned long long v)  { return millihertz(v); }
+constexpr      hertz operator ""_Hz(unsigned long long v)   { return hertz(v);      }
+constexpr  kilohertz operator ""_kHz(unsigned long long v)  { return kilohertz(v);  }
+constexpr  megahertz operator ""_MHz(unsigned long long v)  { return megahertz(v);  }
+constexpr  gigahertz operator ""_GHz(unsigned long long v)  { return gigahertz(v);  }
+
+} // namespace literals
 
 // Frequency ==
 

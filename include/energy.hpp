@@ -247,6 +247,18 @@ typedef energy<long long, std::ratio<   1000, 36000>> joule;
 typedef energy<long long, std::ratio<   1000,  8598>> calorie;
 
 
+namespace literals {
+
+constexpr microwatthour operator ""_uWh(unsigned long long v) { return microwatthour(v); }
+constexpr milliwatthour operator ""_mWh(unsigned long long v) { return milliwatthour(v); }
+constexpr      watthour operator ""_Wh(unsigned long long v)  { return      watthour(v); }
+constexpr  kilowatthour operator ""_kWh(unsigned long long v) { return  kilowatthour(v); }
+constexpr         joule operator ""_j(unsigned long long v)   { return         joule(v); }
+constexpr       calorie operator ""_c(unsigned long long v)   { return       calorie(v); }
+
+}
+
+
 // Energy ==
 
 template <class _LhsEnergy, class _RhsEnergy>

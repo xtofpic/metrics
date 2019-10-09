@@ -248,6 +248,18 @@ typedef power<long long, std::mega > megawatt;
 typedef power<long long, std::giga > gigawatt;
 
 
+namespace literals {
+
+constexpr  nanowatt operator ""_nW(unsigned long long v) { return   nanowatt(v); }
+constexpr microwatt operator ""_uW(unsigned long long v) { return  microwatt(v); }
+constexpr milliwatt operator ""_mW(unsigned long long v) { return  milliwatt(v); }
+constexpr      watt operator ""_W(unsigned long long v)  { return       watt(v); }
+constexpr  kilowatt operator ""_kW(unsigned long long v) { return   kilowatt(v); }
+constexpr  megawatt operator ""_MW(unsigned long long v) { return   megawatt(v); }
+constexpr  gigawatt operator ""_GW(unsigned long long v) { return   gigawatt(v); }
+
+} // namespace literals
+
 
 // Power ==
 

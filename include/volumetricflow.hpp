@@ -248,6 +248,18 @@ typedef volumetricflow<long long, std::ratio<   24,    1> > millilitre_hour;
 typedef volumetricflow<long long                          > millilitre_day;
 
 
+namespace literals {
+
+constexpr microlitre_second operator ""_ul_sec(unsigned long long v) { return microlitre_second(v); }
+constexpr microlitre_minute operator ""_ul_m(unsigned long long v)   { return microlitre_minute(v); }
+constexpr microlitre_hour   operator ""_ul_h(unsigned long long v)   { return microlitre_hour(v);   }
+constexpr millilitre_second operator ""_ml_sec(unsigned long long v) { return millilitre_second(v); }
+constexpr millilitre_minute operator ""_ml_m(unsigned long long v)   { return millilitre_minute(v); }
+constexpr millilitre_hour   operator ""_ml_h(unsigned long long v)   { return millilitre_hour(v);   }
+constexpr millilitre_day    operator ""_ml_d(unsigned long long v)   { return millilitre_day(v);    }
+
+} // namespace literals
+
 
 // VolumetricFlow ==
 

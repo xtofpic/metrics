@@ -247,6 +247,17 @@ typedef voltage<long long, std::kilo > kilovolt;
 typedef voltage<long long, std::mega > megavolt;
 
 
+namespace literals {
+
+constexpr  nanovolt operator ""_nV(unsigned long long v) { return  nanovolt(v); }
+constexpr microvolt operator ""_uV(unsigned long long v) { return microvolt(v); }
+constexpr millivolt operator ""_mV(unsigned long long v) { return millivolt(v); }
+constexpr      volt operator ""_V(unsigned long long v)  { return      volt(v); }
+constexpr  kilovolt operator ""_kV(unsigned long long v) { return  kilovolt(v); }
+constexpr  megavolt operator ""_MV(unsigned long long v) { return  megavolt(v); }
+
+} // namespace literals
+
 
 // Voltage ==
 

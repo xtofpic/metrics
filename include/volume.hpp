@@ -247,6 +247,17 @@ typedef volume<long long, std::kilo > kilolitre;
 typedef volume<long long, std::mega > megalitre;
 
 
+namespace literals {
+
+constexpr   nanolitre operator ""_nl(unsigned long long v) { return   nanolitre(v); }
+constexpr  microlitre operator ""_ul(unsigned long long v) { return  microlitre(v); }
+constexpr  millilitre operator ""_ml(unsigned long long v) { return  millilitre(v); }
+constexpr       litre operator ""_l(unsigned long long v)  { return       litre(v); }
+constexpr   kilolitre operator ""_kl(unsigned long long v) { return   kilolitre(v); }
+constexpr   megalitre operator ""_Ml(unsigned long long v) { return   megalitre(v); }
+
+} // namespace literals
+
 
 // Volume ==
 

@@ -253,6 +253,22 @@ typedef speed<long long, std::ratio<   24,       1> > metre_hour;
 typedef speed<long long, std::ratio<    1,       1> > metre_day;
 
 
+namespace literals {
+
+constexpr micrometre_second operator ""_um_sec(unsigned long long v) { return   micrometre_second(v); }
+constexpr micrometre_minute operator ""_um_m(unsigned long long v)   { return   micrometre_minute(v); }
+constexpr   micrometre_hour operator ""_um_h(unsigned long long v)   { return   micrometre_hour(v);   }
+constexpr millimetre_second operator ""_mm_sec(unsigned long long v) { return   millimetre_second(v); }
+constexpr millimetre_minute operator ""_mm_m(unsigned long long v)   { return   millimetre_minute(v); }
+constexpr   millimetre_hour operator ""_mm_h(unsigned long long v)   { return   millimetre_hour(v);   }
+constexpr    millimetre_day operator ""_mm_d(unsigned long long v)   { return   millimetre_day(v);    }
+constexpr      metre_second operator ""_m_sec(unsigned long long v)  { return   metre_second(v);      }
+constexpr      metre_minute operator ""_m_m(unsigned long long v)    { return   metre_minute(v);      }
+constexpr        metre_hour operator ""_m_h(unsigned long long v)    { return   metre_hour(v);        }
+constexpr         metre_day operator ""_m_d(unsigned long long v)    { return   metre_day(v);         }
+
+} // namespace literals
+
 
 // Speed ==
 

@@ -251,6 +251,21 @@ typedef pressure<long long, std::ratio<         1000, 1013250> > millibar;
 typedef pressure<long long, std::ratio<            1, 1013250> > microbar;
 
 
+namespace literals {
+
+constexpr millimetremercure operator ""_mmHg(unsigned long long v) { return   millimetremercure(v); }
+constexpr            pascal operator ""_Pa(unsigned long long v)   { return   pascal(v); }
+constexpr       hectopascal operator ""_hPa(unsigned long long v)  { return   hectopascal(v); }
+constexpr        kilopascal operator ""_kPa(unsigned long long v)  { return   kilopascal(v); }
+constexpr        megapascal operator ""_MPa(unsigned long long v)  { return   megapascal(v); }
+constexpr        gigapascal operator ""_GPa(unsigned long long v)  { return   gigapascal(v); }
+constexpr        terapascal operator ""_TPa(unsigned long long v)  { return   terapascal(v); }
+constexpr               bar operator ""_bar(unsigned long long v)  { return   bar(v); }
+constexpr          millibar operator ""_mbar(unsigned long long v) { return   millibar(v); }
+constexpr          microbar operator ""_ubar(unsigned long long v) { return   microbar(v); }
+
+} // namespace literals
+
 
 // Pressure ==
 

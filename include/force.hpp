@@ -245,7 +245,15 @@ typedef force<long long, std::deca                     > decanewton;
 typedef force<long long, std::ratio<980665, 100000000> > gramforce;
 typedef force<long long, std::ratio<980665,    100000> > kilogramforce;
 
+namespace literals {
 
+constexpr   millinewton operator ""_mN(unsigned long long v)  { return millinewton(v); }
+constexpr        newton operator ""_N(unsigned long long v)   { return newton(v); }
+constexpr    decanewton operator ""_dN(unsigned long long v)  { return decanewton(v); }
+constexpr     gramforce operator ""_gf(unsigned long long v)  { return gramforce(v); }
+constexpr kilogramforce operator ""_kgf(unsigned long long v) { return kilogramforce(v); }
+
+}
 
 // Force ==
 

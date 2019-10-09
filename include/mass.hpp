@@ -245,6 +245,17 @@ typedef mass<long long            > gram;
 typedef mass<     long, std::kilo > kilogram;
 typedef mass<     long, std::mega > ton;
 
+namespace literals {
+
+constexpr  nanogram operator ""_ng(unsigned long long v)  { return  nanogram(v); }
+constexpr microgram operator ""_ug(unsigned long long v)  { return microgram(v); }
+constexpr milligram operator ""_mg(unsigned long long v)  { return milligram(v); }
+constexpr      gram operator ""_g(unsigned long long v)   { return      gram(v); }
+constexpr  kilogram operator ""_kg(unsigned long long v)  { return  kilogram(v); }
+constexpr      ton  operator ""_ton(unsigned long long v) { return      ton(v);  }
+
+} // namespace literals
+
 
 // Mass ==
 
