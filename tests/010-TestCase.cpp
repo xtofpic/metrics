@@ -111,5 +111,7 @@ TEST_CASE( "Angular speed conversion (pass)", "[single-file]" )
 {
 	REQUIRE(metric::turn_second(1) == metric::turn_hour(3600));
 	REQUIRE(metric::degree_second(360) == metric::turn_hour(3600));
+	using namespace metric::literals;
+	REQUIRE(360_degsec == metric::turn_hour(3600));
 }
 
