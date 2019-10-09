@@ -246,6 +246,16 @@ typedef electriccurrent<long long            > ampere;
 typedef electriccurrent<     long, std::kilo > kiloampere;
 typedef electriccurrent<     long, std::mega > megaampere;
 
+namespace literals {
+
+constexpr nanoampere operator ""_nA(unsigned long long v) { return nanoampere(v); }
+constexpr microampere operator ""_uA(unsigned long long v) { return microampere(v); }
+constexpr milliampere operator ""_mA(unsigned long long v) { return milliampere(v); }
+constexpr ampere operator ""_A(unsigned long long v) { return ampere(v); }
+constexpr kiloampere operator ""_kA(unsigned long long v) { return kiloampere(v); }
+constexpr megaampere operator ""_MA(unsigned long long v) { return megaampere(v); }
+
+} // literals
 
 // ElectricCurrent ==
 

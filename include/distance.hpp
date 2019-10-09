@@ -247,7 +247,17 @@ typedef distance<long long            > metre;
 typedef distance<     long, std::kilo > kilometre;
 typedef distance<     long, std::mega > megametre;
 
+namespace literals {
 
+constexpr  nanometre operator ""_nm(unsigned long long v) { return  nanometre(v); }
+constexpr micrometre operator ""_um(unsigned long long v) { return micrometre(v); }
+constexpr millimetre operator ""_mm(unsigned long long v) { return millimetre(v); }
+constexpr centimetre operator ""_cm(unsigned long long v) { return centimetre(v); }
+constexpr      metre operator ""_m(unsigned long long v)  { return      metre(v); }
+constexpr  kilometre operator ""_km(unsigned long long v) { return  kilometre(v); }
+constexpr  megametre operator ""_Mm(unsigned long long v) { return  megametre(v); }
+
+} // namespace literals
 
 // Distance ==
 

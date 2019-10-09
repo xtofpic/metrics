@@ -238,10 +238,20 @@ public:
 };
 
 
-typedef angularspeed<long long, std::ratio<3600, 360> > degree_second;
+typedef angularspeed<long long, std::ratio<3600, 360> > degree_second;  // Not fan.
 typedef angularspeed<long long, std::ratio<3600,   1> > turn_second;
 typedef angularspeed<long long, std::ratio<  60,   1> > turn_minute;
 typedef angularspeed<long long                        > turn_hour;
+
+
+namespace literals {
+
+constexpr degree_second operator ""_degsec(unsigned long long v) { return degree_second(v); }
+constexpr   turn_second operator ""_rps(unsigned long long v)    { return turn_second(v); }
+constexpr   turn_minute operator ""_rpm(unsigned long long v)    { return turn_minute(v); }
+constexpr     turn_hour operator ""_rph(unsigned long long v)    { return turn_hour(v); }
+
+}
 
 
 
