@@ -1,0 +1,15 @@
+
+language: cpp
+
+before_script:
+  - export CXX=${COMPILER}
+  - cd ${TRAVIS_BUILD_DIR}
+  - cmake -H. -BBuild-Debug -DCMAKE_BUILD_TYPE=Debug -Wdev
+
+script:
+  - cd Build-Debug
+  - make -j 2
+
+
+
+
