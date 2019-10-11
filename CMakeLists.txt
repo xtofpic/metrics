@@ -12,13 +12,16 @@ project("Metrics"
 	HOMEPAGE_URL "https://github.com/xtofpic/metrics")
 
 
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/externals/cmake-codecov/cmake" ${CMAKE_MODULE_PATH})
+
+
 
 include(GNUInstallDirs)
 # include(CMakePackageConfigHelpers)
 include(CTest)
 
 
-option(CATCH_ENABLE_COVERAGE "Generate coverage for codecov.io" ON)
+# option(CATCH_ENABLE_COVERAGE "Generate coverage for codecov.io" ON)
 
 
 
@@ -35,6 +38,8 @@ target_include_directories(
 	INTERFACE	$<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}/include>
 			$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
+
+find_package(codecov)
 
 # set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 # target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_17)
@@ -75,4 +80,8 @@ install(
 
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include DESTINATION include)
+
+
+coverage_evaluate()
+
 
