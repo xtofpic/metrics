@@ -1,6 +1,8 @@
 # metrics
 C++ library to handle metric type and conversion
 
+[![Build Status](https://travis-ci.org/xtofpic/metrics.svg?branch=master)](https://travis-ci.org/xtofpic/metrics)
+
 
 ## Overview
 
