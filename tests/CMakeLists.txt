@@ -1,0 +1,11 @@
+
+include_directories (
+	${TEST_SOURCE_DIR}
+)
+
+
+add_executable (010-TestCase 010-TestCase.cpp)
+
+set_property(TARGET 010-TestCase PROPERTY CXX_STANDARD 17)
+
+
