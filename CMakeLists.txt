@@ -12,20 +12,13 @@ project("Metrics"
 	HOMEPAGE_URL "https://github.com/xtofpic/metrics")
 
 
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/externals/cmake-codecov/cmake" ${CMAKE_MODULE_PATH})
-
-
-
 include(GNUInstallDirs)
-# include(CMakePackageConfigHelpers)
+include(CMakePackageConfigHelpers)
 include(CTest)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-# option(CATCH_ENABLE_COVERAGE "Generate coverage for codecov.io" ON)
-
-
-
-# set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/externals/cmake-codecov/cmake" ${CMAKE_MODULE_PATH})
 
 
 add_library(${PROJECT_NAME} INTERFACE)
