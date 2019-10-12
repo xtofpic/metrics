@@ -7,9 +7,14 @@ before_install:
 before_script:
   - export CXX=${COMPILER}
   - cd ${TRAVIS_BUILD_DIR}
-  - cmake -H. -BBuild-Debug -DCMAKE_BUILD_TYPE=Debug -Wdev
+  - cmake -H. -BBuild-Debug -DCMAKE_BUILD_TYPE=Debug -Wdev -DENABLE_COVERAGE=On
 
 script:
   - cd Build-Debug
   - make -j 2
+  - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+      make gcov
+      make lcov
+      bash <(curl -s https://codecov.io/bash) -X gcov || echo "Codecov did not collect coverage reports"
+    fi
 
