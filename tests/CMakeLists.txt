@@ -3,6 +3,7 @@ include_directories (
 	${TEST_SOURCE_DIR}
 )
 
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/externals/cmake-codecov/cmake" ${CMAKE_MODULE_PATH})
 
 add_executable (010-TestCase 010-TestCase.cpp)
 
