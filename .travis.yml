@@ -1,6 +1,9 @@
 
 language: cpp
 
+before_install:
+  - git submodule update --init --recursive
+
 before_script:
   - export CXX=${COMPILER}
   - cd ${TRAVIS_BUILD_DIR}
@@ -9,7 +12,4 @@ before_script:
 script:
   - cd Build-Debug
   - make -j 2
-
-
-
 
