@@ -1,8 +1,29 @@
 
 language: cpp
 
+matrix:
+  include:
+    - os: linux
+      compiler: g++
+    - os: linux
+      compiler: clang
+    - os: osx
+      compiler: clang
+
+addons:
+  apt:
+    sources:
+      - kalakris-cmake
+  packages:
+    - cmake
+    - lcov
+
 before_install:
   - git submodule update --init --recursive
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+      brew upgrade cmake
+    fi
 
 before_script:
   - export CXX=${COMPILER}
@@ -12,8 +33,9 @@ before_script:
 script:
   - cd Build-Debug
   - make -j 2
+  - make test
   - |
-    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+    if [[ "${TRAVIS_OS_NAME}" == "linux" ]] && [[ "${COMPILER}" == "g++" ]]; then
       make gcov
       make lcov
       bash <(curl -s https://codecov.io/bash) -X gcov || echo "Codecov did not collect coverage reports"
