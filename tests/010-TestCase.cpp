@@ -33,6 +33,12 @@ TEST_CASE( "Distances conversion (pass)", "[single-file]" )
 	metric::kilometre _km14minus2(14);
 	_km14minus2 -= metric::kilometre(2);
 	REQUIRE(_km14minus2 == metric::nanometre(12000000000000));
+	REQUIRE(metric::yard(10000) == metric::metre(9144));
+	REQUIRE(metric::inch(100) == metric::centimetre(254));
+	REQUIRE(metric::inch(1) == metric::micrometre(25400));
+	REQUIRE(metric::nauticalmile(100) == metric::metre(185200));
+	REQUIRE(metric::nauticalmile(1) == metric::metre(1852));
+	REQUIRE(metric::foot(10000) == metric::metre(3048));
 }
 
 

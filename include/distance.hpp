@@ -239,23 +239,51 @@ public:
 };
 
 
-typedef distance<long long, std::nano > nanometre;
-typedef distance<long long, std::micro> micrometre;
-typedef distance<long long, std::milli> millimetre;
-typedef distance<long long, std::centi> centimetre;
-typedef distance<long long            > metre;
-typedef distance<     long, std::kilo > kilometre;
-typedef distance<     long, std::mega > megametre;
+// typedef distance<long long, metric::yocto> yoctometre;
+// typedef distance<long long, metric::zepto> zeptometre;
+typedef distance<long long,    std::atto > attometre;
+typedef distance<long long,    std::femto> femtometre;
+typedef distance<long long,    std::pico > picometre;
+typedef distance<long long,    std::nano > nanometre;
+typedef distance<long long,    std::micro> micrometre;
+typedef distance<long long,    std::milli> millimetre;
+typedef distance<long long,    std::centi> centimetre;
+typedef distance<long long               > metre;
+typedef distance<     long,    std::kilo > kilometre;
+typedef distance<     long,    std::mega > megametre;
+typedef distance<     long,    std::giga > gigametre;
+typedef distance<     long,    std::tera > terametre;
+typedef distance<     long,    std::peta > petametre;
+typedef distance<     long,    std::exa  > exametre;
+// typedef distance<     long, metric::zetta> zettametre;
+
+typedef distance<long long, std::ratio<9144LL, 10000LL>> yard;			// yd
+typedef distance<long long, std::ratio< 254LL, 10000LL>> inch;			// in
+typedef distance<long long, std::ratio<1852LL,     1LL>> nauticalmile;	// nmi
+typedef distance<long long, std::ratio<3048LL, 10000LL>> foot;			// ft
+
+
 
 namespace literals {
 
-constexpr  nanometre operator ""_nm(unsigned long long v) { return  nanometre(v); }
-constexpr micrometre operator ""_um(unsigned long long v) { return micrometre(v); }
-constexpr millimetre operator ""_mm(unsigned long long v) { return millimetre(v); }
-constexpr centimetre operator ""_cm(unsigned long long v) { return centimetre(v); }
-constexpr      metre operator ""_m(unsigned long long v)  { return      metre(v); }
-constexpr  kilometre operator ""_km(unsigned long long v) { return  kilometre(v); }
-constexpr  megametre operator ""_Mm(unsigned long long v) { return  megametre(v); }
+constexpr    attometre operator ""_am(unsigned long long v)  { return    attometre(v); }
+constexpr   femtometre operator ""_fm(unsigned long long v)  { return   femtometre(v); }
+constexpr    picometre operator ""_pm(unsigned long long v)  { return    picometre(v); }
+constexpr    nanometre operator ""_nm(unsigned long long v)  { return    nanometre(v); }
+constexpr   micrometre operator ""_um(unsigned long long v)  { return   micrometre(v); }
+constexpr   millimetre operator ""_mm(unsigned long long v)  { return   millimetre(v); }
+constexpr   centimetre operator ""_cm(unsigned long long v)  { return   centimetre(v); }
+constexpr        metre operator ""_m( unsigned long long v)  { return        metre(v); }
+constexpr    kilometre operator ""_km(unsigned long long v)  { return    kilometre(v); }
+constexpr    megametre operator ""_Mm(unsigned long long v)  { return    megametre(v); }
+constexpr    gigametre operator ""_Gm(unsigned long long v)  { return    gigametre(v); }
+constexpr    terametre operator ""_Tm(unsigned long long v)  { return    terametre(v); }
+constexpr    petametre operator ""_Pm(unsigned long long v)  { return    petametre(v); }
+constexpr     exametre operator ""_Em(unsigned long long v)  { return     exametre(v); }
+constexpr         yard operator ""_yd(unsigned long long v)  { return         yard(v); }
+constexpr         inch operator ""_in(unsigned long long v)  { return         inch(v); }
+constexpr nauticalmile operator ""_nmi(unsigned long long v) { return nauticalmile(v); }
+constexpr         foot operator ""_ft(unsigned long long v)  { return         foot(v); }
 
 } // namespace literals
 
