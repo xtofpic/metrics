@@ -38,10 +38,10 @@ This library provide types and conversion for the following metrics:
 | | terametre | tera | _Tm
 | | petametre | peta | _Pm
 | | exametre | exa | _Em
-| | yard | 9144/10000 | yd
-| | inch | 254/10000 | in
-| | nauticalmile | 1852/1 | nmi
-| | foot | 3048/10000 | ft
+| | yard | 9144/10000 | _yd
+| | inch | 254/10000 | _in
+| | nauticalmile | 1852/1 | _nmi
+| | foot | 3048/10000 | _ft
 
 
 
