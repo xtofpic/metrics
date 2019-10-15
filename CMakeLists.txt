@@ -7,9 +7,7 @@ endif ()
 
 
 project("Metrics"
-	VERSION 0.0.1
-	DESCRIPTION "A header only c++ library that manage metrics type"
-	HOMEPAGE_URL "https://github.com/xtofpic/metrics")
+	VERSION 0.0.1)
 
 
 include(GNUInstallDirs)
