@@ -16,10 +16,6 @@ addons:
 
 before_install:
   - git submodule update --init --recursive
-  - |
-    if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-      brew upgrade cmake
-    fi
 
 before_script:
   - export CXX=${COMPILER}
