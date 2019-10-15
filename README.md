@@ -12,27 +12,40 @@ C++ library to handle metric type and conversion
 Metrics library provides strongly typed types to make interfaces and API precise.
 It also provide implicit conversions on similar type.
 
-Actually, this library is used/tested on macosx/clang and visual studio only.
-
 
 ### Description
 
 This library provide types and conversion for the following metrics:
 
-**angularspeed:**
-* degree / second
-* turn / second
-* turn / minute
-* turn / hour
 
-**distance:**
-* nanometre
-* micrometre
-* millimetre
-* centimetre
-* metre
-* kilometre
-* megametre
+| | | ratio| literal   
+|-|-|-|- 
+| **angularspeed** | degree / second | 3600/360 | _degsec  
+| | turn / second | 3600/1 | _rps  
+| | turn / minute | 60/1 | _rpm  
+| | turn / hour | 1/1 | _rph  
+| **distance** | attometre | atto | _am
+| | femtometre | femto | _fm
+| | picometre | pico | _pm
+| | nanometre | nano | _nm
+| | micrometre | micro | _um
+| | millimetre | milli | _mm
+| | centimetre | centi | _cm
+| | metre | 1/1 | _m
+| | kilometre | kilo | _km
+| | megametre | mega | _Mm
+| | gigametre | giga | _Gm
+| | terametre | tera | _Tm
+| | petametre | peta | _Pm
+| | exametre | exa | _Em
+| | yard | 9144/10000 | yd
+| | inch | 254/10000 | in
+| | nauticalmile | 1852/1 | nmi
+| | foot | 3048/10000 | ft
+
+
+
+
 
 **electric current:**
 * nanoampere
