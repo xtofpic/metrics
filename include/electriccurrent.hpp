@@ -239,6 +239,8 @@ public:
 };
 
 
+typedef electriccurrent<long long, std::femto> femtoampere;
+typedef electriccurrent<long long, std::pico > picoampere;
 typedef electriccurrent<long long, std::nano > nanoampere;
 typedef electriccurrent<long long, std::micro> microampere;
 typedef electriccurrent<long long, std::milli> milliampere;
@@ -248,12 +250,14 @@ typedef electriccurrent<     long, std::mega > megaampere;
 
 namespace literals {
 
-constexpr nanoampere operator ""_nA(unsigned long long v) { return nanoampere(v); }
+constexpr femtoampere operator ""_fA(unsigned long long v) { return femtoampere(v); }
+constexpr picoampere  operator ""_pA(unsigned long long v) { return picoampere(v);  }
+constexpr nanoampere  operator ""_nA(unsigned long long v) { return nanoampere(v);  }
 constexpr microampere operator ""_uA(unsigned long long v) { return microampere(v); }
 constexpr milliampere operator ""_mA(unsigned long long v) { return milliampere(v); }
-constexpr ampere operator ""_A(unsigned long long v) { return ampere(v); }
-constexpr kiloampere operator ""_kA(unsigned long long v) { return kiloampere(v); }
-constexpr megaampere operator ""_MA(unsigned long long v) { return megaampere(v); }
+constexpr ampere      operator ""_A( unsigned long long v) { return ampere(v);      }
+constexpr kiloampere  operator ""_kA(unsigned long long v) { return kiloampere(v);  }
+constexpr megaampere  operator ""_MA(unsigned long long v) { return megaampere(v);  }
 
 } // literals
 

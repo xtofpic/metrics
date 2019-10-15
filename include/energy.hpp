@@ -239,22 +239,30 @@ public:
 };
 
 
-typedef energy<long long, std::ratio<      1, 10000>> microwatthour;
-typedef energy<long long, std::ratio<      1,    10>> milliwatthour;
-typedef energy<long long, std::ratio<   1000,    10>> watthour;
-typedef energy<long long, std::ratio<1000000,    10>> kilowatthour;
-typedef energy<long long, std::ratio<   1000, 36000>> joule;
-typedef energy<long long, std::ratio<   1000,  8598>> calorie;
+typedef energy<long long, std::ratio<                  1LL, 10000LL>> microwatthour;
+typedef energy<long long, std::ratio<                  1LL,    10LL>> milliwatthour;
+typedef energy<long long, std::ratio<               1000LL,    10LL>> watthour;
+typedef energy<long long, std::ratio<            1000000LL,    10LL>> kilowatthour;
+typedef energy<long long, std::ratio<         1000000000LL,    10LL>> megawatthour;
+typedef energy<long long, std::ratio<      1000000000000LL,    10LL>> gigawatthour;
+typedef energy<long long, std::ratio<   1000000000000000LL,    10LL>> terawatthour;
+typedef energy<long long, std::ratio<1000000000000000000LL,    10LL>> petawatthour;
+typedef energy<long long, std::ratio<               1000LL, 36000LL>> joule;
+typedef energy<long long, std::ratio<               1000LL,  8598LL>> calorie;
 
 
 namespace literals {
 
 constexpr microwatthour operator ""_uWh(unsigned long long v) { return microwatthour(v); }
 constexpr milliwatthour operator ""_mWh(unsigned long long v) { return milliwatthour(v); }
-constexpr      watthour operator ""_Wh(unsigned long long v)  { return      watthour(v); }
+constexpr      watthour operator ""_Wh( unsigned long long v) { return      watthour(v); }
 constexpr  kilowatthour operator ""_kWh(unsigned long long v) { return  kilowatthour(v); }
-constexpr         joule operator ""_j(unsigned long long v)   { return         joule(v); }
-constexpr       calorie operator ""_c(unsigned long long v)   { return       calorie(v); }
+constexpr  megawatthour operator ""_MWh(unsigned long long v) { return  megawatthour(v); }
+constexpr  gigawatthour operator ""_GWh(unsigned long long v) { return  gigawatthour(v); }
+constexpr  terawatthour operator ""_TWh(unsigned long long v) { return  terawatthour(v); }
+constexpr  petawatthour operator ""_PWh(unsigned long long v) { return  petawatthour(v); }
+constexpr         joule operator ""_j(  unsigned long long v) { return         joule(v); }
+constexpr       calorie operator ""_c(  unsigned long long v) { return       calorie(v); }
 
 }
 

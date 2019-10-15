@@ -238,9 +238,10 @@ public:
 };
 
 
-typedef angularspeed<long long, std::ratio<3600, 360> > degree_second;  // Not fan.
-typedef angularspeed<long long, std::ratio<3600,   1> > turn_second;
-typedef angularspeed<long long, std::ratio<  60,   1> > turn_minute;
+// typedef angularspeed<long long, std::ratio<3600, 360> > degree_second;  // Not fan.
+typedef angularspeed<long long, std::ratio<  10, 1> > degree_second;  // Not fan.
+typedef angularspeed<long long, std::ratio<3600, 1> > turn_second;
+typedef angularspeed<long long, std::ratio<  60, 1> > turn_minute;
 typedef angularspeed<long long                        > turn_hour;
 
 
