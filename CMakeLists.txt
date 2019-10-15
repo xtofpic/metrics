@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.10)
 
 
 if (POLICY CMP0025)
@@ -7,8 +7,7 @@ endif ()
 
 
 project("Metrics"
-	VERSION 0.0.1
-	HOMEPAGE_URL "https://github.com/xtofpic/metrics")
+	VERSION 0.0.1)
 
 
 include(GNUInstallDirs)
