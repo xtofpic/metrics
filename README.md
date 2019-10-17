@@ -147,6 +147,7 @@ The Metrics library is a header's only library. Just copy the necessary metrics 
 ### Examples
 
 
+An example of strongly typed signature.
 ```c++
 #include <iostream>
 #include <mass.hpp>
@@ -171,6 +172,30 @@ int main()
 }
 ```
 
+An example of unit conversion
+```c++
+#include <iostream>
+#include <mass.hpp>
 
+using namespace metric::literals;
+
+template<uint8_t Temperature>
+struct waterDensity
+{
+        static constexpr double value = 1 + (static_cast<double>(Temperature) / 1000000); // TODO: Find and write real formula here.
+};
+
+template<typename Density, typename MassType, typename MassRatio>
+metric::volume<double, MassRatio> operator* (const metric::mass<MassType, MassRatio>& m, Density d)
+{
+        return metric::volume<double, MassRatio>(m.count() * Density::value);
+}
+
+int main()
+{
+        std::cout << "10kg of water at 25°C = " << metric::volume_cast<metric::millilitre>(10_kg * waterDensity<25>()).count() << " millilitre" << std::endl;
+	return 0;
+}
+```
 
 
