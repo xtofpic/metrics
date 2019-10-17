@@ -184,13 +184,13 @@ struct waterDensity
 {
 	static constexpr double temp = static_cast<double>(Temperature);
 	// (Air saturated) Formula source: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4909168/
-	static constexpr double value = (999.84847 + (6.337563 * 0.01) * temp + (-8.523829 * 0.001) * temp * temp + (6.943248 * 0.00001) * temp * temp * temp + (-3.821216 * 0.0000001) * temp * temp * temp * temp) / 1000;
+	static constexpr double value = 999.84847 + (6.337563 * 0.01) * temp + (-8.523829 * 0.001) * temp * temp + (6.943248 * 0.00001) * temp * temp * temp + (-3.821216 * 0.0000001) * temp * temp * temp * temp;
 };
 
 template<typename Density, typename MassType, typename MassRatio>
 metric::volume<double, MassRatio> operator* (const metric::mass<MassType, MassRatio>& m, Density d)
 {
-        return metric::volume<double, MassRatio>(m.count() * Density::value);
+        return metric::volume<double, MassRatio>(m.count() / Density::value);
 }
 
 int main()
