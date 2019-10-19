@@ -10,6 +10,10 @@ matrix:
     - os: osx
       compiler: clang
 
+install:
+    - pip install --user conan
+    - conan user
+
 addons:
   apt:
     sources:
@@ -28,7 +32,7 @@ before_script:
   - cd Debug
   - conan install ..
   - cd ..
-  - cmake -BDebug -DCMAKE_BUILD_TYPE=Debug -Wdev -DENABLE_COVERAGE=On
+  - cmake -H. -BDebug -DCMAKE_BUILD_TYPE=Debug -Wdev -DENABLE_COVERAGE=On
 
 script:
   - cd Debug
