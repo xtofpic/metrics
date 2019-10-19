@@ -11,8 +11,13 @@ matrix:
       compiler: clang
 
 install:
-    - pip install --user conan
-    - conan user
+    - |
+      if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+        pip install --user conan
+        conan user
+      else
+        brew install conan
+      fi
 
 addons:
   apt:
