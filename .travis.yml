@@ -24,10 +24,14 @@ before_install:
 before_script:
   - export CXX=${COMPILER}
   - cd ${TRAVIS_BUILD_DIR}
-  - cmake -H. -BBuild-Debug -DCMAKE_BUILD_TYPE=Debug -Wdev -DENABLE_COVERAGE=On
+  - mkdir Debug
+  - cd Debug
+  - conan install ..
+  - cd ..
+  - cmake -BDebug -DCMAKE_BUILD_TYPE=Debug -Wdev -DENABLE_COVERAGE=On
 
 script:
-  - cd Build-Debug
+  - cd Debug
   - make -j 2
   - make test
   - |

@@ -32,6 +32,14 @@ target_include_directories(
 
 find_package(codecov)
 
+
+
+add_definitions("-std=c++11")
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup()
+
+
+
 # set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 # target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_17)
 
