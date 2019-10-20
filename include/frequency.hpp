@@ -113,17 +113,6 @@ frequency_cast(const frequency<_Rep, _Period>& __fd)
     return __frequency_cast<frequency<_Rep, _Period>, _ToFrequency>()(__fd);
 }
 
-
-template <class _Rep>
-struct frequency_values
-{
-public:
-    inline static METRICCONSTEXPR _Rep zero() {return _Rep(0);}
-    inline static METRICCONSTEXPR _Rep max()  {return std::numeric_limits<_Rep>::max();}
-    inline static METRICCONSTEXPR _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
-};
-
-
 template <class _Rep, class _Period>
 class frequency
 {
@@ -218,9 +207,9 @@ public:
 
     // special values
 
-    inline static METRICCONSTEXPR frequency zero() {return frequency(frequency_values<rep>::zero());}
-    inline static METRICCONSTEXPR frequency min()  {return frequency(frequency_values<rep>::min());}
-    inline static METRICCONSTEXPR frequency max()  {return frequency(frequency_values<rep>::max());}
+    inline static METRICCONSTEXPR frequency zero() {return frequency(limits_values<rep>::zero());}
+    inline static METRICCONSTEXPR frequency min()  {return frequency(limits_values<rep>::min());}
+    inline static METRICCONSTEXPR frequency max()  {return frequency(limits_values<rep>::max());}
 };
 
 

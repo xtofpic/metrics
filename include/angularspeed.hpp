@@ -112,17 +112,6 @@ angularspeed_cast(const angularspeed<_Rep, _Period>& __fd)
     return __angularspeed_cast<angularspeed<_Rep, _Period>, _ToAngularSpeed>()(__fd);
 }
 
-
-template <class _Rep>
-struct angularspeed_values
-{
-public:
-    inline static METRICCONSTEXPR _Rep zero() {return _Rep(0);}
-    inline static METRICCONSTEXPR _Rep max()  {return std::numeric_limits<_Rep>::max();}
-    inline static METRICCONSTEXPR _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
-};
-
-
 template <class _Rep, class _Period>
 class angularspeed
 {
@@ -217,9 +206,9 @@ public:
 
     // special values
 
-    inline static METRICCONSTEXPR angularspeed zero() {return angularspeed(angularspeed_values<rep>::zero());}
-    inline static METRICCONSTEXPR angularspeed min()  {return angularspeed(angularspeed_values<rep>::min());}
-    inline static METRICCONSTEXPR angularspeed max()  {return angularspeed(angularspeed_values<rep>::max());}
+    inline static METRICCONSTEXPR angularspeed zero() {return angularspeed(limits_values<rep>::zero());}
+    inline static METRICCONSTEXPR angularspeed min()  {return angularspeed(limits_values<rep>::min());}
+    inline static METRICCONSTEXPR angularspeed max()  {return angularspeed(limits_values<rep>::max());}
 };
 
 

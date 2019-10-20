@@ -113,17 +113,6 @@ mass_cast(const mass<_Rep, _Period>& __fd)
     return __mass_cast<mass<_Rep, _Period>, _ToMass>()(__fd);
 }
 
-
-template <class _Rep>
-struct mass_values
-{
-public:
-    inline static METRICCONSTEXPR _Rep zero() {return _Rep(0);}
-    inline static METRICCONSTEXPR _Rep max()  {return std::numeric_limits<_Rep>::max();}
-    inline static METRICCONSTEXPR _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
-};
-
-
 template <class _Rep, class _Period>
 class mass
 {
@@ -218,9 +207,9 @@ public:
 
     // special values
 
-    inline static METRICCONSTEXPR mass zero() {return mass(mass_values<rep>::zero());}
-    inline static METRICCONSTEXPR mass min()  {return mass(mass_values<rep>::min());}
-    inline static METRICCONSTEXPR mass max()  {return mass(mass_values<rep>::max());}
+    inline static METRICCONSTEXPR mass zero() {return mass(limits_values<rep>::zero());}
+    inline static METRICCONSTEXPR mass min()  {return mass(limits_values<rep>::min());}
+    inline static METRICCONSTEXPR mass max()  {return mass(limits_values<rep>::max());}
 };
 
 typedef mass<long long, std::nano > nanogram;

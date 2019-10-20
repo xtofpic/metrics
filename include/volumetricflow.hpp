@@ -29,6 +29,35 @@ template <typename A> struct __is_volumetricflow: __is_specialization<A, volumet
 
 namespace std {
 
+/*
+template<typename _Type,
+    template <typename...> class _Template>
+struct __is_specialization
+    : std::false_type
+{};
+
+template<template <typename...> class _Template,
+    typename... _Types>
+    struct __is_specialization<_Template<_Types...>, _Template>
+    : std::true_type
+{};
+*/
+
+
+
+
+template <template <typename...> class _Master, class _Rep1, class _Period1, class _Rep2, class _Period2>
+struct common_type< _Master<_Rep1, _Period1>,
+                    _Master<_Rep2, _Period2> >
+{
+            typedef _Master<typename common_type<_Rep1, _Rep2>::type,
+                ratio< GCD<_Period1::num, _Period2::num>::value,
+                       LCM<_Period1::den, _Period2::den>::value> > type;
+};
+
+
+
+/*
 template <class _Rep1, class _Period1, class _Rep2, class _Period2>
 struct common_type< metric::volumetricflow<_Rep1, _Period1>,
                     metric::volumetricflow<_Rep2, _Period2> >
@@ -36,7 +65,7 @@ struct common_type< metric::volumetricflow<_Rep1, _Period1>,
             typedef metric::volumetricflow<typename common_type<_Rep1, _Rep2>::type,
                 ratio< GCD<_Period1::num, _Period2::num>::value,
                        LCM<_Period1::den, _Period2::den>::value> > type;
-};
+}; */
 
 } // namespace std
 
@@ -112,17 +141,6 @@ volumetricflow_cast(const volumetricflow<_Rep, _Period>& __fd)
 {
     return __volumetricflow_cast<volumetricflow<_Rep, _Period>, _ToVolumetricFlow>()(__fd);
 }
-
-
-template <class _Rep>
-struct volumetricflow_values
-{
-public:
-    inline static METRICCONSTEXPR _Rep zero() {return _Rep(0);}
-    inline static METRICCONSTEXPR _Rep max()  {return std::numeric_limits<_Rep>::max();}
-    inline static METRICCONSTEXPR _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
-};
-
 
 template <class _Rep, class _Period>
 class volumetricflow
@@ -218,9 +236,9 @@ public:
 
     // special values
 
-    inline static METRICCONSTEXPR volumetricflow zero() {return volumetricflow(volumetricflow_values<rep>::zero());}
-    inline static METRICCONSTEXPR volumetricflow min()  {return volumetricflow(volumetricflow_values<rep>::min());}
-    inline static METRICCONSTEXPR volumetricflow max()  {return volumetricflow(volumetricflow_values<rep>::max());}
+    inline static METRICCONSTEXPR volumetricflow zero() {return volumetricflow(limits_values<rep>::zero());}
+    inline static METRICCONSTEXPR volumetricflow min()  {return volumetricflow(limits_values<rep>::min());}
+    inline static METRICCONSTEXPR volumetricflow max()  {return volumetricflow(limits_values<rep>::max());}
 };
 
 

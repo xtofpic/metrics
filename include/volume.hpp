@@ -113,17 +113,6 @@ volume_cast(const volume<_Rep, _Period>& __fd)
     return __volume_cast<volume<_Rep, _Period>, _ToVolume>()(__fd);
 }
 
-
-template <class _Rep>
-struct volume_values
-{
-public:
-    inline static METRICCONSTEXPR _Rep zero() {return _Rep(0);}
-    inline static METRICCONSTEXPR _Rep max()  {return std::numeric_limits<_Rep>::max();}
-    inline static METRICCONSTEXPR _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
-};
-
-
 template <class _Rep, class _Period>
 class volume
 {
@@ -218,9 +207,9 @@ public:
 
     // special values
 
-    inline static METRICCONSTEXPR volume zero() {return volume(volume_values<rep>::zero());}
-    inline static METRICCONSTEXPR volume min()  {return volume(volume_values<rep>::min());}
-    inline static METRICCONSTEXPR volume max()  {return volume(volume_values<rep>::max());}
+    inline static METRICCONSTEXPR volume zero() {return volume(limits_values<rep>::zero());}
+    inline static METRICCONSTEXPR volume min()  {return volume(limits_values<rep>::min());}
+    inline static METRICCONSTEXPR volume max()  {return volume(limits_values<rep>::max());}
 };
 
 

@@ -113,17 +113,6 @@ force_cast(const force<_Rep, _Period>& __fd)
     return __force_cast<force<_Rep, _Period>, _ToForce>()(__fd);
 }
 
-
-template <class _Rep>
-struct force_values
-{
-public:
-    inline static METRICCONSTEXPR _Rep zero() {return _Rep(0);}
-    inline static METRICCONSTEXPR _Rep max()  {return std::numeric_limits<_Rep>::max();}
-    inline static METRICCONSTEXPR _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
-};
-
-
 template <class _Rep, class _Period>
 class force
 {
@@ -218,9 +207,9 @@ public:
 
     // special values
 
-    inline static METRICCONSTEXPR force zero() {return force(force_values<rep>::zero());}
-    inline static METRICCONSTEXPR force min()  {return force(force_values<rep>::min());}
-    inline static METRICCONSTEXPR force max()  {return force(force_values<rep>::max());}
+    inline static METRICCONSTEXPR force zero() {return force(limits_values<rep>::zero());}
+    inline static METRICCONSTEXPR force min()  {return force(limits_values<rep>::min());}
+    inline static METRICCONSTEXPR force max()  {return force(limits_values<rep>::max());}
 };
 
 

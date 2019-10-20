@@ -113,17 +113,6 @@ pressure_cast(const pressure<_Rep, _Period>& __fd)
     return __pressure_cast<pressure<_Rep, _Period>, _ToPressure>()(__fd);
 }
 
-
-template <class _Rep>
-struct pressure_values
-{
-public:
-    inline static METRICCONSTEXPR _Rep zero() {return _Rep(0);}
-    inline static METRICCONSTEXPR _Rep max()  {return std::numeric_limits<_Rep>::max();}
-    inline static METRICCONSTEXPR _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
-};
-
-
 template <class _Rep, class _Period>
 class pressure
 {
@@ -218,9 +207,9 @@ public:
 
     // special values
 
-    inline static METRICCONSTEXPR pressure zero() {return pressure(pressure_values<rep>::zero());}
-    inline static METRICCONSTEXPR pressure min()  {return pressure(pressure_values<rep>::min());}
-    inline static METRICCONSTEXPR pressure max()  {return pressure(pressure_values<rep>::max());}
+    inline static METRICCONSTEXPR pressure zero() {return pressure(limits_values<rep>::zero());}
+    inline static METRICCONSTEXPR pressure min()  {return pressure(limits_values<rep>::min());}
+    inline static METRICCONSTEXPR pressure max()  {return pressure(limits_values<rep>::max());}
 };
 
 

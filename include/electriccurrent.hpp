@@ -113,17 +113,6 @@ electriccurrent_cast(const electriccurrent<_Rep, _Period>& __fd)
     return __electriccurrent_cast<electriccurrent<_Rep, _Period>, _ToElectricCurrent>()(__fd);
 }
 
-
-template <class _Rep>
-struct electriccurrent_values
-{
-public:
-    inline static METRICCONSTEXPR _Rep zero() {return _Rep(0);}
-    inline static METRICCONSTEXPR _Rep max()  {return std::numeric_limits<_Rep>::max();}
-    inline static METRICCONSTEXPR _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
-};
-
-
 template <class _Rep, class _Period>
 class electriccurrent
 {
@@ -218,9 +207,9 @@ public:
 
     // special values
 
-    inline static METRICCONSTEXPR electriccurrent zero() {return electriccurrent(electriccurrent_values<rep>::zero());}
-    inline static METRICCONSTEXPR electriccurrent min()  {return electriccurrent(electriccurrent_values<rep>::min());}
-    inline static METRICCONSTEXPR electriccurrent max()  {return electriccurrent(electriccurrent_values<rep>::max());}
+    inline static METRICCONSTEXPR electriccurrent zero() {return electriccurrent(limits_values<rep>::zero());}
+    inline static METRICCONSTEXPR electriccurrent min()  {return electriccurrent(limits_values<rep>::min());}
+    inline static METRICCONSTEXPR electriccurrent max()  {return electriccurrent(limits_values<rep>::max());}
 };
 
 

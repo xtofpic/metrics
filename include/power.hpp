@@ -113,17 +113,6 @@ power_cast(const power<_Rep, _Period>& __fd)
     return __power_cast<power<_Rep, _Period>, _ToPower>()(__fd);
 }
 
-
-template <class _Rep>
-struct power_values
-{
-public:
-    inline static METRICCONSTEXPR _Rep zero() {return _Rep(0);}
-    inline static METRICCONSTEXPR _Rep max()  {return std::numeric_limits<_Rep>::max();}
-    inline static METRICCONSTEXPR _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
-};
-
-
 template <class _Rep, class _Period>
 class power
 {
@@ -218,9 +207,9 @@ public:
 
     // special values
 
-    inline static METRICCONSTEXPR power zero() {return power(power_values<rep>::zero());}
-    inline static METRICCONSTEXPR power min()  {return power(power_values<rep>::min());}
-    inline static METRICCONSTEXPR power max()  {return power(power_values<rep>::max());}
+    inline static METRICCONSTEXPR power zero() {return power(limits_values<rep>::zero());}
+    inline static METRICCONSTEXPR power min()  {return power(limits_values<rep>::min());}
+    inline static METRICCONSTEXPR power max()  {return power(limits_values<rep>::max());}
 };
 
 

@@ -113,17 +113,6 @@ voltage_cast(const voltage<_Rep, _Period>& __fd)
     return __voltage_cast<voltage<_Rep, _Period>, _ToVoltage>()(__fd);
 }
 
-
-template <class _Rep>
-struct voltage_values
-{
-public:
-    inline static METRICCONSTEXPR _Rep zero() {return _Rep(0);}
-    inline static METRICCONSTEXPR _Rep max()  {return std::numeric_limits<_Rep>::max();}
-    inline static METRICCONSTEXPR _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
-};
-
-
 template <class _Rep, class _Period>
 class voltage
 {
@@ -218,9 +207,9 @@ public:
 
     // special values
 
-    inline static METRICCONSTEXPR voltage zero() {return voltage(voltage_values<rep>::zero());}
-    inline static METRICCONSTEXPR voltage min()  {return voltage(voltage_values<rep>::min());}
-    inline static METRICCONSTEXPR voltage max()  {return voltage(voltage_values<rep>::max());}
+    inline static METRICCONSTEXPR voltage zero() {return voltage(limits_values<rep>::zero());}
+    inline static METRICCONSTEXPR voltage min()  {return voltage(limits_values<rep>::min());}
+    inline static METRICCONSTEXPR voltage max()  {return voltage(limits_values<rep>::max());}
 };
 
 

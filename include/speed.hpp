@@ -113,17 +113,6 @@ speed_cast(const speed<_Rep, _Period>& __fd)
     return __speed_cast<speed<_Rep, _Period>, _ToSpeed>()(__fd);
 }
 
-
-template <class _Rep>
-struct speed_values
-{
-public:
-    inline static METRICCONSTEXPR _Rep zero() {return _Rep(0);}
-    inline static METRICCONSTEXPR _Rep max()  {return std::numeric_limits<_Rep>::max();}
-    inline static METRICCONSTEXPR _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
-};
-
-
 template <class _Rep, class _Period>
 class speed
 {
@@ -218,9 +207,9 @@ public:
 
     // special values
 
-    inline static METRICCONSTEXPR speed zero() {return speed(speed_values<rep>::zero());}
-    inline static METRICCONSTEXPR speed min()  {return speed(speed_values<rep>::min());}
-    inline static METRICCONSTEXPR speed max()  {return speed(speed_values<rep>::max());}
+    inline static METRICCONSTEXPR speed zero() {return speed(limits_values<rep>::zero());}
+    inline static METRICCONSTEXPR speed min()  {return speed(limits_values<rep>::min());}
+    inline static METRICCONSTEXPR speed max()  {return speed(limits_values<rep>::max());}
 };
 
 

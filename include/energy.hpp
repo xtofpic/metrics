@@ -113,17 +113,6 @@ energy_cast(const energy<_Rep, _Period>& __fd)
     return __energy_cast<energy<_Rep, _Period>, _ToEnergy>()(__fd);
 }
 
-
-template <class _Rep>
-struct energy_values
-{
-public:
-    inline static METRICCONSTEXPR _Rep zero() {return _Rep(0);}
-    inline static METRICCONSTEXPR _Rep max()  {return std::numeric_limits<_Rep>::max();}
-    inline static METRICCONSTEXPR _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
-};
-
-
 template <class _Rep, class _Period>
 class energy
 {
@@ -218,9 +207,9 @@ public:
 
     // special values
 
-    inline static METRICCONSTEXPR energy zero() {return energy(energy_values<rep>::zero());}
-    inline static METRICCONSTEXPR energy min()  {return energy(energy_values<rep>::min());}
-    inline static METRICCONSTEXPR energy max()  {return energy(energy_values<rep>::max());}
+    inline static METRICCONSTEXPR energy zero() {return energy(limits_values<rep>::zero());}
+    inline static METRICCONSTEXPR energy min()  {return energy(limits_values<rep>::min());}
+    inline static METRICCONSTEXPR energy max()  {return energy(limits_values<rep>::max());}
 };
 
 

@@ -113,17 +113,6 @@ distance_cast(const distance<_Rep, _Period>& __fd)
     return __distance_cast<distance<_Rep, _Period>, _ToDistance>()(__fd);
 }
 
-
-template <class _Rep>
-struct distance_values
-{
-public:
-    inline static METRICCONSTEXPR _Rep zero() {return _Rep(0);}
-    inline static METRICCONSTEXPR _Rep max()  {return std::numeric_limits<_Rep>::max();}
-    inline static METRICCONSTEXPR _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
-};
-
-
 template <class _Rep, class _Period>
 class distance
 {
@@ -218,9 +207,9 @@ public:
 
     // special values
 
-    inline static METRICCONSTEXPR distance zero() {return distance(distance_values<rep>::zero());}
-    inline static METRICCONSTEXPR distance min()  {return distance(distance_values<rep>::min());}
-    inline static METRICCONSTEXPR distance max()  {return distance(distance_values<rep>::max());}
+    inline static METRICCONSTEXPR distance zero() {return distance(limits_values<rep>::zero());}
+    inline static METRICCONSTEXPR distance min()  {return distance(limits_values<rep>::min());}
+    inline static METRICCONSTEXPR distance max()  {return distance(limits_values<rep>::max());}
 };
 
 
