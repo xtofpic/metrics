@@ -21,10 +21,10 @@ environment:
 
 build_script:
   - mkdir build
-  - conan install . -o gtest:shared=True
   - cd build
-  - cmake ../ -DBUILD_TEST=TRUE
-  - cmake --build . --config Debug
+  - conan install ..
+  - cd ..
+  - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Debug -Wdev -DENABLE_COVERAGE=Off
 
 test_script:
   - cd build
