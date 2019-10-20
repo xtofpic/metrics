@@ -75,28 +75,36 @@ int main()
 An example of unit conversion
 ```c++
 #include <iostream>
-#include <mass.hpp>
+#include <metrics.hpp>
 
 using namespace metric::literals;
 
 template<uint8_t Temperature>
 struct waterDensity
 {
-	static constexpr double temp = static_cast<double>(Temperature);
-	// (Air saturated) Formula source: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4909168/
-	static constexpr double value = 999.84847 + (6.337563 * 0.01) * temp + (-8.523829 * 0.001) * temp * temp + (6.943248 * 0.00001) * temp * temp * temp + (-3.821216 * 0.0000001) * temp * temp * temp * temp;
+    static constexpr double temp = static_cast<double>(Temperature);
+    // (Air saturated) Formula source: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4909168/
+    static constexpr double value = 999.84847 + (6.337563 * 0.01) * temp + (-8.523829 * 0.001) * temp * temp + (6.943248 * 0.00001) * temp * temp * temp + (-3.821216 * 0.0000001) * temp * temp * temp * temp;
+};
+
+template<int8_t Temperature>
+struct mercuryDensity
+{
+    // Formula source: https://www.techniques-ingenieur.fr/base-documentaire/sciences-fondamentales-th8/introduction-aux-constantes-physico-chimiques-42342210/corrections-barometriques-k64/masse-volumique-du-mercure-k64niv10002.html
+    static constexpr double value = 13595.1 / (1 + (1.818 * 0.0001 * (Temperature)));
 };
 
 template<typename Density, typename MassType, typename MassRatio>
 metric::volume<double, MassRatio> operator* (const metric::mass<MassType, MassRatio>& m, Density d)
 {
-        return metric::volume<double, MassRatio>(m.count() / Density::value);
+    return metric::volume<double, MassRatio>(m.count() / Density::value);
 }
 
 int main()
 {
-        std::cout << "10kg of water at 25°C = " << metric::volume_cast<metric::millilitre>(10_kg * waterDensity<25>()).count() << " millilitre" << std::endl;
-	return 0;
+    std::cout << "10kg of   water at 25°C = " << metric::volume_cast<metric::millilitre>(10_kg *   waterDensity<25>()).count() << " millilitre" << std::endl;
+    std::cout << " 1kg of mercury at  5°C = " << metric::volume_cast<metric::microlitre>( 1_kg * mercuryDensity< 5>()).count() << " microlitre" << std::endl;
+    return 0;
 }
 ```
 
