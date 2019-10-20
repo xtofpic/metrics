@@ -13,7 +13,7 @@
 #define METRICS_CONFIG_HPP
 
 #include <ratio>
-
+#include <limits>
 
 
 #ifdef _WIN32
@@ -54,6 +54,38 @@ template <intmax_t _Num, intmax_t _Den> struct __is_ratio<std::ratio<_Num, _Den>
 } // namespace std
 
 #endif
+
+
+namespace metric
+{
+
+
+template<typename _Type,
+    template <typename...> class _Template>
+struct __is_specialization
+    : std::false_type
+{};
+
+template<template <typename...> class _Template,
+    typename... _Types>
+    struct __is_specialization<_Template<_Types...>, _Template>
+    : std::true_type
+{};
+
+
+template <class _Rep>
+struct limits_values
+{
+public:
+    inline static METRICCONSTEXPR _Rep zero() {return _Rep(0);}
+    inline static METRICCONSTEXPR _Rep max()  {return std::numeric_limits<_Rep>::max();}
+    inline static METRICCONSTEXPR _Rep min()  {return std::numeric_limits<_Rep>::lowest();}
+};
+
+
+
+
+}
 
 
 #endif // METRICS_CONFIG_HPP

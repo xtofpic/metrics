@@ -19,24 +19,9 @@
 
 namespace metric {
 
-
 template <class _Rep, class _Period = std::ratio<1> > class pressure;
 
-template <class _Tp> 
-    struct __is_pressure: std::false_type {};
-
-template <class _Rep, class _Period>
-    struct __is_pressure<pressure<_Rep, _Period> > : std::true_type  {};
-
-template <class _Rep, class _Period>
-    struct __is_pressure<const pressure<_Rep, _Period> > : std::true_type  {};
-
-template <class _Rep, class _Period>
-    struct __is_pressure<volatile pressure<_Rep, _Period> > : std::true_type  {};
-
-template <class _Rep, class _Period>
-    struct __is_pressure<const volatile pressure<_Rep, _Period> > : std::true_type  {};
-
+template <typename A> struct __is_pressure: __is_specialization<A, pressure> {};
 
 } // namespace metric
 

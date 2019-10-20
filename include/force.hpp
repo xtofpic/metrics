@@ -19,24 +19,9 @@
 
 namespace metric {
 
-
 template <class _Rep, class _Period = std::ratio<1> > class force;
 
-template <class _Tp> 
-    struct __is_force: std::false_type {};
-
-template <class _Rep, class _Period>
-    struct __is_force<force<_Rep, _Period> > : std::true_type  {};
-
-template <class _Rep, class _Period>
-    struct __is_force<const force<_Rep, _Period> > : std::true_type  {};
-
-template <class _Rep, class _Period>
-    struct __is_force<volatile force<_Rep, _Period> > : std::true_type  {};
-
-template <class _Rep, class _Period>
-    struct __is_force<const volatile force<_Rep, _Period> > : std::true_type  {};
-
+template <typename A> struct __is_force: __is_specialization<A, force> {};
 
 } // namespace metric
 

@@ -19,24 +19,9 @@
 
 namespace metric {
 
-
 template <class _Rep, class _Period = std::ratio<1> > class mass;
 
-template <class _Tp> 
-    struct __is_mass: std::false_type {};
-
-template <class _Rep, class _Period>
-    struct __is_mass<mass<_Rep, _Period> > : std::true_type  {};
-
-template <class _Rep, class _Period>
-    struct __is_mass<const mass<_Rep, _Period> > : std::true_type  {};
-
-template <class _Rep, class _Period>
-    struct __is_mass<volatile mass<_Rep, _Period> > : std::true_type  {};
-
-template <class _Rep, class _Period>
-    struct __is_mass<const volatile mass<_Rep, _Period> > : std::true_type  {};
-
+template <typename A> struct __is_mass: __is_specialization<A, mass> {};
 
 } // namespace metric
 

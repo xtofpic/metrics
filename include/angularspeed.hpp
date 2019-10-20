@@ -19,24 +19,9 @@
 
 namespace metric {
 
-
 template <class _Rep, class _Period = std::ratio<1> > class angularspeed;
 
-template <class _Tp> 
-    struct __is_angularspeed: std::false_type {};
-
-template <class _Rep, class _Period>
-    struct __is_angularspeed<angularspeed<_Rep, _Period> > : std::true_type  {};
-
-template <class _Rep, class _Period>
-    struct __is_angularspeed<const angularspeed<_Rep, _Period> > : std::true_type  {};
-
-template <class _Rep, class _Period>
-    struct __is_angularspeed<volatile angularspeed<_Rep, _Period> > : std::true_type  {};
-
-template <class _Rep, class _Period>
-    struct __is_angularspeed<const volatile angularspeed<_Rep, _Period> > : std::true_type  {};
-
+template <typename A> struct __is_angularspeed: __is_specialization<A, angularspeed> {};
 
 } // namespace metric
 

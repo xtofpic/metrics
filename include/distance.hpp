@@ -19,24 +19,9 @@
 
 namespace metric {
 
-
 template <class _Rep, class _Period = std::ratio<1> > class distance;
 
-template <class _Tp>
-    struct __is_distance: std::false_type {};
-
-template <class _Rep, class _Period>
-    struct __is_distance<distance<_Rep, _Period> > : std::true_type  {};
-
-template <class _Rep, class _Period>
-    struct __is_distance<const distance<_Rep, _Period> > : std::true_type  {};
-
-template <class _Rep, class _Period>
-    struct __is_distance<volatile distance<_Rep, _Period> > : std::true_type  {};
-
-template <class _Rep, class _Period>
-    struct __is_distance<const volatile distance<_Rep, _Period> > : std::true_type  {};
-
+template <typename A> struct __is_distance: __is_specialization<A, distance> {};
 
 } // namespace metric
 

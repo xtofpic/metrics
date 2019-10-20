@@ -19,24 +19,9 @@
 
 namespace metric {
 
-
 template <class _Rep, class _Period = std::ratio<1> > class energy;
 
-template <class _Tp> 
-    struct __is_energy: std::false_type {};
-
-template <class _Rep, class _Period>
-    struct __is_energy<energy<_Rep, _Period> > : std::true_type  {};
-
-template <class _Rep, class _Period>
-    struct __is_energy<const energy<_Rep, _Period> > : std::true_type  {};
-
-template <class _Rep, class _Period>
-    struct __is_energy<volatile energy<_Rep, _Period> > : std::true_type  {};
-
-template <class _Rep, class _Period>
-    struct __is_energy<const volatile energy<_Rep, _Period> > : std::true_type  {};
-
+template <typename A> struct __is_energy: __is_specialization<A, energy> {};
 
 } // namespace metric
 

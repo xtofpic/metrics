@@ -29,5 +29,6 @@
 #include "frequency.hpp"
 #include "speed.hpp"
 #include "volumetricflow.hpp"
+#include "electricresistance.hpp"
 
 #endif // METRICS_ALL_HPP

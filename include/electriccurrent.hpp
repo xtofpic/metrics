@@ -19,24 +19,9 @@
 
 namespace metric {
 
-
 template <class _Rep, class _Period = std::ratio<1> > class electriccurrent;
 
-template <class _Tp> 
-    struct __is_electriccurrent: std::false_type {};
-
-template <class _Rep, class _Period>
-    struct __is_electriccurrent<electriccurrent<_Rep, _Period> > : std::true_type  {};
-
-template <class _Rep, class _Period>
-    struct __is_electriccurrent<const electriccurrent<_Rep, _Period> > : std::true_type  {};
-
-template <class _Rep, class _Period>
-    struct __is_electriccurrent<volatile electriccurrent<_Rep, _Period> > : std::true_type  {};
-
-template <class _Rep, class _Period>
-    struct __is_electriccurrent<const volatile electriccurrent<_Rep, _Period> > : std::true_type  {};
-
+template <typename A> struct __is_electriccurrent: __is_specialization<A, electriccurrent> {};
 
 } // namespace metric
 

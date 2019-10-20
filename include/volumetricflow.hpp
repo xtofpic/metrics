@@ -19,24 +19,9 @@
 
 namespace metric {
 
-
 template <class _Rep, class _Period = std::ratio<1> > class volumetricflow;
 
-template <class _Tp> 
-    struct __is_volumetricflow: std::false_type {};
-
-template <class _Rep, class _Period>
-    struct __is_volumetricflow<volumetricflow<_Rep, _Period> > : std::true_type  {};
-
-template <class _Rep, class _Period>
-    struct __is_volumetricflow<const volumetricflow<_Rep, _Period> > : std::true_type  {};
-
-template <class _Rep, class _Period>
-    struct __is_volumetricflow<volatile volumetricflow<_Rep, _Period> > : std::true_type  {};
-
-template <class _Rep, class _Period>
-    struct __is_volumetricflow<const volatile volumetricflow<_Rep, _Period> > : std::true_type  {};
-
+template <typename A> struct __is_volumetricflow: __is_specialization<A, volumetricflow> {};
 
 } // namespace metric
 
