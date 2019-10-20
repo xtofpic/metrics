@@ -168,7 +168,7 @@ int main()
 |                       | kilowatt          | kilo                   | _kW
 |                       | megawatt          | mega                   | _MW
 |                       | gigawatt          | giga                   | _GW
-| **pressure:**         | millimetremercure | 1/760                  | _mmHg
+| **pressure:**         | millimetremercury | 1/760                  | _mmHg
 |                       | pascal            | 1/101325               | _Pa
 |                       | hectopascal       | 100/101325             | _hPa
 |                       | kilopascal        | 1000/101325            | _kPa
