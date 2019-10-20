@@ -20,13 +20,13 @@ environment:
       CONFIG: Release
 
 build_script:
-  - cmmd: mkdir build
-  - cmmd: conan install . -o gtest:shared=True
-  - cmmd: cd build
-  - cmmd: cmake ../ -DBUILD_TEST=TRUE
-  - cmmd: cmake --build . --config Debug
+  - mkdir build
+  - conan install . -o gtest:shared=True
+  - cd build
+  - cmake ../ -DBUILD_TEST=TRUE
+  - cmake --build . --config Debug
 
 test_script:
-  - cmmd: cd build
-  - cmmd: cmake test
+  - cd build
+  - cmake test
 
