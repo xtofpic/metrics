@@ -88,6 +88,8 @@ install(
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include DESTINATION include)
 
 
-coverage_evaluate()
+if(METRIC_ENABLE_COVERAGE)
+    coverage_evaluate()
+endif()
 
 
