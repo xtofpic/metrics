@@ -97,94 +97,84 @@ struct common_type< _Master<_Rep1, _Period1>,
                        LCM<_Period1::den, _Period2::den>::value> > type;
 };
 
-
 }
 
 
 namespace metric
 {
 
-
-
-template <class _FromAngularSpeed, class _ToAngularSpeed,
-          class _Period = typename std::ratio_divide<typename _FromAngularSpeed::period, typename _ToAngularSpeed::period>::type,
+// Cast
+template <class _FromMetric, class _ToMetric,
+          class _Period = typename std::ratio_divide<typename _FromMetric::period, typename _ToMetric::period>::type,
           bool = _Period::num == 1,
           bool = _Period::den == 1>
 struct __metric_cast;
 
-
-
-
-template <class _FromAngularSpeed, class _ToAngularSpeed, class _Period>
-struct __metric_cast<_FromAngularSpeed, _ToAngularSpeed, _Period, true, true>
+template <class _FromMetric, class _ToMetric, class _Period>
+struct __metric_cast<_FromMetric, _ToMetric, _Period, true, true>
 {
     inline METRICCONSTEXPR
-    _ToAngularSpeed operator()(const _FromAngularSpeed& __fd) const
+    _ToMetric operator()(const _FromMetric& __fd) const
     {
-        return _ToAngularSpeed(static_cast<typename _ToAngularSpeed::rep>(__fd.count()));
+        return _ToAngularSpeed(static_cast<typename _ToMetric::rep>(__fd.count()));
     }
 };
 
-template <class _FromAngularSpeed, class _ToAngularSpeed, class _Period>
-struct __metric_cast<_FromAngularSpeed, _ToAngularSpeed, _Period, true, false>
+template <class _FromMetric, class _ToMetric, class _Period>
+struct __metric_cast<_FromMetric, _ToMetric, _Period, true, false>
 {
     inline METRICCONSTEXPR
-    _ToAngularSpeed operator()(const _FromAngularSpeed& __fd) const
+    _ToMetric operator()(const _FromMetric& __fd) const
     {
-        typedef typename std::common_type<typename _ToAngularSpeed::rep, typename _FromAngularSpeed::rep, intmax_t>::type _Ct;
-        return _ToAngularSpeed(static_cast<typename _ToAngularSpeed::rep>(
+        typedef typename std::common_type<typename _ToMetric::rep, typename _FromMetric::rep, intmax_t>::type _Ct;
+        return _ToMetric(static_cast<typename _ToMetric::rep>(
                            static_cast<_Ct>(__fd.count()) / static_cast<_Ct>(_Period::den)));
     }
 };
 
-template <class _FromAngularSpeed, class _ToAngularSpeed, class _Period>
-struct __metric_cast<_FromAngularSpeed, _ToAngularSpeed, _Period, false, true>
+template <class _FromMetric, class _ToMetric, class _Period>
+struct __metric_cast<_FromMetric, _ToMetric, _Period, false, true>
 {
     inline METRICCONSTEXPR
-    _ToAngularSpeed operator()(const _FromAngularSpeed& __fd) const
+    _ToMetric operator()(const _FromMetric& __fd) const
     {
-        typedef typename std::common_type<typename _ToAngularSpeed::rep, typename _FromAngularSpeed::rep, intmax_t>::type _Ct;
-        return _ToAngularSpeed(static_cast<typename _ToAngularSpeed::rep>(
+        typedef typename std::common_type<typename _ToMetric::rep, typename _FromMetric::rep, intmax_t>::type _Ct;
+        return _ToMetric(static_cast<typename _ToMetric::rep>(
                            static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)));
     }
 };
 
-template <class _FromAngularSpeed, class _ToAngularSpeed, class _Period>
-struct __metric_cast<_FromAngularSpeed, _ToAngularSpeed, _Period, false, false>
+template <class _FromMetric, class _ToMetric, class _Period>
+struct __metric_cast<_FromMetric, _ToMetric, _Period, false, false>
 {
     inline METRICCONSTEXPR
-    _ToAngularSpeed operator()(const _FromAngularSpeed& __fd) const
+    _ToMetric operator()(const _FromMetric& __fd) const
     {
-        typedef typename std::common_type<typename _ToAngularSpeed::rep, typename _FromAngularSpeed::rep, intmax_t>::type _Ct;
-        return _ToAngularSpeed(static_cast<typename _ToAngularSpeed::rep>(
+        typedef typename std::common_type<typename _ToMetric::rep, typename _FromMetric::rep, intmax_t>::type _Ct;
+        return _ToMetric(static_cast<typename _ToMetric::rep>(
                            static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)
                                                           / static_cast<_Ct>(_Period::den)));
     }
 };
 
 
-
-
-
-
-
 // Metric ==
-template <class _LhsAngularSpeed, class _RhsAngularSpeed>
+template <class _LhsMetric, class _RhsMetric>
 struct __metric_eq
 {
     inline METRICCONSTEXPR
-    bool operator()(const _LhsAngularSpeed& __lhs, const _RhsAngularSpeed& __rhs) const
+    bool operator()(const _LhsMetric& __lhs, const _RhsMetric& __rhs) const
         {
-            typedef typename std::common_type<_LhsAngularSpeed, _RhsAngularSpeed>::type _Ct;
+            typedef typename std::common_type<_LhsMetric, _RhsMetric>::type _Ct;
             return _Ct(__lhs).count() == _Ct(__rhs).count();
         }
 };
 
-template <class _LhsAngularSpeed>
-struct __metric_eq<_LhsAngularSpeed, _LhsAngularSpeed>
+template <class _LhsMetric>
+struct __metric_eq<_LhsMetric, _LhsMetric>
 {
     inline METRICCONSTEXPR
-    bool operator()(const _LhsAngularSpeed& __lhs, const _LhsAngularSpeed& __rhs) const
+    bool operator()(const _LhsMetric& __lhs, const _LhsMetric& __rhs) const
         {return __lhs.count() == __rhs.count();}
 };
 
@@ -209,22 +199,22 @@ operator!=(const _Master<_Rep1, _Period1>& __lhs, const _Master<_Rep2, _Period2>
 
 
 // Metric <
-template <class _LhsAngularSpeed, class _RhsAngularSpeed>
+template <class _LhsMetric, class _RhsMetric>
 struct __metric_lt
 {
     inline METRICCONSTEXPR
-    bool operator()(const _LhsAngularSpeed& __lhs, const _RhsAngularSpeed& __rhs) const
+    bool operator()(const _LhsMetric& __lhs, const _RhsMetric& __rhs) const
         {
-            typedef typename std::common_type<_LhsAngularSpeed, _RhsAngularSpeed>::type _Ct;
+            typedef typename std::common_type<_LhsMetric, _RhsMetric>::type _Ct;
             return _Ct(__lhs).count() < _Ct(__rhs).count();
         }
 };
 
-template <class _LhsAngularSpeed>
-struct __metric_lt<_LhsAngularSpeed, _LhsAngularSpeed>
+template <class _LhsMetric>
+struct __metric_lt<_LhsMetric, _LhsMetric>
 {
     inline METRICCONSTEXPR
-    bool operator()(const _LhsAngularSpeed& __lhs, const _LhsAngularSpeed& __rhs) const
+    bool operator()(const _LhsMetric& __lhs, const _LhsMetric& __rhs) const
         {return __lhs.count() < __rhs.count();}
 };
 
@@ -238,7 +228,7 @@ operator< (const _Master<_Rep1, _Period1>& __lhs, const _Master<_Rep2, _Period2>
     return __metric_lt<_Master<_Rep1, _Period1>, _Master<_Rep2, _Period2> >()(__lhs, __rhs);
 }
 
-// AngularSpeed >
+// Metric >
 template <template <typename...> class _Master, class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
 METRICCONSTEXPR
@@ -248,8 +238,7 @@ operator> (const _Master<_Rep1, _Period1>& __lhs, const _Master<_Rep2, _Period2>
     return __rhs < __lhs;
 }
 
-// AngularSpeed <=
-
+// Metric <=
 template <template <typename...> class _Master, class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
 METRICCONSTEXPR
@@ -259,8 +248,7 @@ operator<=(const _Master<_Rep1, _Period1>& __lhs, const _Master<_Rep2, _Period2>
     return !(__rhs < __lhs);
 }
 
-// AngularSpeed >=
-
+// Metric >=
 template <template <typename...> class _Master, class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
 METRICCONSTEXPR
@@ -270,8 +258,7 @@ operator>=(const _Master<_Rep1, _Period1>& __lhs, const _Master<_Rep2, _Period2>
     return !(__lhs < __rhs);
 }
 
-// AngularSpeed +
-
+// Metric +
 template <template <typename...> class _Master, class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
 METRICCONSTEXPR
@@ -282,8 +269,7 @@ operator+(const _Master<_Rep1, _Period1>& __lhs, const _Master<_Rep2, _Period2>&
     return _Cd(_Cd(__lhs).count() + _Cd(__rhs).count());
 }
 
-// AngularSpeed -
-
+// Metric -
 template <template <typename...> class _Master, class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
 METRICCONSTEXPR
@@ -294,8 +280,7 @@ operator-(const _Master<_Rep1, _Period1>& __lhs, const _Master<_Rep2, _Period2>&
     return _Cd(_Cd(__lhs).count() - _Cd(__rhs).count());
 }
 
-// AngularSpeed *
-
+// Metric *
 template <template <typename...> class _Master, class _Rep1, class _Period, class _Rep2>
 inline
 METRICCONSTEXPR
@@ -324,64 +309,7 @@ operator*(const _Rep1& __s, const _Master<_Rep2, _Period>& __d)
     return __d * __s;
 }
 
-
-
-/*
-// AngularSpeed /
-
-template <class _AngularSpeed, class _Rep, bool = __is_angularspeed<_Rep>::value>
-struct __angularspeed_divide_result
-{
-};
-
-template <class _AngularSpeed, class _Rep2,
-    bool = std::is_convertible<_Rep2,
-                          typename std::common_type<typename _AngularSpeed::rep, _Rep2>::type>::value>
-struct __angularspeed_divide_imp
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __angularspeed_divide_imp<angularspeed<_Rep1, _Period>, _Rep2, true>
-{
-    typedef angularspeed<typename std::common_type<_Rep1, _Rep2>::type, _Period> type;
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __angularspeed_divide_result<angularspeed<_Rep1, _Period>, _Rep2, false>
-    : __angularspeed_divide_imp<angularspeed<_Rep1, _Period>, _Rep2>
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename __angularspeed_divide_result<angularspeed<_Rep1, _Period>, _Rep2>::type
-operator/(const angularspeed<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef angularspeed<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
-}
-
-
-// AngularSpeed %
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename __angularspeed_divide_result<angularspeed<_Rep1, _Period>, _Rep2>::type
-operator%(const angularspeed<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef angularspeed<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
-}
-
-
-*/
-
-
+// Metric /
 template <template <typename...> class _Master, class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
 METRICCONSTEXPR
@@ -392,8 +320,7 @@ operator/(const _Master<_Rep1, _Period1>& __lhs, const _Master<_Rep2, _Period2>&
     return _Ct(__lhs).count() / _Ct(__rhs).count();
 }
 
-
-
+// Metric %
 template <template <typename...> class _Master, class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
 METRICCONSTEXPR
@@ -404,8 +331,6 @@ operator%(const _Master<_Rep1, _Period1>& __lhs, const _Master<_Rep2, _Period2>&
     typedef typename std::common_type<_Master<_Rep1, _Period1>, _Master<_Rep2, _Period2> >::type _Cd;
     return _Cd(static_cast<_Cr>(_Cd(__lhs).count()) % static_cast<_Cr>(_Cd(__rhs).count()));
 }
-
-
 
 
 }
