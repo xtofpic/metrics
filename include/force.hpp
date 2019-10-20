@@ -23,26 +23,6 @@ template <class _Rep, class _Period = std::ratio<1> > class force;
 
 template <typename A> struct __is_force: __is_specialization<A, force> {};
 
-} // namespace metric
-
-
-
-namespace std {
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-struct common_type< metric::force<_Rep1, _Period1>,
-                    metric::force<_Rep2, _Period2> >
-{
-            typedef metric::force<typename common_type<_Rep1, _Rep2>::type,
-                ratio< GCD<_Period1::num, _Period2::num>::value,
-                       LCM<_Period1::den, _Period2::den>::value> > type;
-};
-
-} // namespace std
-
-
-namespace metric {
-
 
 // force_cast
 

@@ -23,55 +23,6 @@ template <class _Rep, class _Period = std::ratio<1> > class volumetricflow;
 
 template <typename A> struct __is_volumetricflow: __is_specialization<A, volumetricflow> {};
 
-} // namespace metric
-
-
-
-namespace std {
-
-/*
-template<typename _Type,
-    template <typename...> class _Template>
-struct __is_specialization
-    : std::false_type
-{};
-
-template<template <typename...> class _Template,
-    typename... _Types>
-    struct __is_specialization<_Template<_Types...>, _Template>
-    : std::true_type
-{};
-*/
-
-
-
-
-template <template <typename...> class _Master, class _Rep1, class _Period1, class _Rep2, class _Period2>
-struct common_type< _Master<_Rep1, _Period1>,
-                    _Master<_Rep2, _Period2> >
-{
-            typedef _Master<typename common_type<_Rep1, _Rep2>::type,
-                ratio< GCD<_Period1::num, _Period2::num>::value,
-                       LCM<_Period1::den, _Period2::den>::value> > type;
-};
-
-
-
-/*
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-struct common_type< metric::volumetricflow<_Rep1, _Period1>,
-                    metric::volumetricflow<_Rep2, _Period2> >
-{
-            typedef metric::volumetricflow<typename common_type<_Rep1, _Rep2>::type,
-                ratio< GCD<_Period1::num, _Period2::num>::value,
-                       LCM<_Period1::den, _Period2::den>::value> > type;
-}; */
-
-} // namespace std
-
-
-namespace metric {
-
 
 // volumetricflow_cast
 
