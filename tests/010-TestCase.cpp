@@ -112,9 +112,9 @@ TEST_CASE( "Pressure conversion (pass)", "[single-file]" )
 	REQUIRE(metric::hectopascal(100) == metric::millibar(100));
 	REQUIRE(metric::pascal(1000000000000) == metric::terapascal(1));
 	REQUIRE(metric::bar(1) == metric::microbar(1000000));
-	std::cout << "1 bar := " << metric::pressure_cast<metric::millimetremercure>(metric::bar(1)).count() << " mmHg." << std::endl;
-	REQUIRE(metric::bar(1) > metric::millimetremercure(750));
-	REQUIRE(metric::bar(1) < metric::millimetremercure(751));
+	std::cout << "1 bar := " << metric::pressure_cast<metric::millimetremercury>(metric::bar(1)).count() << " mmHg." << std::endl;
+	REQUIRE(metric::bar(1) > metric::millimetremercury(750));
+	REQUIRE(metric::bar(1) < metric::millimetremercury(751));
 }
 
 TEST_CASE( "Speed conversion (pass)", "[single-file]" )
