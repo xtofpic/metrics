@@ -116,7 +116,7 @@ struct __metric_cast<_FromMetric, _ToMetric, _Period, true, true>
     inline METRICCONSTEXPR
     _ToMetric operator()(const _FromMetric& __fd) const
     {
-        return _ToAngularSpeed(static_cast<typename _ToMetric::rep>(__fd.count()));
+        return _ToMetric(static_cast<typename _ToMetric::rep>(__fd.count()));
     }
 };
 
