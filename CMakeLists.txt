@@ -34,8 +34,10 @@ target_include_directories(
 	INTERFACE	$<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}/include>
 			$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
+if(METRIC_ENABLE_COVERAGE)
+    find_package(codecov)
+endif()
 
-find_package(codecov)
 
 
 
