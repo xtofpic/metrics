@@ -2,11 +2,11 @@ version: '{build}'
 
 
 install:
-  - cmmd: echo "Downloading conan..."
-  - cmmd: set PATH=%PATH%;%PYTHON%/Scripts/
-  - cmmd: pip.exe install conan
-  - cmmd: conan user # Create the conan data directory
-  - cmmd: conan --version
+  - echo "Downloading conan..."
+  - set PATH=%PATH%;%PYTHON%/Scripts/
+  - pip.exe install conan
+  - conan user # Create the conan data directory
+  - conan --version
 
 
 image: Visual Studio 2017
