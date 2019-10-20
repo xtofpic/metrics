@@ -198,7 +198,7 @@ typedef pressure<long long, std::ratio<         1000, 1013250> > millibar;
 typedef pressure<long long, std::ratio<            1, 1013250> > microbar;
 
 namespace literals {
-constexpr millimetremercure operator ""_mmHg(unsigned long long v) { return millimetremercure(v); }
+constexpr millimetremercury operator ""_mmHg(unsigned long long v) { return millimetremercury(v); }
 constexpr            pascal operator ""_Pa(  unsigned long long v) { return            pascal(v); }
 constexpr       hectopascal operator ""_hPa( unsigned long long v) { return       hectopascal(v); }
 constexpr        kilopascal operator ""_kPa( unsigned long long v) { return        kilopascal(v); }
