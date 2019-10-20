@@ -24,62 +24,6 @@ template <class _Rep, class _Period = std::ratio<1> > class electriccurrent;
 template <typename A> struct __is_electriccurrent: __is_specialization<A, electriccurrent> {};
 
 
-// electriccurrent_cast
-
-template <class _FromElectricCurrent, class _ToElectricCurrent,
-          class _Period = typename std::ratio_divide<typename _FromElectricCurrent::period, typename _ToElectricCurrent::period>::type,
-          bool = _Period::num == 1,
-          bool = _Period::den == 1>
-struct __electriccurrent_cast;
-
-template <class _FromElectricCurrent, class _ToElectricCurrent, class _Period>
-struct __electriccurrent_cast<_FromElectricCurrent, _ToElectricCurrent, _Period, true, true>
-{   
-    inline METRICCONSTEXPR
-    _ToElectricCurrent operator()(const _FromElectricCurrent& __fd) const
-    {   
-        return _ToElectricCurrent(static_cast<typename _ToElectricCurrent::rep>(__fd.count()));
-    }
-};
-
-template <class _FromElectricCurrent, class _ToElectricCurrent, class _Period>
-struct __electriccurrent_cast<_FromElectricCurrent, _ToElectricCurrent, _Period, true, false>
-{   
-    inline METRICCONSTEXPR
-    _ToElectricCurrent operator()(const _FromElectricCurrent& __fd) const
-    {   
-        typedef typename std::common_type<typename _ToElectricCurrent::rep, typename _FromElectricCurrent::rep, intmax_t>::type _Ct;
-        return _ToElectricCurrent(static_cast<typename _ToElectricCurrent::rep>(
-                           static_cast<_Ct>(__fd.count()) / static_cast<_Ct>(_Period::den)));
-    }
-};
-
-template <class _FromElectricCurrent, class _ToElectricCurrent, class _Period>
-struct __electriccurrent_cast<_FromElectricCurrent, _ToElectricCurrent, _Period, false, true>
-{   
-    inline METRICCONSTEXPR
-    _ToElectricCurrent operator()(const _FromElectricCurrent& __fd) const
-    {   
-        typedef typename std::common_type<typename _ToElectricCurrent::rep, typename _FromElectricCurrent::rep, intmax_t>::type _Ct;
-        return _ToElectricCurrent(static_cast<typename _ToElectricCurrent::rep>(
-                           static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)));
-    }
-};
-
-template <class _FromElectricCurrent, class _ToElectricCurrent, class _Period>
-struct __electriccurrent_cast<_FromElectricCurrent, _ToElectricCurrent, _Period, false, false>
-{
-    inline METRICCONSTEXPR
-    _ToElectricCurrent operator()(const _FromElectricCurrent& __fd) const
-    {
-        typedef typename std::common_type<typename _ToElectricCurrent::rep, typename _FromElectricCurrent::rep, intmax_t>::type _Ct;
-        return _ToElectricCurrent(static_cast<typename _ToElectricCurrent::rep>(
-                           static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)
-                                                          / static_cast<_Ct>(_Period::den)));
-    }
-};
-
-
 template <class _ToElectricCurrent, class _Rep, class _Period>
 inline
 METRICCONSTEXPR
@@ -90,7 +34,7 @@ typename std::enable_if
 >::type
 electriccurrent_cast(const electriccurrent<_Rep, _Period>& __fd)
 {
-    return __electriccurrent_cast<electriccurrent<_Rep, _Period>, _ToElectricCurrent>()(__fd);
+    return __metric_cast<electriccurrent<_Rep, _Period>, _ToElectricCurrent>()(__fd);
 }
 
 template <class _Rep, class _Period>
@@ -193,188 +137,7 @@ public:
 };
 
 
-typedef electriccurrent<long long, std::femto> femtoampere;
-typedef electriccurrent<long long, std::pico > picoampere;
-typedef electriccurrent<long long, std::nano > nanoampere;
-typedef electriccurrent<long long, std::micro> microampere;
-typedef electriccurrent<long long, std::milli> milliampere;
-typedef electriccurrent<long long            > ampere;
-typedef electriccurrent<     long, std::kilo > kiloampere;
-typedef electriccurrent<     long, std::mega > megaampere;
-
-namespace literals {
-
-constexpr femtoampere operator ""_fA(unsigned long long v) { return femtoampere(v); }
-constexpr picoampere  operator ""_pA(unsigned long long v) { return picoampere(v);  }
-constexpr nanoampere  operator ""_nA(unsigned long long v) { return nanoampere(v);  }
-constexpr microampere operator ""_uA(unsigned long long v) { return microampere(v); }
-constexpr milliampere operator ""_mA(unsigned long long v) { return milliampere(v); }
-constexpr ampere      operator ""_A( unsigned long long v) { return ampere(v);      }
-constexpr kiloampere  operator ""_kA(unsigned long long v) { return kiloampere(v);  }
-constexpr megaampere  operator ""_MA(unsigned long long v) { return megaampere(v);  }
-
-} // literals
-
-// ElectricCurrent ==
-
-template <class _LhsElectricCurrent, class _RhsElectricCurrent>
-struct __electriccurrent_eq
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsElectricCurrent& __lhs, const _RhsElectricCurrent& __rhs) const
-        {
-            typedef typename std::common_type<_LhsElectricCurrent, _RhsElectricCurrent>::type _Ct;
-            return _Ct(__lhs).count() == _Ct(__rhs).count();
-        }
-};
-
-template <class _LhsElectricCurrent>
-struct __electriccurrent_eq<_LhsElectricCurrent, _LhsElectricCurrent>
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsElectricCurrent& __lhs, const _LhsElectricCurrent& __rhs) const
-        {return __lhs.count() == __rhs.count();}
-};
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator==(const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<_Rep2, _Period2>& __rhs)
-{
-    return __electriccurrent_eq<electriccurrent<_Rep1, _Period1>, electriccurrent<_Rep2, _Period2> >()(__lhs, __rhs);
-}
-
-// ElectricCurrent !=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator!=(const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<_Rep2, _Period2>& __rhs)
-{
-    return !(__lhs == __rhs);
-}
-
-// ElectricCurrent <
-
-template <class _LhsElectricCurrent, class _RhsElectricCurrent>
-struct __electriccurrent_lt
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsElectricCurrent& __lhs, const _RhsElectricCurrent& __rhs) const
-        {
-            typedef typename std::common_type<_LhsElectricCurrent, _RhsElectricCurrent>::type _Ct;
-            return _Ct(__lhs).count() < _Ct(__rhs).count();
-        }
-};
-
-template <class _LhsElectricCurrent>
-struct __electriccurrent_lt<_LhsElectricCurrent, _LhsElectricCurrent>
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsElectricCurrent& __lhs, const _LhsElectricCurrent& __rhs) const
-        {return __lhs.count() < __rhs.count();}
-};
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator< (const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<_Rep2, _Period2>& __rhs)
-{
-    return __electriccurrent_lt<electriccurrent<_Rep1, _Period1>, electriccurrent<_Rep2, _Period2> >()(__lhs, __rhs);
-}
-
-// ElectricCurrent >
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator> (const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<_Rep2, _Period2>& __rhs)
-{
-    return __rhs < __lhs;
-}
-
-// ElectricCurrent <=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator<=(const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<_Rep2, _Period2>& __rhs)
-{
-    return !(__rhs < __lhs);
-}
-
-// ElectricCurrent >=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator>=(const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<_Rep2, _Period2>& __rhs)
-{
-    return !(__lhs < __rhs);
-}
-
-// ElectricCurrent +
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<electriccurrent<_Rep1, _Period1>, electriccurrent<_Rep2, _Period2> >::type
-operator+(const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<electriccurrent<_Rep1, _Period1>, electriccurrent<_Rep2, _Period2> >::type _Cd;
-    return _Cd(_Cd(__lhs).count() + _Cd(__rhs).count());
-}
-
-// ElectricCurrent -
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<electriccurrent<_Rep1, _Period1>, electriccurrent<_Rep2, _Period2> >::type
-operator-(const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<electriccurrent<_Rep1, _Period1>, electriccurrent<_Rep2, _Period2> >::type _Cd;
-    return _Cd(_Cd(__lhs).count() - _Cd(__rhs).count());
-}
-
-// ElectricCurrent *
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename std::enable_if
-<
-    std::is_convertible<_Rep2, typename std::common_type<_Rep1, _Rep2>::type>::value,
-    electriccurrent<typename std::common_type<_Rep1, _Rep2>::type, _Period>
->::type
-operator*(const electriccurrent<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef electriccurrent<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() * static_cast<_Cr>(__s));
-}
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename std::enable_if
-<
-    std::is_convertible<_Rep1, typename std::common_type<_Rep1, _Rep2>::type>::value,
-    electriccurrent<typename std::common_type<_Rep1, _Rep2>::type, _Period>
->::type
-operator*(const _Rep1& __s, const electriccurrent<_Rep2, _Period>& __d)
-{
-    return __d * __s;
-}
-
 // ElectricCurrent /
-
 template <class _ElectricCurrent, class _Rep, bool = __is_electriccurrent<_Rep>::value>
 struct __electriccurrent_divide_result
 {
@@ -410,18 +173,8 @@ operator/(const electriccurrent<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
 }
 
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<_Rep1, _Rep2>::type
-operator/(const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<electriccurrent<_Rep1, _Period1>, electriccurrent<_Rep2, _Period2> >::type _Ct;
-    return _Ct(__lhs).count() / _Ct(__rhs).count();
-}
 
 // ElectricCurrent %
-
 template <class _Rep1, class _Period, class _Rep2>
 inline
 METRICCONSTEXPR
@@ -433,16 +186,25 @@ operator%(const electriccurrent<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
 }
 
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<electriccurrent<_Rep1, _Period1>, electriccurrent<_Rep2, _Period2> >::type
-operator%(const electriccurrent<_Rep1, _Period1>& __lhs, const electriccurrent<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef typename std::common_type<electriccurrent<_Rep1, _Period1>, electriccurrent<_Rep2, _Period2> >::type _Cd;
-    return _Cd(static_cast<_Cr>(_Cd(__lhs).count()) % static_cast<_Cr>(_Cd(__rhs).count()));
-}
+typedef electriccurrent<long long, std::femto> femtoampere;
+typedef electriccurrent<long long, std::pico > picoampere;
+typedef electriccurrent<long long, std::nano > nanoampere;
+typedef electriccurrent<long long, std::micro> microampere;
+typedef electriccurrent<long long, std::milli> milliampere;
+typedef electriccurrent<long long            > ampere;
+typedef electriccurrent<     long, std::kilo > kiloampere;
+typedef electriccurrent<     long, std::mega > megaampere;
+
+namespace literals {
+constexpr femtoampere operator ""_fA(unsigned long long v) { return femtoampere(v); }
+constexpr picoampere  operator ""_pA(unsigned long long v) { return picoampere(v);  }
+constexpr nanoampere  operator ""_nA(unsigned long long v) { return nanoampere(v);  }
+constexpr microampere operator ""_uA(unsigned long long v) { return microampere(v); }
+constexpr milliampere operator ""_mA(unsigned long long v) { return milliampere(v); }
+constexpr ampere      operator ""_A( unsigned long long v) { return ampere(v);      }
+constexpr kiloampere  operator ""_kA(unsigned long long v) { return kiloampere(v);  }
+constexpr megaampere  operator ""_MA(unsigned long long v) { return megaampere(v);  }
+} // literals
 
 } // namespace metric
 

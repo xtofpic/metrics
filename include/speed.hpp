@@ -24,62 +24,6 @@ template <class _Rep, class _Period = std::ratio<1> > class speed;
 template <typename A> struct __is_speed: __is_specialization<A, speed> {};
 
 
-// speed_cast
-
-template <class _FromSpeed, class _ToSpeed,
-          class _Period = typename std::ratio_divide<typename _FromSpeed::period, typename _ToSpeed::period>::type,
-          bool = _Period::num == 1,
-          bool = _Period::den == 1>
-struct __speed_cast;
-
-template <class _FromSpeed, class _ToSpeed, class _Period>
-struct __speed_cast<_FromSpeed, _ToSpeed, _Period, true, true>
-{   
-    inline METRICCONSTEXPR
-    _ToSpeed operator()(const _FromSpeed& __fd) const
-    {   
-        return _ToSpeed(static_cast<typename _ToSpeed::rep>(__fd.count()));
-    }
-};
-
-template <class _FromSpeed, class _ToSpeed, class _Period>
-struct __speed_cast<_FromSpeed, _ToSpeed, _Period, true, false>
-{   
-    inline METRICCONSTEXPR
-    _ToSpeed operator()(const _FromSpeed& __fd) const
-    {   
-        typedef typename std::common_type<typename _ToSpeed::rep, typename _FromSpeed::rep, intmax_t>::type _Ct;
-        return _ToSpeed(static_cast<typename _ToSpeed::rep>(
-                           static_cast<_Ct>(__fd.count()) / static_cast<_Ct>(_Period::den)));
-    }
-};
-
-template <class _FromSpeed, class _ToSpeed, class _Period>
-struct __speed_cast<_FromSpeed, _ToSpeed, _Period, false, true>
-{   
-    inline METRICCONSTEXPR
-    _ToSpeed operator()(const _FromSpeed& __fd) const
-    {   
-        typedef typename std::common_type<typename _ToSpeed::rep, typename _FromSpeed::rep, intmax_t>::type _Ct;
-        return _ToSpeed(static_cast<typename _ToSpeed::rep>(
-                           static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)));
-    }
-};
-
-template <class _FromSpeed, class _ToSpeed, class _Period>
-struct __speed_cast<_FromSpeed, _ToSpeed, _Period, false, false>
-{
-    inline METRICCONSTEXPR
-    _ToSpeed operator()(const _FromSpeed& __fd) const
-    {
-        typedef typename std::common_type<typename _ToSpeed::rep, typename _FromSpeed::rep, intmax_t>::type _Ct;
-        return _ToSpeed(static_cast<typename _ToSpeed::rep>(
-                           static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)
-                                                          / static_cast<_Ct>(_Period::den)));
-    }
-};
-
-
 template <class _ToSpeed, class _Rep, class _Period>
 inline
 METRICCONSTEXPR
@@ -90,7 +34,7 @@ typename std::enable_if
 >::type
 speed_cast(const speed<_Rep, _Period>& __fd)
 {
-    return __speed_cast<speed<_Rep, _Period>, _ToSpeed>()(__fd);
+    return __metric_cast<speed<_Rep, _Period>, _ToSpeed>()(__fd);
 }
 
 template <class _Rep, class _Period>
@@ -193,197 +137,7 @@ public:
 };
 
 
-
-typedef speed<long long, std::ratio<86400, 1000000> > micrometre_second;
-typedef speed<long long, std::ratio< 1440, 1000000> > micrometre_minute;
-typedef speed<long long, std::ratio<   24, 1000000> > micrometre_hour;
-typedef speed<long long, std::ratio<86400,    1000> > millimetre_second;
-typedef speed<long long, std::ratio< 1440,    1000> > millimetre_minute;
-typedef speed<long long, std::ratio<   24,    1000> > millimetre_hour;
-typedef speed<long long, std::ratio<    1,    1000> > millimetre_day;
-typedef speed<long long, std::ratio<86400,       1> > metre_second;
-typedef speed<long long, std::ratio< 1440,       1> > metre_minute;
-typedef speed<long long, std::ratio<   24,       1> > metre_hour;
-typedef speed<long long, std::ratio<    1,       1> > metre_day;
-
-
-namespace literals {
-
-constexpr micrometre_second operator ""_um_sec(unsigned long long v) { return   micrometre_second(v); }
-constexpr micrometre_minute operator ""_um_m(unsigned long long v)   { return   micrometre_minute(v); }
-constexpr   micrometre_hour operator ""_um_h(unsigned long long v)   { return   micrometre_hour(v);   }
-constexpr millimetre_second operator ""_mm_sec(unsigned long long v) { return   millimetre_second(v); }
-constexpr millimetre_minute operator ""_mm_m(unsigned long long v)   { return   millimetre_minute(v); }
-constexpr   millimetre_hour operator ""_mm_h(unsigned long long v)   { return   millimetre_hour(v);   }
-constexpr    millimetre_day operator ""_mm_d(unsigned long long v)   { return   millimetre_day(v);    }
-constexpr      metre_second operator ""_m_sec(unsigned long long v)  { return   metre_second(v);      }
-constexpr      metre_minute operator ""_m_m(unsigned long long v)    { return   metre_minute(v);      }
-constexpr        metre_hour operator ""_m_h(unsigned long long v)    { return   metre_hour(v);        }
-constexpr         metre_day operator ""_m_d(unsigned long long v)    { return   metre_day(v);         }
-
-} // namespace literals
-
-
-// Speed ==
-
-template <class _LhsSpeed, class _RhsSpeed>
-struct __speed_eq
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsSpeed& __lhs, const _RhsSpeed& __rhs) const
-        {
-            typedef typename std::common_type<_LhsSpeed, _RhsSpeed>::type _Ct;
-            return _Ct(__lhs).count() == _Ct(__rhs).count();
-        }
-};
-
-template <class _LhsSpeed>
-struct __speed_eq<_LhsSpeed, _LhsSpeed>
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsSpeed& __lhs, const _LhsSpeed& __rhs) const
-        {return __lhs.count() == __rhs.count();}
-};
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator==(const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __rhs)
-{
-    return __speed_eq<speed<_Rep1, _Period1>, speed<_Rep2, _Period2> >()(__lhs, __rhs);
-}
-
-// Speed !=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator!=(const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __rhs)
-{
-    return !(__lhs == __rhs);
-}
-
-// Speed <
-
-template <class _LhsSpeed, class _RhsSpeed>
-struct __speed_lt
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsSpeed& __lhs, const _RhsSpeed& __rhs) const
-        {
-            typedef typename std::common_type<_LhsSpeed, _RhsSpeed>::type _Ct;
-            return _Ct(__lhs).count() < _Ct(__rhs).count();
-        }
-};
-
-template <class _LhsSpeed>
-struct __speed_lt<_LhsSpeed, _LhsSpeed>
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsSpeed& __lhs, const _LhsSpeed& __rhs) const
-        {return __lhs.count() < __rhs.count();}
-};
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator< (const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __rhs)
-{
-    return __speed_lt<speed<_Rep1, _Period1>, speed<_Rep2, _Period2> >()(__lhs, __rhs);
-}
-
-// Speed >
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator> (const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __rhs)
-{
-    return __rhs < __lhs;
-}
-
-// Speed <=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator<=(const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __rhs)
-{
-    return !(__rhs < __lhs);
-}
-
-// Speed >=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator>=(const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __rhs)
-{
-    return !(__lhs < __rhs);
-}
-
-// Speed +
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<speed<_Rep1, _Period1>, speed<_Rep2, _Period2> >::type
-operator+(const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<speed<_Rep1, _Period1>, speed<_Rep2, _Period2> >::type _Cd;
-    return _Cd(_Cd(__lhs).count() + _Cd(__rhs).count());
-}
-
-// Speed -
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<speed<_Rep1, _Period1>, speed<_Rep2, _Period2> >::type
-operator-(const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<speed<_Rep1, _Period1>, speed<_Rep2, _Period2> >::type _Cd;
-    return _Cd(_Cd(__lhs).count() - _Cd(__rhs).count());
-}
-
-// Speed *
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename std::enable_if
-<
-    std::is_convertible<_Rep2, typename std::common_type<_Rep1, _Rep2>::type>::value,
-    speed<typename std::common_type<_Rep1, _Rep2>::type, _Period>
->::type
-operator*(const speed<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef speed<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() * static_cast<_Cr>(__s));
-}
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename std::enable_if
-<
-    std::is_convertible<_Rep1, typename std::common_type<_Rep1, _Rep2>::type>::value,
-    speed<typename std::common_type<_Rep1, _Rep2>::type, _Period>
->::type
-operator*(const _Rep1& __s, const speed<_Rep2, _Period>& __d)
-{
-    return __d * __s;
-}
-
 // Speed /
-
 template <class _Speed, class _Rep, bool = __is_speed<_Rep>::value>
 struct __speed_divide_result
 {
@@ -419,18 +173,8 @@ operator/(const speed<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
 }
 
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<_Rep1, _Rep2>::type
-operator/(const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<speed<_Rep1, _Period1>, speed<_Rep2, _Period2> >::type _Ct;
-    return _Ct(__lhs).count() / _Ct(__rhs).count();
-}
 
 // Speed %
-
 template <class _Rep1, class _Period, class _Rep2>
 inline
 METRICCONSTEXPR
@@ -442,16 +186,32 @@ operator%(const speed<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
 }
 
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<speed<_Rep1, _Period1>, speed<_Rep2, _Period2> >::type
-operator%(const speed<_Rep1, _Period1>& __lhs, const speed<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef typename std::common_type<speed<_Rep1, _Period1>, speed<_Rep2, _Period2> >::type _Cd;
-    return _Cd(static_cast<_Cr>(_Cd(__lhs).count()) % static_cast<_Cr>(_Cd(__rhs).count()));
-}
+
+typedef speed<long long, std::ratio<86400, 1000000> > micrometre_second;
+typedef speed<long long, std::ratio< 1440, 1000000> > micrometre_minute;
+typedef speed<long long, std::ratio<   24, 1000000> > micrometre_hour;
+typedef speed<long long, std::ratio<86400,    1000> > millimetre_second;
+typedef speed<long long, std::ratio< 1440,    1000> > millimetre_minute;
+typedef speed<long long, std::ratio<   24,    1000> > millimetre_hour;
+typedef speed<long long, std::ratio<    1,    1000> > millimetre_day;
+typedef speed<long long, std::ratio<86400,       1> > metre_second;
+typedef speed<long long, std::ratio< 1440,       1> > metre_minute;
+typedef speed<long long, std::ratio<   24,       1> > metre_hour;
+typedef speed<long long, std::ratio<    1,       1> > metre_day;
+
+namespace literals {
+constexpr micrometre_second operator ""_um_sec(unsigned long long v) { return   micrometre_second(v); }
+constexpr micrometre_minute operator ""_um_m(unsigned long long v)   { return   micrometre_minute(v); }
+constexpr   micrometre_hour operator ""_um_h(unsigned long long v)   { return   micrometre_hour(v);   }
+constexpr millimetre_second operator ""_mm_sec(unsigned long long v) { return   millimetre_second(v); }
+constexpr millimetre_minute operator ""_mm_m(unsigned long long v)   { return   millimetre_minute(v); }
+constexpr   millimetre_hour operator ""_mm_h(unsigned long long v)   { return   millimetre_hour(v);   }
+constexpr    millimetre_day operator ""_mm_d(unsigned long long v)   { return   millimetre_day(v);    }
+constexpr      metre_second operator ""_m_sec(unsigned long long v)  { return   metre_second(v);      }
+constexpr      metre_minute operator ""_m_m(unsigned long long v)    { return   metre_minute(v);      }
+constexpr        metre_hour operator ""_m_h(unsigned long long v)    { return   metre_hour(v);        }
+constexpr         metre_day operator ""_m_d(unsigned long long v)    { return   metre_day(v);         }
+} // namespace literals
 
 } // namespace metric
 

@@ -24,62 +24,6 @@ template <class _Rep, class _Period = std::ratio<1> > class mass;
 template <typename A> struct __is_mass: __is_specialization<A, mass> {};
 
 
-// mass_cast
-
-template <class _FromMass, class _ToMass,
-          class _Period = typename std::ratio_divide<typename _FromMass::period, typename _ToMass::period>::type,
-          bool = _Period::num == 1,
-          bool = _Period::den == 1>
-struct __mass_cast;
-
-template <class _FromMass, class _ToMass, class _Period>
-struct __mass_cast<_FromMass, _ToMass, _Period, true, true>
-{   
-    inline METRICCONSTEXPR
-    _ToMass operator()(const _FromMass& __fd) const
-    {   
-        return _ToMass(static_cast<typename _ToMass::rep>(__fd.count()));
-    }
-};
-
-template <class _FromMass, class _ToMass, class _Period>
-struct __mass_cast<_FromMass, _ToMass, _Period, true, false>
-{   
-    inline METRICCONSTEXPR
-    _ToMass operator()(const _FromMass& __fd) const
-    {   
-        typedef typename std::common_type<typename _ToMass::rep, typename _FromMass::rep, intmax_t>::type _Ct;
-        return _ToMass(static_cast<typename _ToMass::rep>(
-                           static_cast<_Ct>(__fd.count()) / static_cast<_Ct>(_Period::den)));
-    }
-};
-
-template <class _FromMass, class _ToMass, class _Period>
-struct __mass_cast<_FromMass, _ToMass, _Period, false, true>
-{   
-    inline METRICCONSTEXPR
-    _ToMass operator()(const _FromMass& __fd) const
-    {   
-        typedef typename std::common_type<typename _ToMass::rep, typename _FromMass::rep, intmax_t>::type _Ct;
-        return _ToMass(static_cast<typename _ToMass::rep>(
-                           static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)));
-    }
-};
-
-template <class _FromMass, class _ToMass, class _Period>
-struct __mass_cast<_FromMass, _ToMass, _Period, false, false>
-{
-    inline METRICCONSTEXPR
-    _ToMass operator()(const _FromMass& __fd) const
-    {
-        typedef typename std::common_type<typename _ToMass::rep, typename _FromMass::rep, intmax_t>::type _Ct;
-        return _ToMass(static_cast<typename _ToMass::rep>(
-                           static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)
-                                                          / static_cast<_Ct>(_Period::den)));
-    }
-};
-
-
 template <class _ToMass, class _Rep, class _Period>
 inline
 METRICCONSTEXPR
@@ -90,7 +34,7 @@ typename std::enable_if
 >::type
 mass_cast(const mass<_Rep, _Period>& __fd)
 {
-    return __mass_cast<mass<_Rep, _Period>, _ToMass>()(__fd);
+    return __metric_cast<mass<_Rep, _Period>, _ToMass>()(__fd);
 }
 
 template <class _Rep, class _Period>
@@ -192,185 +136,8 @@ public:
     inline static METRICCONSTEXPR mass max()  {return mass(limits_values<rep>::max());}
 };
 
-typedef mass<long long, std::nano > nanogram;
-typedef mass<long long, std::micro> microgram;
-typedef mass<long long, std::milli> milligram;
-typedef mass<long long            > gram;
-typedef mass<     long, std::kilo > kilogram;
-typedef mass<     long, std::mega > ton;
-
-namespace literals {
-
-constexpr  nanogram operator ""_ng(unsigned long long v)  { return  nanogram(v); }
-constexpr microgram operator ""_ug(unsigned long long v)  { return microgram(v); }
-constexpr milligram operator ""_mg(unsigned long long v)  { return milligram(v); }
-constexpr      gram operator ""_g(unsigned long long v)   { return      gram(v); }
-constexpr  kilogram operator ""_kg(unsigned long long v)  { return  kilogram(v); }
-constexpr      ton  operator ""_ton(unsigned long long v) { return      ton(v);  }
-
-} // namespace literals
-
-
-// Mass ==
-
-template <class _LhsMass, class _RhsMass>
-struct __mass_eq
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsMass& __lhs, const _RhsMass& __rhs) const
-        {
-            typedef typename std::common_type<_LhsMass, _RhsMass>::type _Ct;
-            return _Ct(__lhs).count() == _Ct(__rhs).count();
-        }
-};
-
-template <class _LhsMass>
-struct __mass_eq<_LhsMass, _LhsMass>
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsMass& __lhs, const _LhsMass& __rhs) const
-        {return __lhs.count() == __rhs.count();}
-};
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator==(const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rhs)
-{
-    return __mass_eq<mass<_Rep1, _Period1>, mass<_Rep2, _Period2> >()(__lhs, __rhs);
-}
-
-// Mass !=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator!=(const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rhs)
-{
-    return !(__lhs == __rhs);
-}
-
-// Mass <
-
-template <class _LhsMass, class _RhsMass>
-struct __mass_lt
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsMass& __lhs, const _RhsMass& __rhs) const
-        {
-            typedef typename std::common_type<_LhsMass, _RhsMass>::type _Ct;
-            return _Ct(__lhs).count() < _Ct(__rhs).count();
-        }
-};
-
-template <class _LhsMass>
-struct __mass_lt<_LhsMass, _LhsMass>
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsMass& __lhs, const _LhsMass& __rhs) const
-        {return __lhs.count() < __rhs.count();}
-};
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator< (const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rhs)
-{
-    return __mass_lt<mass<_Rep1, _Period1>, mass<_Rep2, _Period2> >()(__lhs, __rhs);
-}
-
-// Mass >
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator> (const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rhs)
-{
-    return __rhs < __lhs;
-}
-
-// Mass <=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator<=(const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rhs)
-{
-    return !(__rhs < __lhs);
-}
-
-// Mass >=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator>=(const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rhs)
-{
-    return !(__lhs < __rhs);
-}
-
-// Mass +
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<mass<_Rep1, _Period1>, mass<_Rep2, _Period2> >::type
-operator+(const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<mass<_Rep1, _Period1>, mass<_Rep2, _Period2> >::type _Cd;
-    return _Cd(_Cd(__lhs).count() + _Cd(__rhs).count());
-}
-
-// Mass -
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<mass<_Rep1, _Period1>, mass<_Rep2, _Period2> >::type
-operator-(const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<mass<_Rep1, _Period1>, mass<_Rep2, _Period2> >::type _Cd;
-    return _Cd(_Cd(__lhs).count() - _Cd(__rhs).count());
-}
-
-// Mass *
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename std::enable_if
-<
-    std::is_convertible<_Rep2, typename std::common_type<_Rep1, _Rep2>::type>::value,
-    mass<typename std::common_type<_Rep1, _Rep2>::type, _Period>
->::type
-operator*(const mass<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef mass<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() * static_cast<_Cr>(__s));
-}
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename std::enable_if
-<
-    std::is_convertible<_Rep1, typename std::common_type<_Rep1, _Rep2>::type>::value,
-    mass<typename std::common_type<_Rep1, _Rep2>::type, _Period>
->::type
-operator*(const _Rep1& __s, const mass<_Rep2, _Period>& __d)
-{
-    return __d * __s;
-}
 
 // Mass /
-
 template <class _Mass, class _Rep, bool = __is_mass<_Rep>::value>
 struct __mass_divide_result
 {
@@ -406,18 +173,8 @@ operator/(const mass<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
 }
 
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<_Rep1, _Rep2>::type
-operator/(const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<mass<_Rep1, _Period1>, mass<_Rep2, _Period2> >::type _Ct;
-    return _Ct(__lhs).count() / _Ct(__rhs).count();
-}
 
 // Mass %
-
 template <class _Rep1, class _Period, class _Rep2>
 inline
 METRICCONSTEXPR
@@ -429,16 +186,22 @@ operator%(const mass<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
 }
 
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<mass<_Rep1, _Period1>, mass<_Rep2, _Period2> >::type
-operator%(const mass<_Rep1, _Period1>& __lhs, const mass<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef typename std::common_type<mass<_Rep1, _Period1>, mass<_Rep2, _Period2> >::type _Cd;
-    return _Cd(static_cast<_Cr>(_Cd(__lhs).count()) % static_cast<_Cr>(_Cd(__rhs).count()));
-}
+
+typedef mass<long long, std::nano > nanogram;
+typedef mass<long long, std::micro> microgram;
+typedef mass<long long, std::milli> milligram;
+typedef mass<long long            > gram;
+typedef mass<     long, std::kilo > kilogram;
+typedef mass<     long, std::mega > ton;
+
+namespace literals {
+constexpr  nanogram operator ""_ng(unsigned long long v)  { return  nanogram(v); }
+constexpr microgram operator ""_ug(unsigned long long v)  { return microgram(v); }
+constexpr milligram operator ""_mg(unsigned long long v)  { return milligram(v); }
+constexpr      gram operator ""_g(unsigned long long v)   { return      gram(v); }
+constexpr  kilogram operator ""_kg(unsigned long long v)  { return  kilogram(v); }
+constexpr      ton  operator ""_ton(unsigned long long v) { return      ton(v);  }
+} // namespace literals
 
 } // namespace metric
 

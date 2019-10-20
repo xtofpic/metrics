@@ -24,62 +24,6 @@ template <class _Rep, class _Period = std::ratio<1> > class force;
 template <typename A> struct __is_force: __is_specialization<A, force> {};
 
 
-// force_cast
-
-template <class _FromForce, class _ToForce,
-          class _Period = typename std::ratio_divide<typename _FromForce::period, typename _ToForce::period>::type,
-          bool = _Period::num == 1,
-          bool = _Period::den == 1>
-struct __force_cast;
-
-template <class _FromForce, class _ToForce, class _Period>
-struct __force_cast<_FromForce, _ToForce, _Period, true, true>
-{   
-    inline METRICCONSTEXPR
-    _ToForce operator()(const _FromForce& __fd) const
-    {   
-        return _ToForce(static_cast<typename _ToForce::rep>(__fd.count()));
-    }
-};
-
-template <class _FromForce, class _ToForce, class _Period>
-struct __force_cast<_FromForce, _ToForce, _Period, true, false>
-{   
-    inline METRICCONSTEXPR
-    _ToForce operator()(const _FromForce& __fd) const
-    {   
-        typedef typename std::common_type<typename _ToForce::rep, typename _FromForce::rep, intmax_t>::type _Ct;
-        return _ToForce(static_cast<typename _ToForce::rep>(
-                           static_cast<_Ct>(__fd.count()) / static_cast<_Ct>(_Period::den)));
-    }
-};
-
-template <class _FromForce, class _ToForce, class _Period>
-struct __force_cast<_FromForce, _ToForce, _Period, false, true>
-{   
-    inline METRICCONSTEXPR
-    _ToForce operator()(const _FromForce& __fd) const
-    {   
-        typedef typename std::common_type<typename _ToForce::rep, typename _FromForce::rep, intmax_t>::type _Ct;
-        return _ToForce(static_cast<typename _ToForce::rep>(
-                           static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)));
-    }
-};
-
-template <class _FromForce, class _ToForce, class _Period>
-struct __force_cast<_FromForce, _ToForce, _Period, false, false>
-{
-    inline METRICCONSTEXPR
-    _ToForce operator()(const _FromForce& __fd) const
-    {
-        typedef typename std::common_type<typename _ToForce::rep, typename _FromForce::rep, intmax_t>::type _Ct;
-        return _ToForce(static_cast<typename _ToForce::rep>(
-                           static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)
-                                                          / static_cast<_Ct>(_Period::den)));
-    }
-};
-
-
 template <class _ToForce, class _Rep, class _Period>
 inline
 METRICCONSTEXPR
@@ -90,7 +34,7 @@ typename std::enable_if
 >::type
 force_cast(const force<_Rep, _Period>& __fd)
 {
-    return __force_cast<force<_Rep, _Period>, _ToForce>()(__fd);
+    return __metric_cast<force<_Rep, _Period>, _ToForce>()(__fd);
 }
 
 template <class _Rep, class _Period>
@@ -193,182 +137,7 @@ public:
 };
 
 
-typedef force<long long, std::milli                    > millinewton;
-typedef force<long long                                > newton;
-typedef force<long long, std::deca                     > decanewton;
-typedef force<long long, std::ratio<980665, 100000000> > gramforce;
-typedef force<long long, std::ratio<980665,    100000> > kilogramforce;
-
-namespace literals {
-
-constexpr   millinewton operator ""_mN(unsigned long long v)  { return millinewton(v); }
-constexpr        newton operator ""_N(unsigned long long v)   { return newton(v); }
-constexpr    decanewton operator ""_dN(unsigned long long v)  { return decanewton(v); }
-constexpr     gramforce operator ""_gf(unsigned long long v)  { return gramforce(v); }
-constexpr kilogramforce operator ""_kgf(unsigned long long v) { return kilogramforce(v); }
-
-}
-
-// Force ==
-
-template <class _LhsForce, class _RhsForce>
-struct __force_eq
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsForce& __lhs, const _RhsForce& __rhs) const
-        {
-            typedef typename std::common_type<_LhsForce, _RhsForce>::type _Ct;
-            return _Ct(__lhs).count() == _Ct(__rhs).count();
-        }
-};
-
-template <class _LhsForce>
-struct __force_eq<_LhsForce, _LhsForce>
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsForce& __lhs, const _LhsForce& __rhs) const
-        {return __lhs.count() == __rhs.count();}
-};
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator==(const force<_Rep1, _Period1>& __lhs, const force<_Rep2, _Period2>& __rhs)
-{
-    return __force_eq<force<_Rep1, _Period1>, force<_Rep2, _Period2> >()(__lhs, __rhs);
-}
-
-// Force !=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator!=(const force<_Rep1, _Period1>& __lhs, const force<_Rep2, _Period2>& __rhs)
-{
-    return !(__lhs == __rhs);
-}
-
-// Force <
-
-template <class _LhsForce, class _RhsForce>
-struct __force_lt
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsForce& __lhs, const _RhsForce& __rhs) const
-        {
-            typedef typename std::common_type<_LhsForce, _RhsForce>::type _Ct;
-            return _Ct(__lhs).count() < _Ct(__rhs).count();
-        }
-};
-
-template <class _LhsForce>
-struct __force_lt<_LhsForce, _LhsForce>
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsForce& __lhs, const _LhsForce& __rhs) const
-        {return __lhs.count() < __rhs.count();}
-};
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator< (const force<_Rep1, _Period1>& __lhs, const force<_Rep2, _Period2>& __rhs)
-{
-    return __force_lt<force<_Rep1, _Period1>, force<_Rep2, _Period2> >()(__lhs, __rhs);
-}
-
-// Force >
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator> (const force<_Rep1, _Period1>& __lhs, const force<_Rep2, _Period2>& __rhs)
-{
-    return __rhs < __lhs;
-}
-
-// Force <=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator<=(const force<_Rep1, _Period1>& __lhs, const force<_Rep2, _Period2>& __rhs)
-{
-    return !(__rhs < __lhs);
-}
-
-// Force >=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator>=(const force<_Rep1, _Period1>& __lhs, const force<_Rep2, _Period2>& __rhs)
-{
-    return !(__lhs < __rhs);
-}
-
-// Force +
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<force<_Rep1, _Period1>, force<_Rep2, _Period2> >::type
-operator+(const force<_Rep1, _Period1>& __lhs, const force<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<force<_Rep1, _Period1>, force<_Rep2, _Period2> >::type _Cd;
-    return _Cd(_Cd(__lhs).count() + _Cd(__rhs).count());
-}
-
-// Force -
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<force<_Rep1, _Period1>, force<_Rep2, _Period2> >::type
-operator-(const force<_Rep1, _Period1>& __lhs, const force<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<force<_Rep1, _Period1>, force<_Rep2, _Period2> >::type _Cd;
-    return _Cd(_Cd(__lhs).count() - _Cd(__rhs).count());
-}
-
-// Force *
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename std::enable_if
-<
-    std::is_convertible<_Rep2, typename std::common_type<_Rep1, _Rep2>::type>::value,
-    force<typename std::common_type<_Rep1, _Rep2>::type, _Period>
->::type
-operator*(const force<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef force<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() * static_cast<_Cr>(__s));
-}
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename std::enable_if
-<
-    std::is_convertible<_Rep1, typename std::common_type<_Rep1, _Rep2>::type>::value,
-    force<typename std::common_type<_Rep1, _Rep2>::type, _Period>
->::type
-operator*(const _Rep1& __s, const force<_Rep2, _Period>& __d)
-{
-    return __d * __s;
-}
-
 // Force /
-
 template <class _Force, class _Rep, bool = __is_force<_Rep>::value>
 struct __force_divide_result
 {
@@ -404,18 +173,8 @@ operator/(const force<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
 }
 
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<_Rep1, _Rep2>::type
-operator/(const force<_Rep1, _Period1>& __lhs, const force<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<force<_Rep1, _Period1>, force<_Rep2, _Period2> >::type _Ct;
-    return _Ct(__lhs).count() / _Ct(__rhs).count();
-}
 
 // Force %
-
 template <class _Rep1, class _Period, class _Rep2>
 inline
 METRICCONSTEXPR
@@ -427,15 +186,18 @@ operator%(const force<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
 }
 
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<force<_Rep1, _Period1>, force<_Rep2, _Period2> >::type
-operator%(const force<_Rep1, _Period1>& __lhs, const force<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef typename std::common_type<force<_Rep1, _Period1>, force<_Rep2, _Period2> >::type _Cd;
-    return _Cd(static_cast<_Cr>(_Cd(__lhs).count()) % static_cast<_Cr>(_Cd(__rhs).count()));
+typedef force<long long, std::milli                    > millinewton;
+typedef force<long long                                > newton;
+typedef force<long long, std::deca                     > decanewton;
+typedef force<long long, std::ratio<980665, 100000000> > gramforce;
+typedef force<long long, std::ratio<980665,    100000> > kilogramforce;
+
+namespace literals {
+constexpr   millinewton operator ""_mN(unsigned long long v)  { return millinewton(v); }
+constexpr        newton operator ""_N(unsigned long long v)   { return newton(v); }
+constexpr    decanewton operator ""_dN(unsigned long long v)  { return decanewton(v); }
+constexpr     gramforce operator ""_gf(unsigned long long v)  { return gramforce(v); }
+constexpr kilogramforce operator ""_kgf(unsigned long long v) { return kilogramforce(v); }
 }
 
 } // namespace metric

@@ -24,62 +24,6 @@ template <class _Rep, class _Period = std::ratio<1> > class voltage;
 template <typename A> struct __is_voltage: __is_specialization<A, voltage> {};
 
 
-// voltage_cast
-
-template <class _FromVoltage, class _ToVoltage,
-          class _Period = typename std::ratio_divide<typename _FromVoltage::period, typename _ToVoltage::period>::type,
-          bool = _Period::num == 1,
-          bool = _Period::den == 1>
-struct __voltage_cast;
-
-template <class _FromVoltage, class _ToVoltage, class _Period>
-struct __voltage_cast<_FromVoltage, _ToVoltage, _Period, true, true>
-{   
-    inline METRICCONSTEXPR
-    _ToVoltage operator()(const _FromVoltage& __fd) const
-    {   
-        return _ToVoltage(static_cast<typename _ToVoltage::rep>(__fd.count()));
-    }
-};
-
-template <class _FromVoltage, class _ToVoltage, class _Period>
-struct __voltage_cast<_FromVoltage, _ToVoltage, _Period, true, false>
-{   
-    inline METRICCONSTEXPR
-    _ToVoltage operator()(const _FromVoltage& __fd) const
-    {   
-        typedef typename std::common_type<typename _ToVoltage::rep, typename _FromVoltage::rep, intmax_t>::type _Ct;
-        return _ToVoltage(static_cast<typename _ToVoltage::rep>(
-                           static_cast<_Ct>(__fd.count()) / static_cast<_Ct>(_Period::den)));
-    }
-};
-
-template <class _FromVoltage, class _ToVoltage, class _Period>
-struct __voltage_cast<_FromVoltage, _ToVoltage, _Period, false, true>
-{   
-    inline METRICCONSTEXPR
-    _ToVoltage operator()(const _FromVoltage& __fd) const
-    {   
-        typedef typename std::common_type<typename _ToVoltage::rep, typename _FromVoltage::rep, intmax_t>::type _Ct;
-        return _ToVoltage(static_cast<typename _ToVoltage::rep>(
-                           static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)));
-    }
-};
-
-template <class _FromVoltage, class _ToVoltage, class _Period>
-struct __voltage_cast<_FromVoltage, _ToVoltage, _Period, false, false>
-{
-    inline METRICCONSTEXPR
-    _ToVoltage operator()(const _FromVoltage& __fd) const
-    {
-        typedef typename std::common_type<typename _ToVoltage::rep, typename _FromVoltage::rep, intmax_t>::type _Ct;
-        return _ToVoltage(static_cast<typename _ToVoltage::rep>(
-                           static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)
-                                                          / static_cast<_Ct>(_Period::den)));
-    }
-};
-
-
 template <class _ToVoltage, class _Rep, class _Period>
 inline
 METRICCONSTEXPR
@@ -90,7 +34,7 @@ typename std::enable_if
 >::type
 voltage_cast(const voltage<_Rep, _Period>& __fd)
 {
-    return __voltage_cast<voltage<_Rep, _Period>, _ToVoltage>()(__fd);
+    return __metric_cast<voltage<_Rep, _Period>, _ToVoltage>()(__fd);
 }
 
 template <class _Rep, class _Period>
@@ -193,186 +137,7 @@ public:
 };
 
 
-typedef voltage<long long, std::nano > nanovolt;
-typedef voltage<long long, std::micro> microvolt;
-typedef voltage<long long, std::milli> millivolt;
-typedef voltage<long long            > volt;
-typedef voltage<long long, std::kilo > kilovolt;
-typedef voltage<long long, std::mega > megavolt;
-
-
-namespace literals {
-
-constexpr  nanovolt operator ""_nV(unsigned long long v) { return  nanovolt(v); }
-constexpr microvolt operator ""_uV(unsigned long long v) { return microvolt(v); }
-constexpr millivolt operator ""_mV(unsigned long long v) { return millivolt(v); }
-constexpr      volt operator ""_V(unsigned long long v)  { return      volt(v); }
-constexpr  kilovolt operator ""_kV(unsigned long long v) { return  kilovolt(v); }
-constexpr  megavolt operator ""_MV(unsigned long long v) { return  megavolt(v); }
-
-} // namespace literals
-
-
-// Voltage ==
-
-template <class _LhsVoltage, class _RhsVoltage>
-struct __voltage_eq
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsVoltage& __lhs, const _RhsVoltage& __rhs) const
-        {
-            typedef typename std::common_type<_LhsVoltage, _RhsVoltage>::type _Ct;
-            return _Ct(__lhs).count() == _Ct(__rhs).count();
-        }
-};
-
-template <class _LhsVoltage>
-struct __voltage_eq<_LhsVoltage, _LhsVoltage>
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsVoltage& __lhs, const _LhsVoltage& __rhs) const
-        {return __lhs.count() == __rhs.count();}
-};
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator==(const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>& __rhs)
-{
-    return __voltage_eq<voltage<_Rep1, _Period1>, voltage<_Rep2, _Period2> >()(__lhs, __rhs);
-}
-
-// Voltage !=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator!=(const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>& __rhs)
-{
-    return !(__lhs == __rhs);
-}
-
-// Voltage <
-
-template <class _LhsVoltage, class _RhsVoltage>
-struct __voltage_lt
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsVoltage& __lhs, const _RhsVoltage& __rhs) const
-        {
-            typedef typename std::common_type<_LhsVoltage, _RhsVoltage>::type _Ct;
-            return _Ct(__lhs).count() < _Ct(__rhs).count();
-        }
-};
-
-template <class _LhsVoltage>
-struct __voltage_lt<_LhsVoltage, _LhsVoltage>
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsVoltage& __lhs, const _LhsVoltage& __rhs) const
-        {return __lhs.count() < __rhs.count();}
-};
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator< (const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>& __rhs)
-{
-    return __voltage_lt<voltage<_Rep1, _Period1>, voltage<_Rep2, _Period2> >()(__lhs, __rhs);
-}
-
-// Voltage >
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator> (const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>& __rhs)
-{
-    return __rhs < __lhs;
-}
-
-// Voltage <=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator<=(const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>& __rhs)
-{
-    return !(__rhs < __lhs);
-}
-
-// Voltage >=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator>=(const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>& __rhs)
-{
-    return !(__lhs < __rhs);
-}
-
-// Voltage +
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<voltage<_Rep1, _Period1>, voltage<_Rep2, _Period2> >::type
-operator+(const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<voltage<_Rep1, _Period1>, voltage<_Rep2, _Period2> >::type _Cd;
-    return _Cd(_Cd(__lhs).count() + _Cd(__rhs).count());
-}
-
-// Voltage -
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<voltage<_Rep1, _Period1>, voltage<_Rep2, _Period2> >::type
-operator-(const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<voltage<_Rep1, _Period1>, voltage<_Rep2, _Period2> >::type _Cd;
-    return _Cd(_Cd(__lhs).count() - _Cd(__rhs).count());
-}
-
-// Voltage *
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename std::enable_if
-<
-    std::is_convertible<_Rep2, typename std::common_type<_Rep1, _Rep2>::type>::value,
-    voltage<typename std::common_type<_Rep1, _Rep2>::type, _Period>
->::type
-operator*(const voltage<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef voltage<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() * static_cast<_Cr>(__s));
-}
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename std::enable_if
-<
-    std::is_convertible<_Rep1, typename std::common_type<_Rep1, _Rep2>::type>::value,
-    voltage<typename std::common_type<_Rep1, _Rep2>::type, _Period>
->::type
-operator*(const _Rep1& __s, const voltage<_Rep2, _Period>& __d)
-{
-    return __d * __s;
-}
-
 // Voltage /
-
 template <class _Voltage, class _Rep, bool = __is_voltage<_Rep>::value>
 struct __voltage_divide_result
 {
@@ -408,18 +173,8 @@ operator/(const voltage<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
 }
 
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<_Rep1, _Rep2>::type
-operator/(const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<voltage<_Rep1, _Period1>, voltage<_Rep2, _Period2> >::type _Ct;
-    return _Ct(__lhs).count() / _Ct(__rhs).count();
-}
 
 // Voltage %
-
 template <class _Rep1, class _Period, class _Rep2>
 inline
 METRICCONSTEXPR
@@ -431,16 +186,22 @@ operator%(const voltage<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
 }
 
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<voltage<_Rep1, _Period1>, voltage<_Rep2, _Period2> >::type
-operator%(const voltage<_Rep1, _Period1>& __lhs, const voltage<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef typename std::common_type<voltage<_Rep1, _Period1>, voltage<_Rep2, _Period2> >::type _Cd;
-    return _Cd(static_cast<_Cr>(_Cd(__lhs).count()) % static_cast<_Cr>(_Cd(__rhs).count()));
-}
+
+typedef voltage<long long, std::nano > nanovolt;
+typedef voltage<long long, std::micro> microvolt;
+typedef voltage<long long, std::milli> millivolt;
+typedef voltage<long long            > volt;
+typedef voltage<long long, std::kilo > kilovolt;
+typedef voltage<long long, std::mega > megavolt;
+
+namespace literals {
+constexpr  nanovolt operator ""_nV(unsigned long long v) { return  nanovolt(v); }
+constexpr microvolt operator ""_uV(unsigned long long v) { return microvolt(v); }
+constexpr millivolt operator ""_mV(unsigned long long v) { return millivolt(v); }
+constexpr      volt operator ""_V(unsigned long long v)  { return      volt(v); }
+constexpr  kilovolt operator ""_kV(unsigned long long v) { return  kilovolt(v); }
+constexpr  megavolt operator ""_MV(unsigned long long v) { return  megavolt(v); }
+} // namespace literals
 
 } // namespace metric
 

@@ -24,62 +24,6 @@ template <class _Rep, class _Period = std::ratio<1> > class frequency;
 template <typename A> struct __is_frequency: __is_specialization<A, frequency> {};
 
 
-// frequency_cast
-
-template <class _FromFrequency, class _ToFrequency,
-          class _Period = typename std::ratio_divide<typename _FromFrequency::period, typename _ToFrequency::period>::type,
-          bool = _Period::num == 1,
-          bool = _Period::den == 1>
-struct __frequency_cast;
-
-template <class _FromFrequency, class _ToFrequency, class _Period>
-struct __frequency_cast<_FromFrequency, _ToFrequency, _Period, true, true>
-{   
-    inline METRICCONSTEXPR
-    _ToFrequency operator()(const _FromFrequency& __fd) const
-    {   
-        return _ToFrequency(static_cast<typename _ToFrequency::rep>(__fd.count()));
-    }
-};
-
-template <class _FromFrequency, class _ToFrequency, class _Period>
-struct __frequency_cast<_FromFrequency, _ToFrequency, _Period, true, false>
-{   
-    inline METRICCONSTEXPR
-    _ToFrequency operator()(const _FromFrequency& __fd) const
-    {   
-        typedef typename std::common_type<typename _ToFrequency::rep, typename _FromFrequency::rep, intmax_t>::type _Ct;
-        return _ToFrequency(static_cast<typename _ToFrequency::rep>(
-                           static_cast<_Ct>(__fd.count()) / static_cast<_Ct>(_Period::den)));
-    }
-};
-
-template <class _FromFrequency, class _ToFrequency, class _Period>
-struct __frequency_cast<_FromFrequency, _ToFrequency, _Period, false, true>
-{   
-    inline METRICCONSTEXPR
-    _ToFrequency operator()(const _FromFrequency& __fd) const
-    {   
-        typedef typename std::common_type<typename _ToFrequency::rep, typename _FromFrequency::rep, intmax_t>::type _Ct;
-        return _ToFrequency(static_cast<typename _ToFrequency::rep>(
-                           static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)));
-    }
-};
-
-template <class _FromFrequency, class _ToFrequency, class _Period>
-struct __frequency_cast<_FromFrequency, _ToFrequency, _Period, false, false>
-{
-    inline METRICCONSTEXPR
-    _ToFrequency operator()(const _FromFrequency& __fd) const
-    {
-        typedef typename std::common_type<typename _ToFrequency::rep, typename _FromFrequency::rep, intmax_t>::type _Ct;
-        return _ToFrequency(static_cast<typename _ToFrequency::rep>(
-                           static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)
-                                                          / static_cast<_Ct>(_Period::den)));
-    }
-};
-
-
 template <class _ToFrequency, class _Rep, class _Period>
 inline
 METRICCONSTEXPR
@@ -90,7 +34,7 @@ typename std::enable_if
 >::type
 frequency_cast(const frequency<_Rep, _Period>& __fd)
 {
-    return __frequency_cast<frequency<_Rep, _Period>, _ToFrequency>()(__fd);
+    return __metric_cast<frequency<_Rep, _Period>, _ToFrequency>()(__fd);
 }
 
 template <class _Rep, class _Period>
@@ -193,182 +137,7 @@ public:
 };
 
 
-typedef frequency<long long, std::milli> millihertz;
-typedef frequency<long long            > hertz;
-typedef frequency<long long, std::kilo > kilohertz;
-typedef frequency<long     , std::mega > megahertz;
-typedef frequency<long     , std::giga > gigahertz;
-
-namespace literals {
-
-constexpr millihertz operator ""_mHz(unsigned long long v)  { return millihertz(v); }
-constexpr      hertz operator ""_Hz(unsigned long long v)   { return hertz(v);      }
-constexpr  kilohertz operator ""_kHz(unsigned long long v)  { return kilohertz(v);  }
-constexpr  megahertz operator ""_MHz(unsigned long long v)  { return megahertz(v);  }
-constexpr  gigahertz operator ""_GHz(unsigned long long v)  { return gigahertz(v);  }
-
-} // namespace literals
-
-// Frequency ==
-
-template <class _LhsFrequency, class _RhsFrequency>
-struct __frequency_eq
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsFrequency& __lhs, const _RhsFrequency& __rhs) const
-        {
-            typedef typename std::common_type<_LhsFrequency, _RhsFrequency>::type _Ct;
-            return _Ct(__lhs).count() == _Ct(__rhs).count();
-        }
-};
-
-template <class _LhsFrequency>
-struct __frequency_eq<_LhsFrequency, _LhsFrequency>
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsFrequency& __lhs, const _LhsFrequency& __rhs) const
-        {return __lhs.count() == __rhs.count();}
-};
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator==(const frequency<_Rep1, _Period1>& __lhs, const frequency<_Rep2, _Period2>& __rhs)
-{
-    return __frequency_eq<frequency<_Rep1, _Period1>, frequency<_Rep2, _Period2> >()(__lhs, __rhs);
-}
-
-// Frequency !=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator!=(const frequency<_Rep1, _Period1>& __lhs, const frequency<_Rep2, _Period2>& __rhs)
-{
-    return !(__lhs == __rhs);
-}
-
-// Frequency <
-
-template <class _LhsFrequency, class _RhsFrequency>
-struct __frequency_lt
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsFrequency& __lhs, const _RhsFrequency& __rhs) const
-        {
-            typedef typename std::common_type<_LhsFrequency, _RhsFrequency>::type _Ct;
-            return _Ct(__lhs).count() < _Ct(__rhs).count();
-        }
-};
-
-template <class _LhsFrequency>
-struct __frequency_lt<_LhsFrequency, _LhsFrequency>
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsFrequency& __lhs, const _LhsFrequency& __rhs) const
-        {return __lhs.count() < __rhs.count();}
-};
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator< (const frequency<_Rep1, _Period1>& __lhs, const frequency<_Rep2, _Period2>& __rhs)
-{
-    return __frequency_lt<frequency<_Rep1, _Period1>, frequency<_Rep2, _Period2> >()(__lhs, __rhs);
-}
-
-// Frequency >
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator> (const frequency<_Rep1, _Period1>& __lhs, const frequency<_Rep2, _Period2>& __rhs)
-{
-    return __rhs < __lhs;
-}
-
-// Frequency <=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator<=(const frequency<_Rep1, _Period1>& __lhs, const frequency<_Rep2, _Period2>& __rhs)
-{
-    return !(__rhs < __lhs);
-}
-
-// Frequency >=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator>=(const frequency<_Rep1, _Period1>& __lhs, const frequency<_Rep2, _Period2>& __rhs)
-{
-    return !(__lhs < __rhs);
-}
-
-// Frequency +
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<frequency<_Rep1, _Period1>, frequency<_Rep2, _Period2> >::type
-operator+(const frequency<_Rep1, _Period1>& __lhs, const frequency<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<frequency<_Rep1, _Period1>, frequency<_Rep2, _Period2> >::type _Cd;
-    return _Cd(_Cd(__lhs).count() + _Cd(__rhs).count());
-}
-
-// Frequency -
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<frequency<_Rep1, _Period1>, frequency<_Rep2, _Period2> >::type
-operator-(const frequency<_Rep1, _Period1>& __lhs, const frequency<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<frequency<_Rep1, _Period1>, frequency<_Rep2, _Period2> >::type _Cd;
-    return _Cd(_Cd(__lhs).count() - _Cd(__rhs).count());
-}
-
-// Frequency *
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename std::enable_if
-<
-    std::is_convertible<_Rep2, typename std::common_type<_Rep1, _Rep2>::type>::value,
-    frequency<typename std::common_type<_Rep1, _Rep2>::type, _Period>
->::type
-operator*(const frequency<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef frequency<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() * static_cast<_Cr>(__s));
-}
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename std::enable_if
-<
-    std::is_convertible<_Rep1, typename std::common_type<_Rep1, _Rep2>::type>::value,
-    frequency<typename std::common_type<_Rep1, _Rep2>::type, _Period>
->::type
-operator*(const _Rep1& __s, const frequency<_Rep2, _Period>& __d)
-{
-    return __d * __s;
-}
-
 // Frequency /
-
 template <class _Frequency, class _Rep, bool = __is_frequency<_Rep>::value>
 struct __frequency_divide_result
 {
@@ -404,18 +173,8 @@ operator/(const frequency<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
 }
 
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<_Rep1, _Rep2>::type
-operator/(const frequency<_Rep1, _Period1>& __lhs, const frequency<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<frequency<_Rep1, _Period1>, frequency<_Rep2, _Period2> >::type _Ct;
-    return _Ct(__lhs).count() / _Ct(__rhs).count();
-}
 
 // Frequency %
-
 template <class _Rep1, class _Period, class _Rep2>
 inline
 METRICCONSTEXPR
@@ -427,16 +186,19 @@ operator%(const frequency<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
 }
 
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<frequency<_Rep1, _Period1>, frequency<_Rep2, _Period2> >::type
-operator%(const frequency<_Rep1, _Period1>& __lhs, const frequency<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef typename std::common_type<frequency<_Rep1, _Period1>, frequency<_Rep2, _Period2> >::type _Cd;
-    return _Cd(static_cast<_Cr>(_Cd(__lhs).count()) % static_cast<_Cr>(_Cd(__rhs).count()));
-}
+typedef frequency<long long, std::milli> millihertz;
+typedef frequency<long long            > hertz;
+typedef frequency<long long, std::kilo > kilohertz;
+typedef frequency<long     , std::mega > megahertz;
+typedef frequency<long     , std::giga > gigahertz;
+
+namespace literals {
+constexpr millihertz operator ""_mHz(unsigned long long v)  { return millihertz(v); }
+constexpr      hertz operator ""_Hz( unsigned long long v)  { return hertz(v);      }
+constexpr  kilohertz operator ""_kHz(unsigned long long v)  { return kilohertz(v);  }
+constexpr  megahertz operator ""_MHz(unsigned long long v)  { return megahertz(v);  }
+constexpr  gigahertz operator ""_GHz(unsigned long long v)  { return gigahertz(v);  }
+} // namespace literals
 
 } // namespace metric
 

@@ -24,62 +24,6 @@ template <class _Rep, class _Period = std::ratio<1> > class pressure;
 template <typename A> struct __is_pressure: __is_specialization<A, pressure> {};
 
 
-// pressure_cast
-
-template <class _FromPressure, class _ToPressure,
-          class _Period = typename std::ratio_divide<typename _FromPressure::period, typename _ToPressure::period>::type,
-          bool = _Period::num == 1,
-          bool = _Period::den == 1>
-struct __pressure_cast;
-
-template <class _FromPressure, class _ToPressure, class _Period>
-struct __pressure_cast<_FromPressure, _ToPressure, _Period, true, true>
-{   
-    inline METRICCONSTEXPR
-    _ToPressure operator()(const _FromPressure& __fd) const
-    {   
-        return _ToPressure(static_cast<typename _ToPressure::rep>(__fd.count()));
-    }
-};
-
-template <class _FromPressure, class _ToPressure, class _Period>
-struct __pressure_cast<_FromPressure, _ToPressure, _Period, true, false>
-{   
-    inline METRICCONSTEXPR
-    _ToPressure operator()(const _FromPressure& __fd) const
-    {   
-        typedef typename std::common_type<typename _ToPressure::rep, typename _FromPressure::rep, intmax_t>::type _Ct;
-        return _ToPressure(static_cast<typename _ToPressure::rep>(
-                           static_cast<_Ct>(__fd.count()) / static_cast<_Ct>(_Period::den)));
-    }
-};
-
-template <class _FromPressure, class _ToPressure, class _Period>
-struct __pressure_cast<_FromPressure, _ToPressure, _Period, false, true>
-{   
-    inline METRICCONSTEXPR
-    _ToPressure operator()(const _FromPressure& __fd) const
-    {   
-        typedef typename std::common_type<typename _ToPressure::rep, typename _FromPressure::rep, intmax_t>::type _Ct;
-        return _ToPressure(static_cast<typename _ToPressure::rep>(
-                           static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)));
-    }
-};
-
-template <class _FromPressure, class _ToPressure, class _Period>
-struct __pressure_cast<_FromPressure, _ToPressure, _Period, false, false>
-{
-    inline METRICCONSTEXPR
-    _ToPressure operator()(const _FromPressure& __fd) const
-    {
-        typedef typename std::common_type<typename _ToPressure::rep, typename _FromPressure::rep, intmax_t>::type _Ct;
-        return _ToPressure(static_cast<typename _ToPressure::rep>(
-                           static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)
-                                                          / static_cast<_Ct>(_Period::den)));
-    }
-};
-
-
 template <class _ToPressure, class _Rep, class _Period>
 inline
 METRICCONSTEXPR
@@ -90,7 +34,7 @@ typename std::enable_if
 >::type
 pressure_cast(const pressure<_Rep, _Period>& __fd)
 {
-    return __pressure_cast<pressure<_Rep, _Period>, _ToPressure>()(__fd);
+    return __metric_cast<pressure<_Rep, _Period>, _ToPressure>()(__fd);
 }
 
 template <class _Rep, class _Period>
@@ -193,194 +137,7 @@ public:
 };
 
 
-typedef pressure<long long, std::ratio<            1,     760> > millimetremercure; // Torr ou mmHg;
-typedef pressure<long long, std::ratio<            1,  101325> > pascal;
-typedef pressure<long long, std::ratio<          100,  101325> > hectopascal;
-typedef pressure<long long, std::ratio<         1000,  101325> > kilopascal;
-typedef pressure<long long, std::ratio<      1000000,  101325> > megapascal;
-typedef pressure<long long, std::ratio<   1000000000,  101325> > gigapascal;
-typedef pressure<long long, std::ratio<1000000000000,  101325> > terapascal;
-typedef pressure<long long, std::ratio<      1000000, 1013250> > bar;
-typedef pressure<long long, std::ratio<         1000, 1013250> > millibar;
-typedef pressure<long long, std::ratio<            1, 1013250> > microbar;
-
-
-namespace literals {
-
-constexpr millimetremercure operator ""_mmHg(unsigned long long v) { return   millimetremercure(v); }
-constexpr            pascal operator ""_Pa(unsigned long long v)   { return   pascal(v); }
-constexpr       hectopascal operator ""_hPa(unsigned long long v)  { return   hectopascal(v); }
-constexpr        kilopascal operator ""_kPa(unsigned long long v)  { return   kilopascal(v); }
-constexpr        megapascal operator ""_MPa(unsigned long long v)  { return   megapascal(v); }
-constexpr        gigapascal operator ""_GPa(unsigned long long v)  { return   gigapascal(v); }
-constexpr        terapascal operator ""_TPa(unsigned long long v)  { return   terapascal(v); }
-constexpr               bar operator ""_bar(unsigned long long v)  { return   bar(v); }
-constexpr          millibar operator ""_mbar(unsigned long long v) { return   millibar(v); }
-constexpr          microbar operator ""_ubar(unsigned long long v) { return   microbar(v); }
-
-} // namespace literals
-
-
-// Pressure ==
-
-template <class _LhsPressure, class _RhsPressure>
-struct __pressure_eq
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsPressure& __lhs, const _RhsPressure& __rhs) const
-        {
-            typedef typename std::common_type<_LhsPressure, _RhsPressure>::type _Ct;
-            return _Ct(__lhs).count() == _Ct(__rhs).count();
-        }
-};
-
-template <class _LhsPressure>
-struct __pressure_eq<_LhsPressure, _LhsPressure>
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsPressure& __lhs, const _LhsPressure& __rhs) const
-        {return __lhs.count() == __rhs.count();}
-};
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator==(const pressure<_Rep1, _Period1>& __lhs, const pressure<_Rep2, _Period2>& __rhs)
-{
-    return __pressure_eq<pressure<_Rep1, _Period1>, pressure<_Rep2, _Period2> >()(__lhs, __rhs);
-}
-
-// Pressure !=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator!=(const pressure<_Rep1, _Period1>& __lhs, const pressure<_Rep2, _Period2>& __rhs)
-{
-    return !(__lhs == __rhs);
-}
-
-// Pressure <
-
-template <class _LhsPressure, class _RhsPressure>
-struct __pressure_lt
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsPressure& __lhs, const _RhsPressure& __rhs) const
-        {
-            typedef typename std::common_type<_LhsPressure, _RhsPressure>::type _Ct;
-            return _Ct(__lhs).count() < _Ct(__rhs).count();
-        }
-};
-
-template <class _LhsPressure>
-struct __pressure_lt<_LhsPressure, _LhsPressure>
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsPressure& __lhs, const _LhsPressure& __rhs) const
-        {return __lhs.count() < __rhs.count();}
-};
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator< (const pressure<_Rep1, _Period1>& __lhs, const pressure<_Rep2, _Period2>& __rhs)
-{
-    return __pressure_lt<pressure<_Rep1, _Period1>, pressure<_Rep2, _Period2> >()(__lhs, __rhs);
-}
-
-// Pressure >
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator> (const pressure<_Rep1, _Period1>& __lhs, const pressure<_Rep2, _Period2>& __rhs)
-{
-    return __rhs < __lhs;
-}
-
-// Pressure <=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator<=(const pressure<_Rep1, _Period1>& __lhs, const pressure<_Rep2, _Period2>& __rhs)
-{
-    return !(__rhs < __lhs);
-}
-
-// Pressure >=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator>=(const pressure<_Rep1, _Period1>& __lhs, const pressure<_Rep2, _Period2>& __rhs)
-{
-    return !(__lhs < __rhs);
-}
-
-// Pressure +
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<pressure<_Rep1, _Period1>, pressure<_Rep2, _Period2> >::type
-operator+(const pressure<_Rep1, _Period1>& __lhs, const pressure<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<pressure<_Rep1, _Period1>, pressure<_Rep2, _Period2> >::type _Cd;
-    return _Cd(_Cd(__lhs).count() + _Cd(__rhs).count());
-}
-
-// Pressure -
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<pressure<_Rep1, _Period1>, pressure<_Rep2, _Period2> >::type
-operator-(const pressure<_Rep1, _Period1>& __lhs, const pressure<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<pressure<_Rep1, _Period1>, pressure<_Rep2, _Period2> >::type _Cd;
-    return _Cd(_Cd(__lhs).count() - _Cd(__rhs).count());
-}
-
-// Pressure *
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename std::enable_if
-<
-    std::is_convertible<_Rep2, typename std::common_type<_Rep1, _Rep2>::type>::value,
-    pressure<typename std::common_type<_Rep1, _Rep2>::type, _Period>
->::type
-operator*(const pressure<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef pressure<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() * static_cast<_Cr>(__s));
-}
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename std::enable_if
-<
-    std::is_convertible<_Rep1, typename std::common_type<_Rep1, _Rep2>::type>::value,
-    pressure<typename std::common_type<_Rep1, _Rep2>::type, _Period>
->::type
-operator*(const _Rep1& __s, const pressure<_Rep2, _Period>& __d)
-{
-    return __d * __s;
-}
-
 // Pressure /
-
 template <class _Pressure, class _Rep, bool = __is_pressure<_Rep>::value>
 struct __pressure_divide_result
 {
@@ -416,18 +173,8 @@ operator/(const pressure<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
 }
 
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<_Rep1, _Rep2>::type
-operator/(const pressure<_Rep1, _Period1>& __lhs, const pressure<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<pressure<_Rep1, _Period1>, pressure<_Rep2, _Period2> >::type _Ct;
-    return _Ct(__lhs).count() / _Ct(__rhs).count();
-}
 
 // Pressure %
-
 template <class _Rep1, class _Period, class _Rep2>
 inline
 METRICCONSTEXPR
@@ -439,16 +186,29 @@ operator%(const pressure<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
 }
 
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<pressure<_Rep1, _Period1>, pressure<_Rep2, _Period2> >::type
-operator%(const pressure<_Rep1, _Period1>& __lhs, const pressure<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef typename std::common_type<pressure<_Rep1, _Period1>, pressure<_Rep2, _Period2> >::type _Cd;
-    return _Cd(static_cast<_Cr>(_Cd(__lhs).count()) % static_cast<_Cr>(_Cd(__rhs).count()));
-}
+typedef pressure<long long, std::ratio<            1,     760> > millimetremercure; // Torr ou mmHg;
+typedef pressure<long long, std::ratio<            1,  101325> > pascal;
+typedef pressure<long long, std::ratio<          100,  101325> > hectopascal;
+typedef pressure<long long, std::ratio<         1000,  101325> > kilopascal;
+typedef pressure<long long, std::ratio<      1000000,  101325> > megapascal;
+typedef pressure<long long, std::ratio<   1000000000,  101325> > gigapascal;
+typedef pressure<long long, std::ratio<1000000000000,  101325> > terapascal;
+typedef pressure<long long, std::ratio<      1000000, 1013250> > bar;
+typedef pressure<long long, std::ratio<         1000, 1013250> > millibar;
+typedef pressure<long long, std::ratio<            1, 1013250> > microbar;
+
+namespace literals {
+constexpr millimetremercure operator ""_mmHg(unsigned long long v) { return millimetremercure(v); }
+constexpr            pascal operator ""_Pa(  unsigned long long v) { return            pascal(v); }
+constexpr       hectopascal operator ""_hPa( unsigned long long v) { return       hectopascal(v); }
+constexpr        kilopascal operator ""_kPa( unsigned long long v) { return        kilopascal(v); }
+constexpr        megapascal operator ""_MPa( unsigned long long v) { return        megapascal(v); }
+constexpr        gigapascal operator ""_GPa( unsigned long long v) { return        gigapascal(v); }
+constexpr        terapascal operator ""_TPa( unsigned long long v) { return        terapascal(v); }
+constexpr               bar operator ""_bar( unsigned long long v) { return               bar(v); }
+constexpr          millibar operator ""_mbar(unsigned long long v) { return          millibar(v); }
+constexpr          microbar operator ""_ubar(unsigned long long v) { return          microbar(v); }
+} // namespace literals
 
 } // namespace metric
 

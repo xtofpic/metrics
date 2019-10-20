@@ -24,62 +24,6 @@ template <class _Rep, class _Period = std::ratio<1> > class energy;
 template <typename A> struct __is_energy: __is_specialization<A, energy> {};
 
 
-// energy_cast
-
-template <class _FromEnergy, class _ToEnergy,
-          class _Period = typename std::ratio_divide<typename _FromEnergy::period, typename _ToEnergy::period>::type,
-          bool = _Period::num == 1,
-          bool = _Period::den == 1>
-struct __energy_cast;
-
-template <class _FromEnergy, class _ToEnergy, class _Period>
-struct __energy_cast<_FromEnergy, _ToEnergy, _Period, true, true>
-{   
-    inline METRICCONSTEXPR
-    _ToEnergy operator()(const _FromEnergy& __fd) const
-    {   
-        return _ToEnergy(static_cast<typename _ToEnergy::rep>(__fd.count()));
-    }
-};
-
-template <class _FromEnergy, class _ToEnergy, class _Period>
-struct __energy_cast<_FromEnergy, _ToEnergy, _Period, true, false>
-{   
-    inline METRICCONSTEXPR
-    _ToEnergy operator()(const _FromEnergy& __fd) const
-    {   
-        typedef typename std::common_type<typename _ToEnergy::rep, typename _FromEnergy::rep, intmax_t>::type _Ct;
-        return _ToEnergy(static_cast<typename _ToEnergy::rep>(
-                           static_cast<_Ct>(__fd.count()) / static_cast<_Ct>(_Period::den)));
-    }
-};
-
-template <class _FromEnergy, class _ToEnergy, class _Period>
-struct __energy_cast<_FromEnergy, _ToEnergy, _Period, false, true>
-{   
-    inline METRICCONSTEXPR
-    _ToEnergy operator()(const _FromEnergy& __fd) const
-    {   
-        typedef typename std::common_type<typename _ToEnergy::rep, typename _FromEnergy::rep, intmax_t>::type _Ct;
-        return _ToEnergy(static_cast<typename _ToEnergy::rep>(
-                           static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)));
-    }
-};
-
-template <class _FromEnergy, class _ToEnergy, class _Period>
-struct __energy_cast<_FromEnergy, _ToEnergy, _Period, false, false>
-{
-    inline METRICCONSTEXPR
-    _ToEnergy operator()(const _FromEnergy& __fd) const
-    {
-        typedef typename std::common_type<typename _ToEnergy::rep, typename _FromEnergy::rep, intmax_t>::type _Ct;
-        return _ToEnergy(static_cast<typename _ToEnergy::rep>(
-                           static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)
-                                                          / static_cast<_Ct>(_Period::den)));
-    }
-};
-
-
 template <class _ToEnergy, class _Rep, class _Period>
 inline
 METRICCONSTEXPR
@@ -90,7 +34,7 @@ typename std::enable_if
 >::type
 energy_cast(const energy<_Rep, _Period>& __fd)
 {
-    return __energy_cast<energy<_Rep, _Period>, _ToEnergy>()(__fd);
+    return __metric_cast<energy<_Rep, _Period>, _ToEnergy>()(__fd);
 }
 
 template <class _Rep, class _Period>
@@ -193,194 +137,7 @@ public:
 };
 
 
-typedef energy<long long, std::ratio<                  1LL, 10000LL>> microwatthour;
-typedef energy<long long, std::ratio<                  1LL,    10LL>> milliwatthour;
-typedef energy<long long, std::ratio<               1000LL,    10LL>> watthour;
-typedef energy<long long, std::ratio<            1000000LL,    10LL>> kilowatthour;
-typedef energy<long long, std::ratio<         1000000000LL,    10LL>> megawatthour;
-typedef energy<long long, std::ratio<      1000000000000LL,    10LL>> gigawatthour;
-typedef energy<long long, std::ratio<   1000000000000000LL,    10LL>> terawatthour;
-typedef energy<long long, std::ratio<1000000000000000000LL,    10LL>> petawatthour;
-typedef energy<long long, std::ratio<               1000LL, 36000LL>> joule;
-typedef energy<long long, std::ratio<               1000LL,  8598LL>> calorie;
-
-
-namespace literals {
-
-constexpr microwatthour operator ""_uWh(unsigned long long v) { return microwatthour(v); }
-constexpr milliwatthour operator ""_mWh(unsigned long long v) { return milliwatthour(v); }
-constexpr      watthour operator ""_Wh( unsigned long long v) { return      watthour(v); }
-constexpr  kilowatthour operator ""_kWh(unsigned long long v) { return  kilowatthour(v); }
-constexpr  megawatthour operator ""_MWh(unsigned long long v) { return  megawatthour(v); }
-constexpr  gigawatthour operator ""_GWh(unsigned long long v) { return  gigawatthour(v); }
-constexpr  terawatthour operator ""_TWh(unsigned long long v) { return  terawatthour(v); }
-constexpr  petawatthour operator ""_PWh(unsigned long long v) { return  petawatthour(v); }
-constexpr         joule operator ""_j(  unsigned long long v) { return         joule(v); }
-constexpr       calorie operator ""_c(  unsigned long long v) { return       calorie(v); }
-
-}
-
-
-// Energy ==
-
-template <class _LhsEnergy, class _RhsEnergy>
-struct __energy_eq
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsEnergy& __lhs, const _RhsEnergy& __rhs) const
-        {
-            typedef typename std::common_type<_LhsEnergy, _RhsEnergy>::type _Ct;
-            return _Ct(__lhs).count() == _Ct(__rhs).count();
-        }
-};
-
-template <class _LhsEnergy>
-struct __energy_eq<_LhsEnergy, _LhsEnergy>
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsEnergy& __lhs, const _LhsEnergy& __rhs) const
-        {return __lhs.count() == __rhs.count();}
-};
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator==(const energy<_Rep1, _Period1>& __lhs, const energy<_Rep2, _Period2>& __rhs)
-{
-    return __energy_eq<energy<_Rep1, _Period1>, energy<_Rep2, _Period2> >()(__lhs, __rhs);
-}
-
-// Energy !=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator!=(const energy<_Rep1, _Period1>& __lhs, const energy<_Rep2, _Period2>& __rhs)
-{
-    return !(__lhs == __rhs);
-}
-
-// Energy <
-
-template <class _LhsEnergy, class _RhsEnergy>
-struct __energy_lt
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsEnergy& __lhs, const _RhsEnergy& __rhs) const
-        {
-            typedef typename std::common_type<_LhsEnergy, _RhsEnergy>::type _Ct;
-            return _Ct(__lhs).count() < _Ct(__rhs).count();
-        }
-};
-
-template <class _LhsEnergy>
-struct __energy_lt<_LhsEnergy, _LhsEnergy>
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsEnergy& __lhs, const _LhsEnergy& __rhs) const
-        {return __lhs.count() < __rhs.count();}
-};
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator< (const energy<_Rep1, _Period1>& __lhs, const energy<_Rep2, _Period2>& __rhs)
-{
-    return __energy_lt<energy<_Rep1, _Period1>, energy<_Rep2, _Period2> >()(__lhs, __rhs);
-}
-
-// Energy >
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator> (const energy<_Rep1, _Period1>& __lhs, const energy<_Rep2, _Period2>& __rhs)
-{
-    return __rhs < __lhs;
-}
-
-// Energy <=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator<=(const energy<_Rep1, _Period1>& __lhs, const energy<_Rep2, _Period2>& __rhs)
-{
-    return !(__rhs < __lhs);
-}
-
-// Energy >=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator>=(const energy<_Rep1, _Period1>& __lhs, const energy<_Rep2, _Period2>& __rhs)
-{
-    return !(__lhs < __rhs);
-}
-
-// Energy +
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<energy<_Rep1, _Period1>, energy<_Rep2, _Period2> >::type
-operator+(const energy<_Rep1, _Period1>& __lhs, const energy<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<energy<_Rep1, _Period1>, energy<_Rep2, _Period2> >::type _Cd;
-    return _Cd(_Cd(__lhs).count() + _Cd(__rhs).count());
-}
-
-// Energy -
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<energy<_Rep1, _Period1>, energy<_Rep2, _Period2> >::type
-operator-(const energy<_Rep1, _Period1>& __lhs, const energy<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<energy<_Rep1, _Period1>, energy<_Rep2, _Period2> >::type _Cd;
-    return _Cd(_Cd(__lhs).count() - _Cd(__rhs).count());
-}
-
-// Energy *
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename std::enable_if
-<
-    std::is_convertible<_Rep2, typename std::common_type<_Rep1, _Rep2>::type>::value,
-    energy<typename std::common_type<_Rep1, _Rep2>::type, _Period>
->::type
-operator*(const energy<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef energy<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() * static_cast<_Cr>(__s));
-}
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename std::enable_if
-<
-    std::is_convertible<_Rep1, typename std::common_type<_Rep1, _Rep2>::type>::value,
-    energy<typename std::common_type<_Rep1, _Rep2>::type, _Period>
->::type
-operator*(const _Rep1& __s, const energy<_Rep2, _Period>& __d)
-{
-    return __d * __s;
-}
-
 // Energy /
-
 template <class _Energy, class _Rep, bool = __is_energy<_Rep>::value>
 struct __energy_divide_result
 {
@@ -416,18 +173,8 @@ operator/(const energy<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
 }
 
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<_Rep1, _Rep2>::type
-operator/(const energy<_Rep1, _Period1>& __lhs, const energy<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<energy<_Rep1, _Period1>, energy<_Rep2, _Period2> >::type _Ct;
-    return _Ct(__lhs).count() / _Ct(__rhs).count();
-}
 
 // Energy %
-
 template <class _Rep1, class _Period, class _Rep2>
 inline
 METRICCONSTEXPR
@@ -439,15 +186,28 @@ operator%(const energy<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
 }
 
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<energy<_Rep1, _Period1>, energy<_Rep2, _Period2> >::type
-operator%(const energy<_Rep1, _Period1>& __lhs, const energy<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef typename std::common_type<energy<_Rep1, _Period1>, energy<_Rep2, _Period2> >::type _Cd;
-    return _Cd(static_cast<_Cr>(_Cd(__lhs).count()) % static_cast<_Cr>(_Cd(__rhs).count()));
+typedef energy<long long, std::ratio<                  1LL, 10000LL>> microwatthour;
+typedef energy<long long, std::ratio<                  1LL,    10LL>> milliwatthour;
+typedef energy<long long, std::ratio<               1000LL,    10LL>> watthour;
+typedef energy<long long, std::ratio<            1000000LL,    10LL>> kilowatthour;
+typedef energy<long long, std::ratio<         1000000000LL,    10LL>> megawatthour;
+typedef energy<long long, std::ratio<      1000000000000LL,    10LL>> gigawatthour;
+typedef energy<long long, std::ratio<   1000000000000000LL,    10LL>> terawatthour;
+typedef energy<long long, std::ratio<1000000000000000000LL,    10LL>> petawatthour;
+typedef energy<long long, std::ratio<               1000LL, 36000LL>> joule;
+typedef energy<long long, std::ratio<               1000LL,  8598LL>> calorie;
+
+namespace literals {
+constexpr microwatthour operator ""_uWh(unsigned long long v) { return microwatthour(v); }
+constexpr milliwatthour operator ""_mWh(unsigned long long v) { return milliwatthour(v); }
+constexpr      watthour operator ""_Wh( unsigned long long v) { return      watthour(v); }
+constexpr  kilowatthour operator ""_kWh(unsigned long long v) { return  kilowatthour(v); }
+constexpr  megawatthour operator ""_MWh(unsigned long long v) { return  megawatthour(v); }
+constexpr  gigawatthour operator ""_GWh(unsigned long long v) { return  gigawatthour(v); }
+constexpr  terawatthour operator ""_TWh(unsigned long long v) { return  terawatthour(v); }
+constexpr  petawatthour operator ""_PWh(unsigned long long v) { return  petawatthour(v); }
+constexpr         joule operator ""_j(  unsigned long long v) { return         joule(v); }
+constexpr       calorie operator ""_c(  unsigned long long v) { return       calorie(v); }
 }
 
 } // namespace metric

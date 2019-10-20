@@ -24,62 +24,6 @@ template <class _Rep, class _Period = std::ratio<1> > class volumetricflow;
 template <typename A> struct __is_volumetricflow: __is_specialization<A, volumetricflow> {};
 
 
-// volumetricflow_cast
-
-template <class _FromVolumetricFlow, class _ToVolumetricFlow,
-          class _Period = typename std::ratio_divide<typename _FromVolumetricFlow::period, typename _ToVolumetricFlow::period>::type,
-          bool = _Period::num == 1,
-          bool = _Period::den == 1>
-struct __volumetricflow_cast;
-
-template <class _FromVolumetricFlow, class _ToVolumetricFlow, class _Period>
-struct __volumetricflow_cast<_FromVolumetricFlow, _ToVolumetricFlow, _Period, true, true>
-{   
-    inline METRICCONSTEXPR
-    _ToVolumetricFlow operator()(const _FromVolumetricFlow& __fd) const
-    {   
-        return _ToVolumetricFlow(static_cast<typename _ToVolumetricFlow::rep>(__fd.count()));
-    }
-};
-
-template <class _FromVolumetricFlow, class _ToVolumetricFlow, class _Period>
-struct __volumetricflow_cast<_FromVolumetricFlow, _ToVolumetricFlow, _Period, true, false>
-{   
-    inline METRICCONSTEXPR
-    _ToVolumetricFlow operator()(const _FromVolumetricFlow& __fd) const
-    {   
-        typedef typename std::common_type<typename _ToVolumetricFlow::rep, typename _FromVolumetricFlow::rep, intmax_t>::type _Ct;
-        return _ToVolumetricFlow(static_cast<typename _ToVolumetricFlow::rep>(
-                           static_cast<_Ct>(__fd.count()) / static_cast<_Ct>(_Period::den)));
-    }
-};
-
-template <class _FromVolumetricFlow, class _ToVolumetricFlow, class _Period>
-struct __volumetricflow_cast<_FromVolumetricFlow, _ToVolumetricFlow, _Period, false, true>
-{   
-    inline METRICCONSTEXPR
-    _ToVolumetricFlow operator()(const _FromVolumetricFlow& __fd) const
-    {   
-        typedef typename std::common_type<typename _ToVolumetricFlow::rep, typename _FromVolumetricFlow::rep, intmax_t>::type _Ct;
-        return _ToVolumetricFlow(static_cast<typename _ToVolumetricFlow::rep>(
-                           static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)));
-    }
-};
-
-template <class _FromVolumetricFlow, class _ToVolumetricFlow, class _Period>
-struct __volumetricflow_cast<_FromVolumetricFlow, _ToVolumetricFlow, _Period, false, false>
-{
-    inline METRICCONSTEXPR
-    _ToVolumetricFlow operator()(const _FromVolumetricFlow& __fd) const
-    {
-        typedef typename std::common_type<typename _ToVolumetricFlow::rep, typename _FromVolumetricFlow::rep, intmax_t>::type _Ct;
-        return _ToVolumetricFlow(static_cast<typename _ToVolumetricFlow::rep>(
-                           static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)
-                                                          / static_cast<_Ct>(_Period::den)));
-    }
-};
-
-
 template <class _ToVolumetricFlow, class _Rep, class _Period>
 inline
 METRICCONSTEXPR
@@ -90,7 +34,7 @@ typename std::enable_if
 >::type
 volumetricflow_cast(const volumetricflow<_Rep, _Period>& __fd)
 {
-    return __volumetricflow_cast<volumetricflow<_Rep, _Period>, _ToVolumetricFlow>()(__fd);
+    return __metric_cast<volumetricflow<_Rep, _Period>, _ToVolumetricFlow>()(__fd);
 }
 
 template <class _Rep, class _Period>
@@ -193,188 +137,7 @@ public:
 };
 
 
-typedef volumetricflow<long long, std::ratio<86400, 1000> > microlitre_second;
-typedef volumetricflow<long long, std::ratio< 1440, 1000> > microlitre_minute;
-typedef volumetricflow<long long, std::ratio<   24, 1000> > microlitre_hour;
-typedef volumetricflow<long long, std::ratio<86400,    1> > millilitre_second;
-typedef volumetricflow<long long, std::ratio< 1440,    1> > millilitre_minute;
-typedef volumetricflow<long long, std::ratio<   24,    1> > millilitre_hour;
-typedef volumetricflow<long long                          > millilitre_day;
-
-
-namespace literals {
-
-constexpr microlitre_second operator ""_ul_sec(unsigned long long v) { return microlitre_second(v); }
-constexpr microlitre_minute operator ""_ul_m(unsigned long long v)   { return microlitre_minute(v); }
-constexpr microlitre_hour   operator ""_ul_h(unsigned long long v)   { return microlitre_hour(v);   }
-constexpr millilitre_second operator ""_ml_sec(unsigned long long v) { return millilitre_second(v); }
-constexpr millilitre_minute operator ""_ml_m(unsigned long long v)   { return millilitre_minute(v); }
-constexpr millilitre_hour   operator ""_ml_h(unsigned long long v)   { return millilitre_hour(v);   }
-constexpr millilitre_day    operator ""_ml_d(unsigned long long v)   { return millilitre_day(v);    }
-
-} // namespace literals
-
-
-// VolumetricFlow ==
-
-template <class _LhsVolumetricFlow, class _RhsVolumetricFlow>
-struct __volumetricflow_eq
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsVolumetricFlow& __lhs, const _RhsVolumetricFlow& __rhs) const
-        {
-            typedef typename std::common_type<_LhsVolumetricFlow, _RhsVolumetricFlow>::type _Ct;
-            return _Ct(__lhs).count() == _Ct(__rhs).count();
-        }
-};
-
-template <class _LhsVolumetricFlow>
-struct __volumetricflow_eq<_LhsVolumetricFlow, _LhsVolumetricFlow>
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsVolumetricFlow& __lhs, const _LhsVolumetricFlow& __rhs) const
-        {return __lhs.count() == __rhs.count();}
-};
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator==(const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_Rep2, _Period2>& __rhs)
-{
-    return __volumetricflow_eq<volumetricflow<_Rep1, _Period1>, volumetricflow<_Rep2, _Period2> >()(__lhs, __rhs);
-}
-
-// VolumetricFlow !=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator!=(const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_Rep2, _Period2>& __rhs)
-{
-    return !(__lhs == __rhs);
-}
-
-// VolumetricFlow <
-
-template <class _LhsVolumetricFlow, class _RhsVolumetricFlow>
-struct __volumetricflow_lt
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsVolumetricFlow& __lhs, const _RhsVolumetricFlow& __rhs) const
-        {
-            typedef typename std::common_type<_LhsVolumetricFlow, _RhsVolumetricFlow>::type _Ct;
-            return _Ct(__lhs).count() < _Ct(__rhs).count();
-        }
-};
-
-template <class _LhsVolumetricFlow>
-struct __volumetricflow_lt<_LhsVolumetricFlow, _LhsVolumetricFlow>
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsVolumetricFlow& __lhs, const _LhsVolumetricFlow& __rhs) const
-        {return __lhs.count() < __rhs.count();}
-};
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator< (const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_Rep2, _Period2>& __rhs)
-{
-    return __volumetricflow_lt<volumetricflow<_Rep1, _Period1>, volumetricflow<_Rep2, _Period2> >()(__lhs, __rhs);
-}
-
-// VolumetricFlow >
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator> (const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_Rep2, _Period2>& __rhs)
-{
-    return __rhs < __lhs;
-}
-
-// VolumetricFlow <=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator<=(const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_Rep2, _Period2>& __rhs)
-{
-    return !(__rhs < __lhs);
-}
-
-// VolumetricFlow >=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator>=(const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_Rep2, _Period2>& __rhs)
-{
-    return !(__lhs < __rhs);
-}
-
-// VolumetricFlow +
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<volumetricflow<_Rep1, _Period1>, volumetricflow<_Rep2, _Period2> >::type
-operator+(const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<volumetricflow<_Rep1, _Period1>, volumetricflow<_Rep2, _Period2> >::type _Cd;
-    return _Cd(_Cd(__lhs).count() + _Cd(__rhs).count());
-}
-
-// VolumetricFlow -
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<volumetricflow<_Rep1, _Period1>, volumetricflow<_Rep2, _Period2> >::type
-operator-(const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<volumetricflow<_Rep1, _Period1>, volumetricflow<_Rep2, _Period2> >::type _Cd;
-    return _Cd(_Cd(__lhs).count() - _Cd(__rhs).count());
-}
-
-// VolumetricFlow *
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename std::enable_if
-<
-    std::is_convertible<_Rep2, typename std::common_type<_Rep1, _Rep2>::type>::value,
-    volumetricflow<typename std::common_type<_Rep1, _Rep2>::type, _Period>
->::type
-operator*(const volumetricflow<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef volumetricflow<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() * static_cast<_Cr>(__s));
-}
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename std::enable_if
-<
-    std::is_convertible<_Rep1, typename std::common_type<_Rep1, _Rep2>::type>::value,
-    volumetricflow<typename std::common_type<_Rep1, _Rep2>::type, _Period>
->::type
-operator*(const _Rep1& __s, const volumetricflow<_Rep2, _Period>& __d)
-{
-    return __d * __s;
-}
-
 // VolumetricFlow /
-
 template <class _VolumetricFlow, class _Rep, bool = __is_volumetricflow<_Rep>::value>
 struct __volumetricflow_divide_result
 {
@@ -410,18 +173,8 @@ operator/(const volumetricflow<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
 }
 
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<_Rep1, _Rep2>::type
-operator/(const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<volumetricflow<_Rep1, _Period1>, volumetricflow<_Rep2, _Period2> >::type _Ct;
-    return _Ct(__lhs).count() / _Ct(__rhs).count();
-}
 
 // VolumetricFlow %
-
 template <class _Rep1, class _Period, class _Rep2>
 inline
 METRICCONSTEXPR
@@ -433,16 +186,23 @@ operator%(const volumetricflow<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
 }
 
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<volumetricflow<_Rep1, _Period1>, volumetricflow<_Rep2, _Period2> >::type
-operator%(const volumetricflow<_Rep1, _Period1>& __lhs, const volumetricflow<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef typename std::common_type<volumetricflow<_Rep1, _Period1>, volumetricflow<_Rep2, _Period2> >::type _Cd;
-    return _Cd(static_cast<_Cr>(_Cd(__lhs).count()) % static_cast<_Cr>(_Cd(__rhs).count()));
-}
+typedef volumetricflow<long long, std::ratio<86400, 1000> > microlitre_second;
+typedef volumetricflow<long long, std::ratio< 1440, 1000> > microlitre_minute;
+typedef volumetricflow<long long, std::ratio<   24, 1000> > microlitre_hour;
+typedef volumetricflow<long long, std::ratio<86400,    1> > millilitre_second;
+typedef volumetricflow<long long, std::ratio< 1440,    1> > millilitre_minute;
+typedef volumetricflow<long long, std::ratio<   24,    1> > millilitre_hour;
+typedef volumetricflow<long long                          > millilitre_day;
+
+namespace literals {
+constexpr microlitre_second operator ""_ul_sec(unsigned long long v) { return microlitre_second(v); }
+constexpr microlitre_minute operator ""_ul_m(unsigned long long v)   { return microlitre_minute(v); }
+constexpr microlitre_hour   operator ""_ul_h(unsigned long long v)   { return microlitre_hour(v);   }
+constexpr millilitre_second operator ""_ml_sec(unsigned long long v) { return millilitre_second(v); }
+constexpr millilitre_minute operator ""_ml_m(unsigned long long v)   { return millilitre_minute(v); }
+constexpr millilitre_hour   operator ""_ml_h(unsigned long long v)   { return millilitre_hour(v);   }
+constexpr millilitre_day    operator ""_ml_d(unsigned long long v)   { return millilitre_day(v);    }
+} // namespace literals
 
 } // namespace metric
 

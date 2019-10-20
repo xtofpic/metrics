@@ -24,62 +24,6 @@ template <class _Rep, class _Period = std::ratio<1> > class angularspeed;
 template <typename A> struct __is_angularspeed: __is_specialization<A, angularspeed> {};
 
 
-// angularspeed_cast
-
-template <class _FromAngularSpeed, class _ToAngularSpeed,
-          class _Period = typename std::ratio_divide<typename _FromAngularSpeed::period, typename _ToAngularSpeed::period>::type,
-          bool = _Period::num == 1,
-          bool = _Period::den == 1>
-struct __angularspeed_cast;
-
-template <class _FromAngularSpeed, class _ToAngularSpeed, class _Period>
-struct __angularspeed_cast<_FromAngularSpeed, _ToAngularSpeed, _Period, true, true>
-{   
-    inline METRICCONSTEXPR
-    _ToAngularSpeed operator()(const _FromAngularSpeed& __fd) const
-    {   
-        return _ToAngularSpeed(static_cast<typename _ToAngularSpeed::rep>(__fd.count()));
-    }
-};
-
-template <class _FromAngularSpeed, class _ToAngularSpeed, class _Period>
-struct __angularspeed_cast<_FromAngularSpeed, _ToAngularSpeed, _Period, true, false>
-{   
-    inline METRICCONSTEXPR
-    _ToAngularSpeed operator()(const _FromAngularSpeed& __fd) const
-    {   
-        typedef typename std::common_type<typename _ToAngularSpeed::rep, typename _FromAngularSpeed::rep, intmax_t>::type _Ct;
-        return _ToAngularSpeed(static_cast<typename _ToAngularSpeed::rep>(
-                           static_cast<_Ct>(__fd.count()) / static_cast<_Ct>(_Period::den)));
-    }
-};
-
-template <class _FromAngularSpeed, class _ToAngularSpeed, class _Period>
-struct __angularspeed_cast<_FromAngularSpeed, _ToAngularSpeed, _Period, false, true>
-{   
-    inline METRICCONSTEXPR
-    _ToAngularSpeed operator()(const _FromAngularSpeed& __fd) const
-    {   
-        typedef typename std::common_type<typename _ToAngularSpeed::rep, typename _FromAngularSpeed::rep, intmax_t>::type _Ct;
-        return _ToAngularSpeed(static_cast<typename _ToAngularSpeed::rep>(
-                           static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)));
-    }
-};
-
-template <class _FromAngularSpeed, class _ToAngularSpeed, class _Period>
-struct __angularspeed_cast<_FromAngularSpeed, _ToAngularSpeed, _Period, false, false>
-{
-    inline METRICCONSTEXPR
-    _ToAngularSpeed operator()(const _FromAngularSpeed& __fd) const
-    {
-        typedef typename std::common_type<typename _ToAngularSpeed::rep, typename _FromAngularSpeed::rep, intmax_t>::type _Ct;
-        return _ToAngularSpeed(static_cast<typename _ToAngularSpeed::rep>(
-                           static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)
-                                                          / static_cast<_Ct>(_Period::den)));
-    }
-};
-
-
 template <class _ToAngularSpeed, class _Rep, class _Period>
 inline
 METRICCONSTEXPR
@@ -90,7 +34,7 @@ typename std::enable_if
 >::type
 angularspeed_cast(const angularspeed<_Rep, _Period>& __fd)
 {
-    return __angularspeed_cast<angularspeed<_Rep, _Period>, _ToAngularSpeed>()(__fd);
+    return __metric_cast<angularspeed<_Rep, _Period>, _ToAngularSpeed>()(__fd);
 }
 
 template <class _Rep, class _Period>
@@ -193,184 +137,7 @@ public:
 };
 
 
-// typedef angularspeed<long long, std::ratio<3600, 360> > degree_second;  // Not fan.
-typedef angularspeed<long long, std::ratio<  10, 1> > degree_second;  // Not fan.
-typedef angularspeed<long long, std::ratio<3600, 1> > turn_second;
-typedef angularspeed<long long, std::ratio<  60, 1> > turn_minute;
-typedef angularspeed<long long                        > turn_hour;
-
-
-namespace literals {
-
-constexpr degree_second operator ""_degsec(unsigned long long v) { return degree_second(v); }
-constexpr   turn_second operator ""_rps(unsigned long long v)    { return turn_second(v); }
-constexpr   turn_minute operator ""_rpm(unsigned long long v)    { return turn_minute(v); }
-constexpr     turn_hour operator ""_rph(unsigned long long v)    { return turn_hour(v); }
-
-}
-
-
-
-// AngularSpeed ==
-
-template <class _LhsAngularSpeed, class _RhsAngularSpeed>
-struct __angularspeed_eq
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsAngularSpeed& __lhs, const _RhsAngularSpeed& __rhs) const
-        {
-            typedef typename std::common_type<_LhsAngularSpeed, _RhsAngularSpeed>::type _Ct;
-            return _Ct(__lhs).count() == _Ct(__rhs).count();
-        }
-};
-
-template <class _LhsAngularSpeed>
-struct __angularspeed_eq<_LhsAngularSpeed, _LhsAngularSpeed>
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsAngularSpeed& __lhs, const _LhsAngularSpeed& __rhs) const
-        {return __lhs.count() == __rhs.count();}
-};
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator==(const angularspeed<_Rep1, _Period1>& __lhs, const angularspeed<_Rep2, _Period2>& __rhs)
-{
-    return __angularspeed_eq<angularspeed<_Rep1, _Period1>, angularspeed<_Rep2, _Period2> >()(__lhs, __rhs);
-}
-
-// AngularSpeed !=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator!=(const angularspeed<_Rep1, _Period1>& __lhs, const angularspeed<_Rep2, _Period2>& __rhs)
-{
-    return !(__lhs == __rhs);
-}
-
-// AngularSpeed <
-
-template <class _LhsAngularSpeed, class _RhsAngularSpeed>
-struct __angularspeed_lt
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsAngularSpeed& __lhs, const _RhsAngularSpeed& __rhs) const
-        {
-            typedef typename std::common_type<_LhsAngularSpeed, _RhsAngularSpeed>::type _Ct;
-            return _Ct(__lhs).count() < _Ct(__rhs).count();
-        }
-};
-
-template <class _LhsAngularSpeed>
-struct __angularspeed_lt<_LhsAngularSpeed, _LhsAngularSpeed>
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsAngularSpeed& __lhs, const _LhsAngularSpeed& __rhs) const
-        {return __lhs.count() < __rhs.count();}
-};
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator< (const angularspeed<_Rep1, _Period1>& __lhs, const angularspeed<_Rep2, _Period2>& __rhs)
-{
-    return __angularspeed_lt<angularspeed<_Rep1, _Period1>, angularspeed<_Rep2, _Period2> >()(__lhs, __rhs);
-}
-
-// AngularSpeed >
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator> (const angularspeed<_Rep1, _Period1>& __lhs, const angularspeed<_Rep2, _Period2>& __rhs)
-{
-    return __rhs < __lhs;
-}
-
-// AngularSpeed <=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator<=(const angularspeed<_Rep1, _Period1>& __lhs, const angularspeed<_Rep2, _Period2>& __rhs)
-{
-    return !(__rhs < __lhs);
-}
-
-// AngularSpeed >=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator>=(const angularspeed<_Rep1, _Period1>& __lhs, const angularspeed<_Rep2, _Period2>& __rhs)
-{
-    return !(__lhs < __rhs);
-}
-
-// AngularSpeed +
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<angularspeed<_Rep1, _Period1>, angularspeed<_Rep2, _Period2> >::type
-operator+(const angularspeed<_Rep1, _Period1>& __lhs, const angularspeed<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<angularspeed<_Rep1, _Period1>, angularspeed<_Rep2, _Period2> >::type _Cd;
-    return _Cd(_Cd(__lhs).count() + _Cd(__rhs).count());
-}
-
-// AngularSpeed -
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<angularspeed<_Rep1, _Period1>, angularspeed<_Rep2, _Period2> >::type
-operator-(const angularspeed<_Rep1, _Period1>& __lhs, const angularspeed<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<angularspeed<_Rep1, _Period1>, angularspeed<_Rep2, _Period2> >::type _Cd;
-    return _Cd(_Cd(__lhs).count() - _Cd(__rhs).count());
-}
-
-// AngularSpeed *
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename std::enable_if
-<
-    std::is_convertible<_Rep2, typename std::common_type<_Rep1, _Rep2>::type>::value,
-    angularspeed<typename std::common_type<_Rep1, _Rep2>::type, _Period>
->::type
-operator*(const angularspeed<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef angularspeed<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() * static_cast<_Cr>(__s));
-}
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename std::enable_if
-<
-    std::is_convertible<_Rep1, typename std::common_type<_Rep1, _Rep2>::type>::value,
-    angularspeed<typename std::common_type<_Rep1, _Rep2>::type, _Period>
->::type
-operator*(const _Rep1& __s, const angularspeed<_Rep2, _Period>& __d)
-{
-    return __d * __s;
-}
-
 // AngularSpeed /
-
 template <class _AngularSpeed, class _Rep, bool = __is_angularspeed<_Rep>::value>
 struct __angularspeed_divide_result
 {
@@ -406,18 +173,8 @@ operator/(const angularspeed<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
 }
 
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<_Rep1, _Rep2>::type
-operator/(const angularspeed<_Rep1, _Period1>& __lhs, const angularspeed<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<angularspeed<_Rep1, _Period1>, angularspeed<_Rep2, _Period2> >::type _Ct;
-    return _Ct(__lhs).count() / _Ct(__rhs).count();
-}
 
 // AngularSpeed %
-
 template <class _Rep1, class _Period, class _Rep2>
 inline
 METRICCONSTEXPR
@@ -429,16 +186,20 @@ operator%(const angularspeed<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
 }
 
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<angularspeed<_Rep1, _Period1>, angularspeed<_Rep2, _Period2> >::type
-operator%(const angularspeed<_Rep1, _Period1>& __lhs, const angularspeed<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef typename std::common_type<angularspeed<_Rep1, _Period1>, angularspeed<_Rep2, _Period2> >::type _Cd;
-    return _Cd(static_cast<_Cr>(_Cd(__lhs).count()) % static_cast<_Cr>(_Cd(__rhs).count()));
+
+// typedef angularspeed<long long, std::ratio<3600, 360> > degree_second;  // Not fan.
+typedef angularspeed<long long, std::ratio<  10, 1> > degree_second;  // Not fan.
+typedef angularspeed<long long, std::ratio<3600, 1> > turn_second;
+typedef angularspeed<long long, std::ratio<  60, 1> > turn_minute;
+typedef angularspeed<long long                        > turn_hour;
+
+namespace literals {
+constexpr degree_second operator ""_degsec(unsigned long long v) { return degree_second(v); }
+constexpr   turn_second operator ""_rps(unsigned long long v)    { return turn_second(v); }
+constexpr   turn_minute operator ""_rpm(unsigned long long v)    { return turn_minute(v); }
+constexpr     turn_hour operator ""_rph(unsigned long long v)    { return turn_hour(v); }
 }
+
 
 } // namespace metric
 

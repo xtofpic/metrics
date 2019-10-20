@@ -24,62 +24,6 @@ template <class _Rep, class _Period = std::ratio<1> > class volume;
 template <typename A> struct __is_volume: __is_specialization<A, volume> {};
 
 
-// volume_cast
-
-template <class _FromVolume, class _ToVolume,
-          class _Period = typename std::ratio_divide<typename _FromVolume::period, typename _ToVolume::period>::type,
-          bool = _Period::num == 1,
-          bool = _Period::den == 1>
-struct __volume_cast;
-
-template <class _FromVolume, class _ToVolume, class _Period>
-struct __volume_cast<_FromVolume, _ToVolume, _Period, true, true>
-{   
-    inline METRICCONSTEXPR
-    _ToVolume operator()(const _FromVolume& __fd) const
-    {   
-        return _ToVolume(static_cast<typename _ToVolume::rep>(__fd.count()));
-    }
-};
-
-template <class _FromVolume, class _ToVolume, class _Period>
-struct __volume_cast<_FromVolume, _ToVolume, _Period, true, false>
-{   
-    inline METRICCONSTEXPR
-    _ToVolume operator()(const _FromVolume& __fd) const
-    {   
-        typedef typename std::common_type<typename _ToVolume::rep, typename _FromVolume::rep, intmax_t>::type _Ct;
-        return _ToVolume(static_cast<typename _ToVolume::rep>(
-                           static_cast<_Ct>(__fd.count()) / static_cast<_Ct>(_Period::den)));
-    }
-};
-
-template <class _FromVolume, class _ToVolume, class _Period>
-struct __volume_cast<_FromVolume, _ToVolume, _Period, false, true>
-{   
-    inline METRICCONSTEXPR
-    _ToVolume operator()(const _FromVolume& __fd) const
-    {   
-        typedef typename std::common_type<typename _ToVolume::rep, typename _FromVolume::rep, intmax_t>::type _Ct;
-        return _ToVolume(static_cast<typename _ToVolume::rep>(
-                           static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)));
-    }
-};
-
-template <class _FromVolume, class _ToVolume, class _Period>
-struct __volume_cast<_FromVolume, _ToVolume, _Period, false, false>
-{
-    inline METRICCONSTEXPR
-    _ToVolume operator()(const _FromVolume& __fd) const
-    {
-        typedef typename std::common_type<typename _ToVolume::rep, typename _FromVolume::rep, intmax_t>::type _Ct;
-        return _ToVolume(static_cast<typename _ToVolume::rep>(
-                           static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)
-                                                          / static_cast<_Ct>(_Period::den)));
-    }
-};
-
-
 template <class _ToVolume, class _Rep, class _Period>
 inline
 METRICCONSTEXPR
@@ -90,7 +34,7 @@ typename std::enable_if
 >::type
 volume_cast(const volume<_Rep, _Period>& __fd)
 {
-    return __volume_cast<volume<_Rep, _Period>, _ToVolume>()(__fd);
+    return __metric_cast<volume<_Rep, _Period>, _ToVolume>()(__fd);
 }
 
 template <class _Rep, class _Period>
@@ -193,186 +137,7 @@ public:
 };
 
 
-typedef volume<long long, std::nano > nanolitre;
-typedef volume<long long, std::micro> microlitre;
-typedef volume<long long, std::milli> millilitre;
-typedef volume<long long            > litre;
-typedef volume<long long, std::kilo > kilolitre;
-typedef volume<long long, std::mega > megalitre;
-
-
-namespace literals {
-
-constexpr   nanolitre operator ""_nl(unsigned long long v) { return   nanolitre(v); }
-constexpr  microlitre operator ""_ul(unsigned long long v) { return  microlitre(v); }
-constexpr  millilitre operator ""_ml(unsigned long long v) { return  millilitre(v); }
-constexpr       litre operator ""_l(unsigned long long v)  { return       litre(v); }
-constexpr   kilolitre operator ""_kl(unsigned long long v) { return   kilolitre(v); }
-constexpr   megalitre operator ""_Ml(unsigned long long v) { return   megalitre(v); }
-
-} // namespace literals
-
-
-// Volume ==
-
-template <class _LhsVolume, class _RhsVolume>
-struct __volume_eq
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsVolume& __lhs, const _RhsVolume& __rhs) const
-        {
-            typedef typename std::common_type<_LhsVolume, _RhsVolume>::type _Ct;
-            return _Ct(__lhs).count() == _Ct(__rhs).count();
-        }
-};
-
-template <class _LhsVolume>
-struct __volume_eq<_LhsVolume, _LhsVolume>
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsVolume& __lhs, const _LhsVolume& __rhs) const
-        {return __lhs.count() == __rhs.count();}
-};
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator==(const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& __rhs)
-{
-    return __volume_eq<volume<_Rep1, _Period1>, volume<_Rep2, _Period2> >()(__lhs, __rhs);
-}
-
-// Volume !=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator!=(const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& __rhs)
-{
-    return !(__lhs == __rhs);
-}
-
-// Volume <
-
-template <class _LhsVolume, class _RhsVolume>
-struct __volume_lt
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsVolume& __lhs, const _RhsVolume& __rhs) const
-        {
-            typedef typename std::common_type<_LhsVolume, _RhsVolume>::type _Ct;
-            return _Ct(__lhs).count() < _Ct(__rhs).count();
-        }
-};
-
-template <class _LhsVolume>
-struct __volume_lt<_LhsVolume, _LhsVolume>
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsVolume& __lhs, const _LhsVolume& __rhs) const
-        {return __lhs.count() < __rhs.count();}
-};
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator< (const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& __rhs)
-{
-    return __volume_lt<volume<_Rep1, _Period1>, volume<_Rep2, _Period2> >()(__lhs, __rhs);
-}
-
-// Volume >
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator> (const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& __rhs)
-{
-    return __rhs < __lhs;
-}
-
-// Volume <=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator<=(const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& __rhs)
-{
-    return !(__rhs < __lhs);
-}
-
-// Volume >=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator>=(const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& __rhs)
-{
-    return !(__lhs < __rhs);
-}
-
-// Volume +
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<volume<_Rep1, _Period1>, volume<_Rep2, _Period2> >::type
-operator+(const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<volume<_Rep1, _Period1>, volume<_Rep2, _Period2> >::type _Cd;
-    return _Cd(_Cd(__lhs).count() + _Cd(__rhs).count());
-}
-
-// Volume -
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<volume<_Rep1, _Period1>, volume<_Rep2, _Period2> >::type
-operator-(const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<volume<_Rep1, _Period1>, volume<_Rep2, _Period2> >::type _Cd;
-    return _Cd(_Cd(__lhs).count() - _Cd(__rhs).count());
-}
-
-// Volume *
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename std::enable_if
-<
-    std::is_convertible<_Rep2, typename std::common_type<_Rep1, _Rep2>::type>::value,
-    volume<typename std::common_type<_Rep1, _Rep2>::type, _Period>
->::type
-operator*(const volume<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef volume<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() * static_cast<_Cr>(__s));
-}
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename std::enable_if
-<
-    std::is_convertible<_Rep1, typename std::common_type<_Rep1, _Rep2>::type>::value,
-    volume<typename std::common_type<_Rep1, _Rep2>::type, _Period>
->::type
-operator*(const _Rep1& __s, const volume<_Rep2, _Period>& __d)
-{
-    return __d * __s;
-}
-
 // Volume /
-
 template <class _Volume, class _Rep, bool = __is_volume<_Rep>::value>
 struct __volume_divide_result
 {
@@ -408,18 +173,8 @@ operator/(const volume<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
 }
 
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<_Rep1, _Rep2>::type
-operator/(const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<volume<_Rep1, _Period1>, volume<_Rep2, _Period2> >::type _Ct;
-    return _Ct(__lhs).count() / _Ct(__rhs).count();
-}
 
 // Volume %
-
 template <class _Rep1, class _Period, class _Rep2>
 inline
 METRICCONSTEXPR
@@ -431,16 +186,22 @@ operator%(const volume<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
 }
 
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<volume<_Rep1, _Period1>, volume<_Rep2, _Period2> >::type
-operator%(const volume<_Rep1, _Period1>& __lhs, const volume<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef typename std::common_type<volume<_Rep1, _Period1>, volume<_Rep2, _Period2> >::type _Cd;
-    return _Cd(static_cast<_Cr>(_Cd(__lhs).count()) % static_cast<_Cr>(_Cd(__rhs).count()));
-}
+typedef volume<long long, std::nano > nanolitre;
+typedef volume<long long, std::micro> microlitre;
+typedef volume<long long, std::milli> millilitre;
+typedef volume<long long            > litre;
+typedef volume<long long, std::kilo > kilolitre;
+typedef volume<long long, std::mega > megalitre;
+
+namespace literals {
+constexpr   nanolitre operator ""_nl(unsigned long long v) { return   nanolitre(v); }
+constexpr  microlitre operator ""_ul(unsigned long long v) { return  microlitre(v); }
+constexpr  millilitre operator ""_ml(unsigned long long v) { return  millilitre(v); }
+constexpr       litre operator ""_l(unsigned long long v)  { return       litre(v); }
+constexpr   kilolitre operator ""_kl(unsigned long long v) { return   kilolitre(v); }
+constexpr   megalitre operator ""_Ml(unsigned long long v) { return   megalitre(v); }
+} // namespace literals
+
 
 } // namespace metric
 

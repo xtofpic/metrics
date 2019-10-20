@@ -24,62 +24,6 @@ template <class _Rep, class _Period = std::ratio<1> > class electricresistance;
 template <typename A> struct __is_electricresistance: __is_specialization<A, electricresistance> {};
 
 
-// electricresistance_cast
-
-template <class _FromElectricResistance, class _ToElectricResistance,
-          class _Period = typename std::ratio_divide<typename _FromElectricResistance::period, typename _ToElectricResistance::period>::type,
-          bool = _Period::num == 1,
-          bool = _Period::den == 1>
-struct __electricresistance_cast;
-
-template <class _FromElectricResistance, class _ToElectricResistance, class _Period>
-struct __electricresistance_cast<_FromElectricResistance, _ToElectricResistance, _Period, true, true>
-{   
-    inline METRICCONSTEXPR
-    _ToElectricResistance operator()(const _FromElectricResistance& __fd) const
-    {   
-        return _ToElectricResistance(static_cast<typename _ToElectricResistance::rep>(__fd.count()));
-    }
-};
-
-template <class _FromElectricResistance, class _ToElectricResistance, class _Period>
-struct __electricresistance_cast<_FromElectricResistance, _ToElectricResistance, _Period, true, false>
-{   
-    inline METRICCONSTEXPR
-    _ToElectricResistance operator()(const _FromElectricResistance& __fd) const
-    {   
-        typedef typename std::common_type<typename _ToElectricResistance::rep, typename _FromElectricResistance::rep, intmax_t>::type _Ct;
-        return _ToElectricResistance(static_cast<typename _ToElectricResistance::rep>(
-                           static_cast<_Ct>(__fd.count()) / static_cast<_Ct>(_Period::den)));
-    }
-};
-
-template <class _FromElectricResistance, class _ToElectricResistance, class _Period>
-struct __electricresistance_cast<_FromElectricResistance, _ToElectricResistance, _Period, false, true>
-{   
-    inline METRICCONSTEXPR
-    _ToElectricResistance operator()(const _FromElectricResistance& __fd) const
-    {   
-        typedef typename std::common_type<typename _ToElectricResistance::rep, typename _FromElectricResistance::rep, intmax_t>::type _Ct;
-        return _ToElectricResistance(static_cast<typename _ToElectricResistance::rep>(
-                           static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)));
-    }
-};
-
-template <class _FromElectricResistance, class _ToElectricResistance, class _Period>
-struct __electricresistance_cast<_FromElectricResistance, _ToElectricResistance, _Period, false, false>
-{
-    inline METRICCONSTEXPR
-    _ToElectricResistance operator()(const _FromElectricResistance& __fd) const
-    {
-        typedef typename std::common_type<typename _ToElectricResistance::rep, typename _FromElectricResistance::rep, intmax_t>::type _Ct;
-        return _ToElectricResistance(static_cast<typename _ToElectricResistance::rep>(
-                           static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)
-                                                          / static_cast<_Ct>(_Period::den)));
-    }
-};
-
-
 template <class _ToElectricResistance, class _Rep, class _Period>
 inline
 METRICCONSTEXPR
@@ -90,9 +34,8 @@ typename std::enable_if
 >::type
 electricresistance_cast(const electricresistance<_Rep, _Period>& __fd)
 {
-    return __electricresistance_cast<electricresistance<_Rep, _Period>, _ToElectricResistance>()(__fd);
+    return __metric_cast<electricresistance<_Rep, _Period>, _ToElectricResistance>()(__fd);
 }
-
 
 template <class _Rep, class _Period>
 class electricresistance
@@ -193,187 +136,8 @@ public:
     inline static METRICCONSTEXPR electricresistance max()  {return electricresistance(limits_values<rep>::max());}
 };
 
-typedef electricresistance<long long, std::nano > abohm;
-typedef electricresistance<long long, std::micro> microohm;
-typedef electricresistance<long long, std::milli> milliohm;
-typedef electricresistance<long long            > ohm;
-typedef electricresistance<     long, std::kilo > kiloohm;
-typedef electricresistance<     long, std::mega > megaohm;
-typedef electricresistance<     long, std::giga > gigaohm;
-
-namespace literals {
-
-constexpr    abohm operator ""_ao(unsigned long long v) { return    abohm(v); }
-constexpr microohm operator ""_uo(unsigned long long v) { return microohm(v); }
-constexpr milliohm operator ""_mo(unsigned long long v) { return milliohm(v); }
-constexpr      ohm operator ""_o( unsigned long long v) { return      ohm(v); }
-constexpr  kiloohm operator ""_ko(unsigned long long v) { return  kiloohm(v); }
-constexpr  megaohm operator ""_Mo(unsigned long long v) { return  megaohm(v); }
-constexpr  gigaohm operator ""_Go(unsigned long long v) { return  gigaohm(v); }
-
-} // namespace literals
-
-
-// ElectricResistance ==
-
-template <class _LhsElectricResistance, class _RhsElectricResistance>
-struct __electricresistance_eq
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsElectricResistance& __lhs, const _RhsElectricResistance& __rhs) const
-        {
-            typedef typename std::common_type<_LhsElectricResistance, _RhsElectricResistance>::type _Ct;
-            return _Ct(__lhs).count() == _Ct(__rhs).count();
-        }
-};
-
-template <class _LhsElectricResistance>
-struct __electricresistance_eq<_LhsElectricResistance, _LhsElectricResistance>
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsElectricResistance& __lhs, const _LhsElectricResistance& __rhs) const
-        {return __lhs.count() == __rhs.count();}
-};
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator==(const electricresistance<_Rep1, _Period1>& __lhs, const electricresistance<_Rep2, _Period2>& __rhs)
-{
-    return __electricresistance_eq<electricresistance<_Rep1, _Period1>, electricresistance<_Rep2, _Period2> >()(__lhs, __rhs);
-}
-
-// ElectricResistance !=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator!=(const electricresistance<_Rep1, _Period1>& __lhs, const electricresistance<_Rep2, _Period2>& __rhs)
-{
-    return !(__lhs == __rhs);
-}
-
-// ElectricResistance <
-
-template <class _LhsElectricResistance, class _RhsElectricResistance>
-struct __electricresistance_lt
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsElectricResistance& __lhs, const _RhsElectricResistance& __rhs) const
-        {
-            typedef typename std::common_type<_LhsElectricResistance, _RhsElectricResistance>::type _Ct;
-            return _Ct(__lhs).count() < _Ct(__rhs).count();
-        }
-};
-
-template <class _LhsElectricResistance>
-struct __electricresistance_lt<_LhsElectricResistance, _LhsElectricResistance>
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsElectricResistance& __lhs, const _LhsElectricResistance& __rhs) const
-        {return __lhs.count() < __rhs.count();}
-};
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator< (const electricresistance<_Rep1, _Period1>& __lhs, const electricresistance<_Rep2, _Period2>& __rhs)
-{
-    return __electricresistance_lt<electricresistance<_Rep1, _Period1>, electricresistance<_Rep2, _Period2> >()(__lhs, __rhs);
-}
-
-// ElectricResistance >
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator> (const electricresistance<_Rep1, _Period1>& __lhs, const electricresistance<_Rep2, _Period2>& __rhs)
-{
-    return __rhs < __lhs;
-}
-
-// ElectricResistance <=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator<=(const electricresistance<_Rep1, _Period1>& __lhs, const electricresistance<_Rep2, _Period2>& __rhs)
-{
-    return !(__rhs < __lhs);
-}
-
-// ElectricResistance >=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator>=(const electricresistance<_Rep1, _Period1>& __lhs, const electricresistance<_Rep2, _Period2>& __rhs)
-{
-    return !(__lhs < __rhs);
-}
-
-// ElectricResistance +
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<electricresistance<_Rep1, _Period1>, electricresistance<_Rep2, _Period2> >::type
-operator+(const electricresistance<_Rep1, _Period1>& __lhs, const electricresistance<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<electricresistance<_Rep1, _Period1>, electricresistance<_Rep2, _Period2> >::type _Cd;
-    return _Cd(_Cd(__lhs).count() + _Cd(__rhs).count());
-}
-
-// ElectricResistance -
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<electricresistance<_Rep1, _Period1>, electricresistance<_Rep2, _Period2> >::type
-operator-(const electricresistance<_Rep1, _Period1>& __lhs, const electricresistance<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<electricresistance<_Rep1, _Period1>, electricresistance<_Rep2, _Period2> >::type _Cd;
-    return _Cd(_Cd(__lhs).count() - _Cd(__rhs).count());
-}
-
-// ElectricResistance *
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename std::enable_if
-<
-    std::is_convertible<_Rep2, typename std::common_type<_Rep1, _Rep2>::type>::value,
-    electricresistance<typename std::common_type<_Rep1, _Rep2>::type, _Period>
->::type
-operator*(const electricresistance<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef electricresistance<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() * static_cast<_Cr>(__s));
-}
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename std::enable_if
-<
-    std::is_convertible<_Rep1, typename std::common_type<_Rep1, _Rep2>::type>::value,
-    electricresistance<typename std::common_type<_Rep1, _Rep2>::type, _Period>
->::type
-operator*(const _Rep1& __s, const electricresistance<_Rep2, _Period>& __d)
-{
-    return __d * __s;
-}
 
 // ElectricResistance /
-
 template <class _ElectricResistance, class _Rep, bool = __is_electricresistance<_Rep>::value>
 struct __electricresistance_divide_result
 {
@@ -409,18 +173,8 @@ operator/(const electricresistance<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
 }
 
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<_Rep1, _Rep2>::type
-operator/(const electricresistance<_Rep1, _Period1>& __lhs, const electricresistance<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<electricresistance<_Rep1, _Period1>, electricresistance<_Rep2, _Period2> >::type _Ct;
-    return _Ct(__lhs).count() / _Ct(__rhs).count();
-}
 
 // ElectricResistance %
-
 template <class _Rep1, class _Period, class _Rep2>
 inline
 METRICCONSTEXPR
@@ -432,16 +186,23 @@ operator%(const electricresistance<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
 }
 
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<electricresistance<_Rep1, _Period1>, electricresistance<_Rep2, _Period2> >::type
-operator%(const electricresistance<_Rep1, _Period1>& __lhs, const electricresistance<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef typename std::common_type<electricresistance<_Rep1, _Period1>, electricresistance<_Rep2, _Period2> >::type _Cd;
-    return _Cd(static_cast<_Cr>(_Cd(__lhs).count()) % static_cast<_Cr>(_Cd(__rhs).count()));
-}
+typedef electricresistance<long long, std::nano > abohm;
+typedef electricresistance<long long, std::micro> microohm;
+typedef electricresistance<long long, std::milli> milliohm;
+typedef electricresistance<long long            > ohm;
+typedef electricresistance<     long, std::kilo > kiloohm;
+typedef electricresistance<     long, std::mega > megaohm;
+typedef electricresistance<     long, std::giga > gigaohm;
+
+namespace literals {
+constexpr    abohm operator ""_ao(unsigned long long v) { return    abohm(v); }
+constexpr microohm operator ""_uo(unsigned long long v) { return microohm(v); }
+constexpr milliohm operator ""_mo(unsigned long long v) { return milliohm(v); }
+constexpr      ohm operator ""_o( unsigned long long v) { return      ohm(v); }
+constexpr  kiloohm operator ""_ko(unsigned long long v) { return  kiloohm(v); }
+constexpr  megaohm operator ""_Mo(unsigned long long v) { return  megaohm(v); }
+constexpr  gigaohm operator ""_Go(unsigned long long v) { return  gigaohm(v); }
+} // namespace literals
 
 } // namespace metric
 

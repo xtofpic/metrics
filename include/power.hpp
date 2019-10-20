@@ -24,62 +24,6 @@ template <class _Rep, class _Period = std::ratio<1> > class power;
 template <typename A> struct __is_power: __is_specialization<A, power> {};
 
 
-// power_cast
-
-template <class _FromPower, class _ToPower,
-          class _Period = typename std::ratio_divide<typename _FromPower::period, typename _ToPower::period>::type,
-          bool = _Period::num == 1,
-          bool = _Period::den == 1>
-struct __power_cast;
-
-template <class _FromPower, class _ToPower, class _Period>
-struct __power_cast<_FromPower, _ToPower, _Period, true, true>
-{   
-    inline METRICCONSTEXPR
-    _ToPower operator()(const _FromPower& __fd) const
-    {   
-        return _ToPower(static_cast<typename _ToPower::rep>(__fd.count()));
-    }
-};
-
-template <class _FromPower, class _ToPower, class _Period>
-struct __power_cast<_FromPower, _ToPower, _Period, true, false>
-{   
-    inline METRICCONSTEXPR
-    _ToPower operator()(const _FromPower& __fd) const
-    {   
-        typedef typename std::common_type<typename _ToPower::rep, typename _FromPower::rep, intmax_t>::type _Ct;
-        return _ToPower(static_cast<typename _ToPower::rep>(
-                           static_cast<_Ct>(__fd.count()) / static_cast<_Ct>(_Period::den)));
-    }
-};
-
-template <class _FromPower, class _ToPower, class _Period>
-struct __power_cast<_FromPower, _ToPower, _Period, false, true>
-{   
-    inline METRICCONSTEXPR
-    _ToPower operator()(const _FromPower& __fd) const
-    {   
-        typedef typename std::common_type<typename _ToPower::rep, typename _FromPower::rep, intmax_t>::type _Ct;
-        return _ToPower(static_cast<typename _ToPower::rep>(
-                           static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)));
-    }
-};
-
-template <class _FromPower, class _ToPower, class _Period>
-struct __power_cast<_FromPower, _ToPower, _Period, false, false>
-{
-    inline METRICCONSTEXPR
-    _ToPower operator()(const _FromPower& __fd) const
-    {
-        typedef typename std::common_type<typename _ToPower::rep, typename _FromPower::rep, intmax_t>::type _Ct;
-        return _ToPower(static_cast<typename _ToPower::rep>(
-                           static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_Period::num)
-                                                          / static_cast<_Ct>(_Period::den)));
-    }
-};
-
-
 template <class _ToPower, class _Rep, class _Period>
 inline
 METRICCONSTEXPR
@@ -90,7 +34,7 @@ typename std::enable_if
 >::type
 power_cast(const power<_Rep, _Period>& __fd)
 {
-    return __power_cast<power<_Rep, _Period>, _ToPower>()(__fd);
+    return __metric_cast<power<_Rep, _Period>, _ToPower>()(__fd);
 }
 
 template <class _Rep, class _Period>
@@ -193,188 +137,7 @@ public:
 };
 
 
-typedef power<long long, std::nano > nanowatt;
-typedef power<long long, std::micro> microwatt;
-typedef power<long long, std::milli> milliwatt;
-typedef power<long long            > watt;
-typedef power<long long, std::kilo > kilowatt;
-typedef power<long long, std::mega > megawatt;
-typedef power<long long, std::giga > gigawatt;
-
-
-namespace literals {
-
-constexpr  nanowatt operator ""_nW(unsigned long long v) { return   nanowatt(v); }
-constexpr microwatt operator ""_uW(unsigned long long v) { return  microwatt(v); }
-constexpr milliwatt operator ""_mW(unsigned long long v) { return  milliwatt(v); }
-constexpr      watt operator ""_W(unsigned long long v)  { return       watt(v); }
-constexpr  kilowatt operator ""_kW(unsigned long long v) { return   kilowatt(v); }
-constexpr  megawatt operator ""_MW(unsigned long long v) { return   megawatt(v); }
-constexpr  gigawatt operator ""_GW(unsigned long long v) { return   gigawatt(v); }
-
-} // namespace literals
-
-
-// Power ==
-
-template <class _LhsPower, class _RhsPower>
-struct __power_eq
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsPower& __lhs, const _RhsPower& __rhs) const
-        {
-            typedef typename std::common_type<_LhsPower, _RhsPower>::type _Ct;
-            return _Ct(__lhs).count() == _Ct(__rhs).count();
-        }
-};
-
-template <class _LhsPower>
-struct __power_eq<_LhsPower, _LhsPower>
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsPower& __lhs, const _LhsPower& __rhs) const
-        {return __lhs.count() == __rhs.count();}
-};
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator==(const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __rhs)
-{
-    return __power_eq<power<_Rep1, _Period1>, power<_Rep2, _Period2> >()(__lhs, __rhs);
-}
-
-// Power !=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator!=(const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __rhs)
-{
-    return !(__lhs == __rhs);
-}
-
-// Power <
-
-template <class _LhsPower, class _RhsPower>
-struct __power_lt
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsPower& __lhs, const _RhsPower& __rhs) const
-        {
-            typedef typename std::common_type<_LhsPower, _RhsPower>::type _Ct;
-            return _Ct(__lhs).count() < _Ct(__rhs).count();
-        }
-};
-
-template <class _LhsPower>
-struct __power_lt<_LhsPower, _LhsPower>
-{
-    inline METRICCONSTEXPR
-    bool operator()(const _LhsPower& __lhs, const _LhsPower& __rhs) const
-        {return __lhs.count() < __rhs.count();}
-};
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator< (const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __rhs)
-{
-    return __power_lt<power<_Rep1, _Period1>, power<_Rep2, _Period2> >()(__lhs, __rhs);
-}
-
-// Power >
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator> (const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __rhs)
-{
-    return __rhs < __lhs;
-}
-
-// Power <=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator<=(const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __rhs)
-{
-    return !(__rhs < __lhs);
-}
-
-// Power >=
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-bool
-operator>=(const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __rhs)
-{
-    return !(__lhs < __rhs);
-}
-
-// Power +
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<power<_Rep1, _Period1>, power<_Rep2, _Period2> >::type
-operator+(const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<power<_Rep1, _Period1>, power<_Rep2, _Period2> >::type _Cd;
-    return _Cd(_Cd(__lhs).count() + _Cd(__rhs).count());
-}
-
-// Power -
-
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<power<_Rep1, _Period1>, power<_Rep2, _Period2> >::type
-operator-(const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<power<_Rep1, _Period1>, power<_Rep2, _Period2> >::type _Cd;
-    return _Cd(_Cd(__lhs).count() - _Cd(__rhs).count());
-}
-
-// Power *
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename std::enable_if
-<
-    std::is_convertible<_Rep2, typename std::common_type<_Rep1, _Rep2>::type>::value,
-    power<typename std::common_type<_Rep1, _Rep2>::type, _Period>
->::type
-operator*(const power<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef power<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() * static_cast<_Cr>(__s));
-}
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename std::enable_if
-<
-    std::is_convertible<_Rep1, typename std::common_type<_Rep1, _Rep2>::type>::value,
-    power<typename std::common_type<_Rep1, _Rep2>::type, _Period>
->::type
-operator*(const _Rep1& __s, const power<_Rep2, _Period>& __d)
-{
-    return __d * __s;
-}
-
 // Power /
-
 template <class _Power, class _Rep, bool = __is_power<_Rep>::value>
 struct __power_divide_result
 {
@@ -410,18 +173,8 @@ operator/(const power<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
 }
 
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<_Rep1, _Rep2>::type
-operator/(const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<power<_Rep1, _Period1>, power<_Rep2, _Period2> >::type _Ct;
-    return _Ct(__lhs).count() / _Ct(__rhs).count();
-}
 
 // Power %
-
 template <class _Rep1, class _Period, class _Rep2>
 inline
 METRICCONSTEXPR
@@ -433,16 +186,23 @@ operator%(const power<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
 }
 
-template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-inline
-METRICCONSTEXPR
-typename std::common_type<power<_Rep1, _Period1>, power<_Rep2, _Period2> >::type
-operator%(const power<_Rep1, _Period1>& __lhs, const power<_Rep2, _Period2>& __rhs)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef typename std::common_type<power<_Rep1, _Period1>, power<_Rep2, _Period2> >::type _Cd;
-    return _Cd(static_cast<_Cr>(_Cd(__lhs).count()) % static_cast<_Cr>(_Cd(__rhs).count()));
-}
+typedef power<long long, std::nano > nanowatt;
+typedef power<long long, std::micro> microwatt;
+typedef power<long long, std::milli> milliwatt;
+typedef power<long long            > watt;
+typedef power<long long, std::kilo > kilowatt;
+typedef power<long long, std::mega > megawatt;
+typedef power<long long, std::giga > gigawatt;
+
+namespace literals {
+constexpr  nanowatt operator ""_nW(unsigned long long v) { return   nanowatt(v); }
+constexpr microwatt operator ""_uW(unsigned long long v) { return  microwatt(v); }
+constexpr milliwatt operator ""_mW(unsigned long long v) { return  milliwatt(v); }
+constexpr      watt operator ""_W( unsigned long long v) { return       watt(v); }
+constexpr  kilowatt operator ""_kW(unsigned long long v) { return   kilowatt(v); }
+constexpr  megawatt operator ""_MW(unsigned long long v) { return   megawatt(v); }
+constexpr  gigawatt operator ""_GW(unsigned long long v) { return   gigawatt(v); }
+} // namespace literals
 
 } // namespace metric
 
