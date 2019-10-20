@@ -186,7 +186,7 @@ operator%(const pressure<_Rep1, _Period>& __d, const _Rep2& __s)
     return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
 }
 
-typedef pressure<long long, std::ratio<            1,     760> > millimetremercure; // Torr ou mmHg;
+typedef pressure<long long, std::ratio<            1,     760> > millimetremercury; // Torr ou mmHg;
 typedef pressure<long long, std::ratio<            1,  101325> > pascal;
 typedef pressure<long long, std::ratio<          100,  101325> > hectopascal;
 typedef pressure<long long, std::ratio<         1000,  101325> > kilopascal;
