@@ -187,7 +187,11 @@ operator%(const pressure<_Rep1, _Period>& __d, const _Rep2& __s)
 }
 
 typedef pressure<long long, std::ratio<            1,     760> > millimetremercury; // Torr ou mmHg;
+#ifdef _WIN32
+typedef pressure<long long, std::ratio<            1,  101325> > pascl;
+#else
 typedef pressure<long long, std::ratio<            1,  101325> > pascal;
+#endif
 typedef pressure<long long, std::ratio<          100,  101325> > hectopascal;
 typedef pressure<long long, std::ratio<         1000,  101325> > kilopascal;
 typedef pressure<long long, std::ratio<      1000000,  101325> > megapascal;
@@ -199,7 +203,11 @@ typedef pressure<long long, std::ratio<            1, 1013250> > microbar;
 
 namespace literals {
 constexpr millimetremercury operator ""_mmHg(unsigned long long v) { return millimetremercury(v); }
+#ifdef _WIN32
+constexpr            pascl operator ""_Pa(  unsigned long long v) { return            pascl(v); }
+#else
 constexpr            pascal operator ""_Pa(  unsigned long long v) { return            pascal(v); }
+#endif
 constexpr       hectopascal operator ""_hPa( unsigned long long v) { return       hectopascal(v); }
 constexpr        kilopascal operator ""_kPa( unsigned long long v) { return        kilopascal(v); }
 constexpr        megapascal operator ""_MPa( unsigned long long v) { return        megapascal(v); }
