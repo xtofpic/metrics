@@ -20,6 +20,14 @@ struct waterDensity
         static constexpr double value = (999.84847 + (6.337563 * 0.01) * temp + (-8.523829 * 0.001) * temp * temp + (6.943248 * 0.00001) * temp * temp * temp + (-3.821216 * 0.0000001) * temp * temp * temp * temp);
 };
 
+template<int8_t Temperature>
+struct mercuryDensity
+{
+        // static constexpr double temp = static_cast<double>(Temperature);
+        // Formula source: https://www.techniques-ingenieur.fr/base-documentaire/sciences-fondamentales-th8/introduction-aux-constantes-physico-chimiques-42342210/corrections-barometriques-k64/masse-volumique-du-mercure-k64niv10002.html
+        static constexpr double value = 13595.1 / (1 + (1.818 * 0.0001 * (Temperature)));
+};
+
 template<typename Density, typename MassType, typename MassRatio>
 metric::volume<double, MassRatio> operator* (const metric::mass<MassType, MassRatio>& m, Density d)
 {
@@ -30,9 +38,7 @@ metric::volume<double, MassRatio> operator* (const metric::mass<MassType, MassRa
 
 TEST_CASE( "Mass conversion (pass)", "[single-file]" )
 {
-	// 10kg of water at 25°C = Ratio: 997.041
 	REQUIRE(metric::volume_cast<metric::millilitre>(10_kg * waterDensity<25>()) == 10029_ml);
-
 	metric::kilogram _12kg(12);
 	REQUIRE(_12kg == metric::gram(12000));
 	REQUIRE(_12kg == metric::milligram(12000000));
@@ -110,7 +116,11 @@ TEST_CASE( "Power conversion (pass)", "[single-file]" )
 TEST_CASE( "Pressure conversion (pass)", "[single-file]" )
 {
 	REQUIRE(metric::hectopascal(100) == metric::millibar(100));
+#ifdef _WIN32
+	REQUIRE(metric::pascl(1000000000000) == metric::terapascal(1));
+#else
 	REQUIRE(metric::pascal(1000000000000) == metric::terapascal(1));
+#endif
 	REQUIRE(metric::bar(1) == metric::microbar(1000000));
 	std::cout << "1 bar := " << metric::pressure_cast<metric::millimetremercury>(metric::bar(1)).count() << " mmHg." << std::endl;
 	REQUIRE(metric::bar(1) > metric::millimetremercury(750));
