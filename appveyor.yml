@@ -29,6 +29,6 @@ build_script:
   - cmake --build .
 
 test_script:
-  - cd bin
+  - cd tests\bin
   - 010-TestCase.exe
 
