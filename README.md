@@ -2,6 +2,7 @@
 C++ library to handle metric type and conversion
 
 [![Build Status](https://travis-ci.org/xtofpic/metrics.svg?branch=master)](https://travis-ci.org/xtofpic/metrics)
+[![Build status](https://ci.appveyor.com/api/projects/status/github/xtofpic/metrics?svg=true)](https://ci.appveyor.com/project/xtofpic/metrics)
 [![codecov](https://codecov.io/gh/xtofpic/metrics/branch/master/graph/badge.svg)](https://codecov.io/gh/xtofpic/metrics)
 
 
