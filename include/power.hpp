@@ -193,6 +193,8 @@ typedef power<long long            > watt;
 typedef power<long long, std::kilo > kilowatt;
 typedef power<long long, std::mega > megawatt;
 typedef power<long long, std::giga > gigawatt;
+typedef power<long long, std::tera > terawatt;
+typedef power<long long, std::peta > petawatt;
 
 namespace literals {
 constexpr  nanowatt operator ""_nW(unsigned long long v) { return   nanowatt(v); }
@@ -202,6 +204,8 @@ constexpr      watt operator ""_W( unsigned long long v) { return       watt(v);
 constexpr  kilowatt operator ""_kW(unsigned long long v) { return   kilowatt(v); }
 constexpr  megawatt operator ""_MW(unsigned long long v) { return   megawatt(v); }
 constexpr  gigawatt operator ""_GW(unsigned long long v) { return   gigawatt(v); }
+constexpr  terawatt operator ""_TW(unsigned long long v) { return   terawatt(v); }
+constexpr  petawatt operator ""_PW(unsigned long long v) { return   petawatt(v); }
 } // namespace literals
 
 } // namespace metric

@@ -111,21 +111,50 @@ struct __flowrate_cast<_FromFlowRate, _ToFlowRate, _PeriodVolume, _PeriodDuratio
     {
         typedef typename std::common_type<typename _ToFlowRate::volume_rep, typename _FromFlowRate::volume_rep, intmax_t>::type _Ct;
 
-        std::cout << "fd: " << static_cast<_Ct>(__fd.count()) << std::endl;
-        std::cout << "After converting to volume: " << static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_PeriodVolume::num) << std::endl;
-        std::cout << "After converting to time: " << static_cast<_Ct>(__fd.count()) / static_cast<_Ct>(_PeriodDuration::num) << std::endl;
-
         return _ToFlowRate(static_cast<typename _ToFlowRate::volume_rep>(
         		(static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_PeriodVolume::num)) / static_cast<_Ct>(_PeriodDuration::num)));
     }
 };
 
-
-
-/*  No type defined with duration having num/den different.  (TODO if necessary later).
 template <class _FromFlowRate, class _ToFlowRate, class _PeriodVolume, class _PeriodDuration>
-struct __flowrate_cast<_FromFlowRate, _ToFlowRate, _Period, true, true, false, false>
-{   }; */
+struct __flowrate_cast<_FromFlowRate, _ToFlowRate, _PeriodVolume, _PeriodDuration, false, true, true, true>
+{
+    inline
+        _ToFlowRate operator()(const _FromFlowRate& __fd) const
+    {
+        typedef typename std::common_type<typename _ToFlowRate::volume_rep, typename _FromFlowRate::volume_rep, intmax_t>::type _Ct;
+
+        return _ToFlowRate(static_cast<typename _ToFlowRate::volume_rep>(
+            static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_PeriodVolume::num)));
+    }
+};
+
+template <class _FromFlowRate, class _ToFlowRate, class _PeriodVolume, class _PeriodDuration>
+struct __flowrate_cast<_FromFlowRate, _ToFlowRate, _PeriodVolume, _PeriodDuration, false, false, true, true>
+{
+    inline
+	_ToFlowRate operator()(const _FromFlowRate& __fd) const
+    {
+        typedef typename std::common_type<typename _ToFlowRate::volume_rep, typename _FromFlowRate::volume_rep, intmax_t>::type _Ct;
+
+        return _ToFlowRate(static_cast<typename _ToFlowRate::volume_rep>(
+            static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_PeriodVolume::num)
+										   / static_cast<_Ct>(_PeriodVolume::den) ));
+    }
+};
+
+template <class _FromFlowrate, class _ToFlowrate, class _PeriodFlowrate, class _PeriodDuration>
+struct __flowrate_cast<_FromFlowrate, _ToFlowrate, _PeriodFlowrate, _PeriodDuration, false, true, true, false>
+{
+    inline
+        _ToFlowrate operator()(const _FromFlowrate& __fd) const
+    {
+        typedef typename std::common_type<typename _ToFlowrate::flowrate_rep, typename _FromFlowrate::flowrate_rep, intmax_t>::type _Ct;
+
+        return _ToFlowrate(static_cast<typename _ToFlowrate::flowrate_rep>(
+        		(static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_PeriodFlowrate::num)) * static_cast<_Ct>(_PeriodDuration::den)));
+    }
+};
 
 
 template <class _ToFlowRate, class _Vol, class _Period>
@@ -356,6 +385,21 @@ inline Duration operator/(
 {
 	return Duration(v.count() / f.count());
 }
+
+// Flowrate = Volume / Time
+template <
+	typename VolumeRep,
+	typename VolumePer,
+	typename DurationRep,
+	typename DurationPer
+>
+inline flowrate<volume<VolumeRep, VolumePer>, std::chrono::duration<DurationRep, DurationPer>> operator/(
+	const volume<VolumeRep, VolumePer>& v,
+	const std::chrono::duration<DurationRep, DurationPer>& d)
+{
+	return flowrate<volume<VolumeRep, VolumePer>, std::chrono::duration<DurationRep, DurationPer>>(v.count() / d.count());
+}
+
 
 } // namespace metric
 

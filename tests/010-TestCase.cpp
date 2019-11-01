@@ -85,11 +85,19 @@ TEST_CASE( "Energy conversion (pass)", "[single-file]" )
 	REQUIRE(_40k_mwh == metric::watthour(40));
 	REQUIRE(_40k_mwh == metric::microwatthour(40000000));
 	std::cout << "1 joule := " << metric::energy_cast<metric::microwatthour>(metric::joule(1)).count() << " microWatt/hour." << std::endl;
+
+	REQUIRE(metric::watthour(1) == metric::joule(3600));
+
+
 	REQUIRE(metric::joule(1) >= metric::microwatthour(277));
 	REQUIRE(metric::joule(1) < metric::microwatthour(278));
 	std::cout << "1 calorie := " << metric::energy_cast<metric::microwatthour>(metric::calorie(1)).count() << " microWatt/hour." << std::endl;
-	REQUIRE(metric::calorie(1) >= metric::microwatthour(1163));
-	REQUIRE(metric::calorie(1) < metric::microwatthour(1164));
+	// une calorie vaut 180⁄43 joule
+	std::cout << "1 calorie := " << metric::energy_cast<metric::joule>(metric::calorie(1)).count() << " joules." << std::endl;
+
+
+	REQUIRE(metric::calorie(1) >= metric::microwatthour(1162));
+	REQUIRE(metric::calorie(1) < metric::microwatthour(1163));
 }
 
 TEST_CASE( "ForceMass conversion (pass)", "[single-file]" )
@@ -129,7 +137,10 @@ TEST_CASE( "Pressure conversion (pass)", "[single-file]" )
 
 TEST_CASE( "Speed conversion (pass)", "[single-file]" )
 {
+#if _LIBCPP_STD_VER > 17
 	REQUIRE(metric::micrometre_second(10000) == metric::metre_day(864));  // 1 micrometre second = 60/min = 3600/hour = 86400/day = 86,4 mm/j = 0,0864m/j
+#endif
+	REQUIRE(metric::micrometre_second(10000) == metric::metre_hour(36));  // 1 micrometre second = 60/min = 3600/hour = 86400/day = 86,4 mm/j = 0,0864m/j
 }
 
 TEST_CASE( "Voltage conversion (pass)", "[single-file]" )
@@ -162,6 +173,10 @@ TEST_CASE( "Volumetric flows conversion (pass)", "[single-file]" )
 	REQUIRE(metric::millilitre(120) == metric::millilitre_minute(60) * std::chrono::minutes(2));
 
 	REQUIRE(std::chrono::minutes(3) == metric::millilitre(180) / metric::millilitre_minute(60));
+
+
+	REQUIRE(metric::millilitre_minute(60) == metric::millilitre(180) / std::chrono::minutes(3));
+	REQUIRE(metric::millilitre_second(1) == metric::millilitre(180) / std::chrono::minutes(3));
 
 }
 
