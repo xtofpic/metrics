@@ -148,7 +148,7 @@ class flowrate
 {
     static_assert(!__is_flowrate<typename _Volume::rep>::value, "A flowrate representation can not be a flowrate");
     static_assert(__is_volume<_Volume>::value, "First template paramater of flowrate must be a volume");
-    static_assert(std::chrono::__is_duration<_Time>::value, "Second template paramater of flowrate must be a duration");
+    // static_assert(std::chrono::__is_duration<_Time>::value, "Second template paramater of flowrate must be a duration"); // not cross compilable.  TODO: Find a fix
     static_assert(std::__is_ratio<typename _Volume::period>::value, "Second template parameter of flowrate volume must be a std::ratio");
     static_assert(std::__is_ratio<typename _Time::period>::value, "Second template parameter of flowrate duration must be a std::ratio");
     static_assert(_Volume::period::num > 0, "flowrate volume period must be positive");
