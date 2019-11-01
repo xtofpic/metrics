@@ -16,7 +16,7 @@ install:
         pip install --user conan
         conan user
       else
-        brew install conan
+        HOMEBREW_NO_AUTO_UPDATE=1 brew install conan
       fi
 
 addons:
