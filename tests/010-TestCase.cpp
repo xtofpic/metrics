@@ -144,7 +144,25 @@ TEST_CASE( "Volume conversion (pass)", "[single-file]" )
 
 TEST_CASE( "Volumetric flows conversion (pass)", "[single-file]" )
 {
+
+	REQUIRE(metric::flowrate_cast<metric::millilitre_minute>(metric::millilitre_hour(6000)).count() == 100);
+	REQUIRE(metric::flowrate_cast<metric::millilitre_second>(metric::millilitre_hour(36000)).count() == 10);
+	REQUIRE(metric::flowrate_cast<metric::millilitre_hour>(metric::millilitre_minute(100)).count() == 6000);
+	REQUIRE(metric::flowrate_cast<metric::millilitre_hour>(metric::millilitre_second(100)).count() == 360000);
+
+	REQUIRE(metric::millilitre_minute(100) == metric::millilitre_hour(6000));
+	REQUIRE(metric::millilitre_second(10) == metric::millilitre_hour(36000));
+	REQUIRE(metric::millilitre_hour(6000) == metric::millilitre_minute(100));
+	REQUIRE(metric::millilitre_hour(360000) == metric::millilitre_second(100));
+
+
 	REQUIRE(metric::millilitre_minute(60) == metric::microlitre_second(1000));
+	REQUIRE(metric::microlitre_second(1000) == metric::millilitre_minute(60));
+
+	REQUIRE(metric::millilitre(120) == metric::millilitre_minute(60) * std::chrono::minutes(2));
+
+	REQUIRE(std::chrono::minutes(3) == metric::millilitre(180) / metric::millilitre_minute(60));
+
 }
 
 TEST_CASE( "Angular speed conversion (pass)", "[single-file]" )

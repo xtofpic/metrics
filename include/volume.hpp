@@ -162,7 +162,9 @@ struct __volume_divide_result<volume<_Rep1, _Period>, _Rep2, false>
 {
 };
 
-template <class _Rep1, class _Period, class _Rep2>
+
+// TODO:  Use enable_if, otherwise will break with flowrate divide (Time = Volume / Flowrate)
+template <class _Rep1, class _Period, class _Rep2, std::enable_if<std::is_arithmetic<_Rep2>::value, int> = 0>
 inline
 METRICCONSTEXPR
 typename __volume_divide_result<volume<_Rep1, _Period>, _Rep2>::type

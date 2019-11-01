@@ -28,7 +28,7 @@
 #include "electriccurrent.hpp"
 #include "frequency.hpp"
 #include "speed.hpp"
-#include "volumetricflow.hpp"
+#include "flowrate.hpp"
 #include "electricresistance.hpp"
 
 #endif // METRICS_ALL_HPP
