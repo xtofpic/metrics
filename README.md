@@ -29,11 +29,7 @@ This library provide types and conversion for:
  * speed
  * voltage
  * volume
- * volumetric flow
-
-
-
-
+ * flowrate
 
 
 ## User's Guide
@@ -210,7 +206,7 @@ int main()
 |                       | litre             | 1/1                    | _l
 |                       | kilolitre         | kilo                   | _kl
 |                       | megalitre         | mega                   | _Ml
-| **volumetric flow:**  | microlitre/second | 86400/1000             | _ul_sec
+| **flowrate:**         | microlitre/second | 86400/1000             | _ul_sec
 |                       | microlitre/minute | 1440/1000              | _ul_m
 |                       | microlitre/hour   | 24/1000                | _ul_h
 |                       | millilitre/second | 86400/1                | _ml_sec
