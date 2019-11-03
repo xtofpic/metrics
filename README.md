@@ -47,24 +47,23 @@ The Metrics library is a header's only library. Just copy the necessary metrics 
 An example of strongly typed signature.
 ```c++
 #include <iostream>
-#include <mass.hpp>
+#include <metrics.hpp>
 
-void printMass(const metric::gram& gram)
+void printSpeed(metric::metre distance, std::chrono::minutes duration)
 {
-	std::cout << "You send me a weight of " << gram.count() << " gram" << std::endl;
-}
+	metric::kilometre_hour kmh = distance / duration;
+	std::cout << "You are driving at " << kmh.count() << " km/h" << std::endl;
 
+	// Create a custom speed:
+	typedef metric::distance<long long, std::ratio<1609LL, 1LL>> mile;
+	typedef metric::speed<mile, std::chrono::hours> mph;
+	mph speed = distance / duration;
+	std::cout << "You are driving at " << speed.count() << " mph" << std::endl;
+}
 
 int main()
 {
-	metric::kilogram _12kg(12);
-	printMass(_12kg);	// Print: You send me a weight of 12000 gram
-
-	if (_12kg == metric::milligram(12000000))
-	{
-		std::cout << "Great, this library can make some sort of math." << std::endl;
-	}
-
+	printSpeed(metric::metre(247530), std::chrono::minutes(128)); // Enforce type used.
 	return 0;
 }
 ```
