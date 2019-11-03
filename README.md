@@ -139,16 +139,16 @@ int main()
 |                       | ampere            | 1/1                    | _A
 |                       | kiloampere        | kilo                   | _kA
 |                       | megaampere        | mega                   | _MA
-| **energy:**           | microwatthour     | 1/10000                | _uWh
-|                       | milliwatthour     |                   1/10 | _mWh
-|                       | watthour          |                1000/10 | _Wh
-|                       | kilowatthour      |             1000000/10 | _kWh
-|                       | megawatthour      |          1000000000/10 | _MWh
-|                       | gigawatthour      |       1000000000000/10 | _GWh
-|                       | terawatthour      |    1000000000000000/10 | _TWh
-|                       | petawatthour      | 1000000000000000000/10 | _PWh
-|                       | joule             |             1000/36000 | _j
-|                       | calorie           |              1000/8598 | _c
+| **energy:**           | microwatthour     |                        | _uWh
+|                       | milliwatthour     |                        | _mWh
+|                       | watthour          |                        | _Wh
+|                       | kilowatthour      |                        | _kWh
+|                       | megawatthour      |                        | _MWh
+|                       | gigawatthour      |                        | _GWh
+|                       | terawatthour      |                        | _TWh
+|                       | petawatthour      |                        | _PWh
+|                       | joule             |                        | _j
+|                       | calorie           |                        | _c
 | **force:**            | millinewton       | milli                  | _mN
 |                       | newton            | 1/1                    | _N
 |                       | decanewton        | deca                   | _dN
@@ -182,17 +182,17 @@ int main()
 |                       | bar               | 1000000/1013250        | _bar
 |                       | millibar          | 1000/1013250           | _mbar
 |                       | microbar          | 1/1013250              | _ubar
-| **speed:**            | micrometre/second | 86400/1000000          | _um_sec
-|                       | micrometre/minute | 1440/1000000           | _um_m
-|                       | micrometre/hour   | 24/1000000             | _um_h
-|                       | millimetre/second | 86400/1000             | _mm_sec
-|                       | millimetre/minute | 1440/1000              | _mm_m
-|                       | millimetre/hour   | 24/1000                | _mm_h
-|                       | millimetre/day    | 1/1000                 | _mm_d
-|                       | metre/second      | 86400/1                | _m_sec
-|                       | metre/minute      | 1440/1                 | _m_m
-|                       | metre/hour        | 24/1                   | _m_h
-|                       | metre/day         | 1/1                    | _m_d
+| **speed:**            | micrometre/second |                        | _um_sec
+|                       | micrometre/minute |                        | _um_m
+|                       | micrometre/hour   |                        | _um_h
+|                       | millimetre/second |                        | _mm_sec
+|                       | millimetre/minute |                        | _mm_m
+|                       | millimetre/hour   |                        | _mm_h
+|                       | millimetre/day    |                        | _mm_d
+|                       | metre/second      |                        | _m_sec
+|                       | metre/minute      |                        | _m_m
+|                       | metre/hour        |                        | _m_h
+|                       | metre/day         |                        | _m_d
 | **voltage:**          | nanovolt          | nano                   | _nV
 |                       | microvolt         | micro                  | _uV
 |                       | millivolt         | milli                  | _mV
@@ -205,12 +205,12 @@ int main()
 |                       | litre             | 1/1                    | _l
 |                       | kilolitre         | kilo                   | _kl
 |                       | megalitre         | mega                   | _Ml
-| **flowrate:**         | microlitre/second | 86400/1000             | _ul_sec
-|                       | microlitre/minute | 1440/1000              | _ul_m
-|                       | microlitre/hour   | 24/1000                | _ul_h
-|                       | millilitre/second | 86400/1                | _ml_sec
-|                       | millilitre/minute | 1440/1                 | _ml_m
-|                       | millilitre/hour   | 24/1                   | _ml_h
-|                       | millilitre/day    | 1/1                    | _ml_d
+| **flowrate:**         | microlitre/second |                        | _ul_sec
+|                       | microlitre/minute |                        | _ul_m
+|                       | microlitre/hour   |                        | _ul_h
+|                       | millilitre/second |                        | _ml_sec
+|                       | millilitre/minute |                        | _ml_m
+|                       | millilitre/hour   |                        | _ml_h
+|                       | millilitre/day    |                        | _ml_d
 
 
