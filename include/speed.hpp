@@ -73,7 +73,7 @@ struct __speed_cast<_FromSpeed, _ToSpeed, _PeriodDistance, _PeriodDuration, true
 {
     inline  _ToSpeed operator()(const _FromSpeed& __fd) const
     {
-        return _ToSpeed(static_cast<typename _ToSpeed::rep>(__fd.count()));
+        return _ToSpeed(static_cast<typename _ToSpeed::distance_rep>(__fd.count()));
     }
 };
 
@@ -83,7 +83,7 @@ struct __speed_cast<_FromSpeed, _ToSpeed, _PeriodDistance, _PeriodDuration, true
     inline
         _ToSpeed operator()(const _FromSpeed& __fd) const
     {
-        typedef typename std::common_type<typename _ToSpeed::distance_rep, typename _FromSpeed::distance_rep, intmax_t>::type _Ct;
+    	typedef typename std::common_type<typename _ToSpeed::distance_rep, typename _FromSpeed::distance_rep, intmax_t>::type _Ct;
 
         return _ToSpeed(static_cast<typename _ToSpeed::distance_rep>(
             static_cast<_Ct>(__fd.count()) / static_cast<_Ct>(_PeriodDuration::num)));
@@ -96,7 +96,7 @@ struct __speed_cast<_FromSpeed, _ToSpeed, _PeriodDistance, _PeriodDuration, true
     inline
         _ToSpeed operator()(const _FromSpeed& __fd) const
     {
-        typedef typename std::common_type<typename _ToSpeed::distance_rep, typename _FromSpeed::distance_rep, intmax_t>::type _Ct;
+    	typedef typename std::common_type<typename _ToSpeed::distance_rep, typename _FromSpeed::distance_rep, intmax_t>::type _Ct;
 
         return _ToSpeed(static_cast<typename _ToSpeed::distance_rep>(
             static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_PeriodDuration::den)));
@@ -109,7 +109,7 @@ struct __speed_cast<_FromSpeed, _ToSpeed, _PeriodDistance, _PeriodDuration, fals
     inline
         _ToSpeed operator()(const _FromSpeed& __fd) const
     {
-        typedef typename std::common_type<typename _ToSpeed::distance_rep, typename _FromSpeed::distance_rep, intmax_t>::type _Ct;
+    	typedef typename std::common_type<typename _ToSpeed::distance_rep, typename _FromSpeed::distance_rep, intmax_t>::type _Ct;
 
         return _ToSpeed(static_cast<typename _ToSpeed::distance_rep>(
         		(static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_PeriodDistance::num)) / static_cast<_Ct>(_PeriodDuration::num)));
@@ -122,7 +122,7 @@ struct __speed_cast<_FromSpeed, _ToSpeed, _PeriodDistance, _PeriodDuration, fals
     inline
         _ToSpeed operator()(const _FromSpeed& __fd) const
     {
-        typedef typename std::common_type<typename _ToSpeed::power_rep, typename _FromSpeed::power_rep, intmax_t>::type _Ct;
+    	typedef typename std::common_type<typename _ToSpeed::distance_rep, typename _FromSpeed::distance_rep, intmax_t>::type _Ct;
 
         return _ToSpeed(static_cast<typename _ToSpeed::power_rep>(
             static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_PeriodDistance::num)));
@@ -135,9 +135,9 @@ struct __speed_cast<_FromSpeed, _ToSpeed, _PeriodVolume, _PeriodDuration, false,
     inline
 	_ToSpeed operator()(const _FromSpeed& __fd) const
     {
-        typedef typename std::common_type<typename _ToSpeed::volume_rep, typename _FromSpeed::volume_rep, intmax_t>::type _Ct;
+    	typedef typename std::common_type<typename _ToSpeed::distance_rep, typename _FromSpeed::distance_rep, intmax_t>::type _Ct;
 
-        return _ToSpeed(static_cast<typename _ToSpeed::volume_rep>(
+        return _ToSpeed(static_cast<typename _ToSpeed::distance_rep>(
             static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_PeriodVolume::num)
 										   / static_cast<_Ct>(_PeriodVolume::den) ));
     }
@@ -149,10 +149,23 @@ struct __speed_cast<_FromSpeed, _ToSpeed, _PeriodSpeed, _PeriodDuration, false, 
     inline
         _ToSpeed operator()(const _FromSpeed& __fd) const
     {
-        typedef typename std::common_type<typename _ToSpeed::speed_rep, typename _FromSpeed::speed_rep, intmax_t>::type _Ct;
+    	typedef typename std::common_type<typename _ToSpeed::distance_rep, typename _FromSpeed::distance_rep, intmax_t>::type _Ct;
 
         return _ToSpeed(static_cast<typename _ToSpeed::speed_rep>(
         		(static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_PeriodSpeed::num)) * static_cast<_Ct>(_PeriodDuration::den)));
+    }
+};
+
+template <class _FromSpeed, class _ToSpeed, class _PeriodSpeed, class _PeriodDuration>
+struct __speed_cast<_FromSpeed, _ToSpeed, _PeriodSpeed, _PeriodDuration, true, false, true, false>
+{
+    inline
+        _ToSpeed operator()(const _FromSpeed& __fd) const
+    {
+    	typedef typename std::common_type<typename _ToSpeed::distance_rep, typename _FromSpeed::distance_rep, intmax_t>::type _Ct;
+
+        return _ToSpeed(static_cast<typename _ToSpeed::distance_rep>(
+        		(static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_PeriodDuration::den) / static_cast<_Ct>(_PeriodSpeed::den))));
     }
 };
 
@@ -339,6 +352,7 @@ typedef speed<millimetre, std::chrono::hours  > millimetre_hour;
 typedef speed<     metre, std::chrono::seconds> metre_second;
 typedef speed<     metre, std::chrono::minutes> metre_minute;
 typedef speed<     metre, std::chrono::hours  > metre_hour;
+typedef speed< kilometre, std::chrono::hours  > kilometre_hour;
 
 #if _LIBCPP_STD_VER > 17
 typedef speed<     metre, std::chrono::days   > metre_day;
@@ -358,6 +372,7 @@ constexpr   millimetre_hour operator ""_mm_h(unsigned long long v)   { return   
 constexpr      metre_second operator ""_m_sec(unsigned long long v)  { return   metre_second(v);      }
 constexpr      metre_minute operator ""_m_m(unsigned long long v)    { return   metre_minute(v);      }
 constexpr        metre_hour operator ""_m_h(unsigned long long v)    { return   metre_hour(v);        }
+constexpr    kilometre_hour operator ""_km_h(unsigned long long v)   { return   kilometre_hour(v);    }
 
 #if _LIBCPP_STD_VER > 17
 constexpr    millimetre_day operator ""_mm_d(unsigned long long v)   { return   millimetre_day(v);    }
