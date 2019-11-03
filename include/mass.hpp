@@ -162,7 +162,7 @@ struct __mass_divide_result<mass<_Rep1, _Period>, _Rep2, false>
 {
 };
 
-template <class _Rep1, class _Period, class _Rep2>
+template <class _Rep1, class _Period, class _Rep2, typename std::enable_if<std::is_arithmetic<_Rep2>::value, int>::type = 0>
 inline
 METRICCONSTEXPR
 typename __mass_divide_result<mass<_Rep1, _Period>, _Rep2>::type

@@ -23,21 +23,19 @@ struct waterDensity
 template<int8_t Temperature>
 struct mercuryDensity
 {
-        // static constexpr double temp = static_cast<double>(Temperature);
-        // Formula source: https://www.techniques-ingenieur.fr/base-documentaire/sciences-fondamentales-th8/introduction-aux-constantes-physico-chimiques-42342210/corrections-barometriques-k64/masse-volumique-du-mercure-k64niv10002.html
-        static constexpr double value = 13595.1 / (1 + (1.818 * 0.0001 * (Temperature)));
+    // Formula source: https://www.techniques-ingenieur.fr/base-documentaire/sciences-fondamentales-th8/introduction-aux-constantes-physico-chimiques-42342210/corrections-barometriques-k64/masse-volumique-du-mercure-k64niv10002.html
+    static constexpr double value = 13595.1 / (1 + (1.818 * 0.0001 * (Temperature)));
 };
 
 template<typename Density, typename MassType, typename MassRatio>
-metric::volume<double, MassRatio> operator* (const metric::mass<MassType, MassRatio>& m, Density d)
+metric::volume<double, MassRatio> operator/ (const metric::mass<MassType, MassRatio>& m, Density d)
 {
-	// std::cout << "Ratio: " << Density::value << std::endl;
-        return metric::volume<double, MassRatio>(m.count() / Density::value);
+    return metric::volume<double, MassRatio>(m.count() / Density::value);
 }
 
 TEST_CASE( "Mass conversion (pass)", "[single-file]" )
 {
-	REQUIRE(metric::volume_cast<metric::millilitre>(10_kg * waterDensity<25>()) == 10029_ml);
+	REQUIRE(metric::volume_cast<metric::millilitre>(10_kg / waterDensity<25>()) == 10029_ml);
 	metric::kilogram _12kg(12);
 	REQUIRE(_12kg == metric::gram(12000));
 	REQUIRE(_12kg == metric::milligram(12000000));

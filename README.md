@@ -91,15 +91,15 @@ struct mercuryDensity
 };
 
 template<typename Density, typename MassType, typename MassRatio>
-metric::volume<double, MassRatio> operator* (const metric::mass<MassType, MassRatio>& m, Density d)
+metric::volume<double, MassRatio> operator/ (const metric::mass<MassType, MassRatio>& m, Density d)
 {
     return metric::volume<double, MassRatio>(m.count() / Density::value);
 }
 
 int main()
 {
-    std::cout << "10kg of   water at 25°C = " << metric::volume_cast<metric::millilitre>(10_kg *   waterDensity<25>()).count() << " millilitre" << std::endl;
-    std::cout << " 1kg of mercury at  5°C = " << metric::volume_cast<metric::microlitre>( 1_kg * mercuryDensity< 5>()).count() << " microlitre" << std::endl;
+    std::cout << "10kg of   water at 25°C = " << metric::volume_cast<metric::millilitre>(10_kg /   waterDensity<25>()).count() << " millilitre" << std::endl;
+    std::cout << " 1kg of mercury at  5°C = " << metric::volume_cast<metric::microlitre>( 1_kg / mercuryDensity< 5>()).count() << " microlitre" << std::endl;
     return 0;
 }
 ```
