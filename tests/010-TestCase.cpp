@@ -35,7 +35,6 @@ metric::volume<double, MassRatio> operator* (const metric::mass<MassType, MassRa
         return metric::volume<double, MassRatio>(m.count() / Density::value);
 }
 
-
 TEST_CASE( "Mass conversion (pass)", "[single-file]" )
 {
 	REQUIRE(metric::volume_cast<metric::millilitre>(10_kg * waterDensity<25>()) == 10029_ml);
@@ -49,8 +48,6 @@ TEST_CASE( "Mass conversion (pass)", "[single-file]" )
 	_kg10plus2 += metric::kilogram(2);
 	REQUIRE(_kg10plus2 == metric::nanogram(12000000000000));
 }
-
-
 
 TEST_CASE( "Distances conversion (pass)", "[single-file]" )
 {
@@ -71,7 +68,6 @@ TEST_CASE( "Distances conversion (pass)", "[single-file]" )
 	REQUIRE(metric::foot(10000) == metric::metre(3048));
 }
 
-
 TEST_CASE( "Electric current conversion (pass)", "[single-file]" )
 {
 	metric::ampere _12amp(12);
@@ -81,12 +77,74 @@ TEST_CASE( "Electric current conversion (pass)", "[single-file]" )
 
 TEST_CASE( "Energy conversion (pass)", "[single-file]" )
 {
+	REQUIRE(metric::energy_cast<metric::watthour>(metric::joule(100000)).count() == 27);
+
+	REQUIRE(1_kWh == 1000_Wh);
+	REQUIRE(2_kWh == 2000_Wh);
+	REQUIRE(2000_Wh == 2_kWh);
+
+	REQUIRE(2_Wh == 2000_mWh);
+	REQUIRE(2000_mWh == 2_Wh);
+
+	REQUIRE(2_Wh > 1940_mWh);
+	REQUIRE(1930_mWh < 2_Wh);
+
+
+	REQUIRE(2_mWh == 2000_uWh);
+	REQUIRE(2000_uWh == 2_mWh);
+
+	REQUIRE(1_kWh == 3600000_Ws);
+
+	REQUIRE(3600000_Ws == 1_kWh);
+	REQUIRE(7200000_Ws == 2_kWh);
+
+	REQUIRE(3600000_j == 1_kWh);
+
+	REQUIRE(100000_j >= 27_Wh);
+	REQUIRE(100000_j <= 28_Wh);
+
+	REQUIRE(27_Wh <= 100000_j);
+	REQUIRE(28_Wh >= 100000_j);
+
+	REQUIRE(1_Wh == 3600_j);
+
+	REQUIRE(2_Wh == 7200_j);
+	REQUIRE(3600_j == 1_Wh);
+	REQUIRE(7200_j == 2_Wh);
+
 	metric::milliwatthour _40k_mwh(40000);
 	REQUIRE(_40k_mwh == metric::watthour(40));
 	REQUIRE(_40k_mwh == metric::microwatthour(40000000));
-	std::cout << "1 joule := " << metric::energy_cast<metric::microwatthour>(metric::joule(1)).count() << " microWatt/hour." << std::endl;
 
-	REQUIRE(metric::watthour(1) == metric::joule(3600));
+	REQUIRE(metric::energy_cast<metric::watthour>(metric::calorie(1000000000)).count() == 1162790);
+	REQUIRE(metric::calorie(1000000) >= metric::watthour(1162));
+	REQUIRE(metric::calorie(1000000) <= metric::watthour(1164));
+
+	// std::cout << "1 000 000 calorie := " << metric::energy_cast<metric::joule>(metric::calorie(1000000)).count() << " joule." << std::endl;
+	REQUIRE(metric::energy_cast<metric::joule>(metric::calorie(1000000)).count() == 4183200);
+
+
+	REQUIRE(metric::kilowatthour(40) == metric::kilowatt(10) * std::chrono::hours(4));
+	REQUIRE(metric::watthour(40000) == metric::kilowatt(10) * std::chrono::hours(4));
+
+	REQUIRE(metric::kilowatt(10) == metric::kilowatthour(40) / std::chrono::hours(4));
+	REQUIRE(metric::watt(10000) == metric::kilowatthour(40) / std::chrono::hours(4));
+
+	REQUIRE(std::chrono::minutes(240) == metric::kilowatthour(40) / metric::kilowatt(10));
+
+
+	/*
+	std::cout << "1 joule := " << metric::energy_cast<metric::microwatthour>(metric::joule(1)).count() << " microWatt/hour." << std::endl;
+	std::cout << "1 joule := " << metric::energy_cast<metric::wattsecond>(metric::joule(1)).count() << " watt/second." << std::endl;
+
+
+	std::cout << "1 Watt/hour := " << metric::energy_cast<metric::wattsecond>(metric::watthour(1)).count() << " watt/second." << std::endl;
+	std::cout << "1 Watt/second := " << metric::energy_cast<metric::watthour>(metric::wattsecond(1)).count() << " watt/hour." << std::endl;
+
+
+	std::cout << "3600 joules := " << metric::energy_cast<metric::watthour>(metric::joule(3600)).count() << " watt/hour." << std::endl;
+
+	REQUIRE(metric::watthour(3600) == metric::joule(1));
 
 
 	REQUIRE(metric::joule(1) >= metric::microwatthour(277));
@@ -96,8 +154,7 @@ TEST_CASE( "Energy conversion (pass)", "[single-file]" )
 	std::cout << "1 calorie := " << metric::energy_cast<metric::joule>(metric::calorie(1)).count() << " joules." << std::endl;
 
 
-	REQUIRE(metric::calorie(1) >= metric::microwatthour(1162));
-	REQUIRE(metric::calorie(1) < metric::microwatthour(1163));
+	*/
 }
 
 TEST_CASE( "ForceMass conversion (pass)", "[single-file]" )
@@ -135,12 +192,26 @@ TEST_CASE( "Pressure conversion (pass)", "[single-file]" )
 	REQUIRE(metric::bar(1) < metric::millimetremercury(751));
 }
 
+void checkSpeed(metric::metre distance, std::chrono::minutes duration)
+{
+	metric::kilometre_hour kmh = distance / duration;
+	REQUIRE(kmh.count() == 115);
+
+	// Create a custom speed:
+	typedef metric::distance<long long, std::ratio<1609LL, 1LL>> mile;
+	typedef metric::speed<mile, std::chrono::hours> mph;
+	mph speed = distance / duration;
+	REQUIRE(speed.count() == 72);
+}
+
 TEST_CASE( "Speed conversion (pass)", "[single-file]" )
 {
 #if _LIBCPP_STD_VER > 17
 	REQUIRE(metric::micrometre_second(10000) == metric::metre_day(864));  // 1 micrometre second = 60/min = 3600/hour = 86400/day = 86,4 mm/j = 0,0864m/j
 #endif
 	REQUIRE(metric::micrometre_second(10000) == metric::metre_hour(36));  // 1 micrometre second = 60/min = 3600/hour = 86400/day = 86,4 mm/j = 0,0864m/j
+
+	checkSpeed(metric::metre(247530), std::chrono::minutes(128));
 }
 
 TEST_CASE( "Voltage conversion (pass)", "[single-file]" )
