@@ -50,7 +50,7 @@ namespace std
         typedef typename common_type<metric::power<_PowerRep1, _PowerPeriod1>, metric::power<_PowerRep2, _PowerPeriod2>>::type power_type;
         typedef typename common_type<std::chrono::duration<_TimeRep1, _TimePeriod1>, std::chrono::duration<_TimeRep2, _TimePeriod2>>::type duration_type;
 
-        typedef metric::energy<
+        typedef typename metric::energy<
             power_type,
             duration_type
         > type;
@@ -73,7 +73,7 @@ struct __energy_cast<_FromPower, _ToPower, _PeriodPower, _PeriodDuration, true, 
 {
     inline  _ToPower operator()(const _FromPower& __fd) const
     {
-        return _ToPower(static_cast<typename _ToPower::rep>(__fd.count()));
+        return _ToPower(static_cast<typename _ToPower::power_rep>(__fd.count()));
     }
 };
 
@@ -83,10 +83,10 @@ struct __energy_cast<_FromPower, _ToPower, _PeriodPower, _PeriodDuration, true, 
     inline
         _ToPower operator()(const _FromPower& __fd) const
     {
-        typedef typename std::common_type<typename _ToPower::power_rep, typename _FromPower::power_rep, intmax_t>::type _Ct;
+    	typedef typename std::common_type<typename _ToPower::power_rep, typename _FromPower::power_rep, intmax_t>::type _Ct;
 
         return _ToPower(static_cast<typename _ToPower::power_rep>(
-            static_cast<_Ct>(__fd.count()) / static_cast<_Ct>(_PeriodDuration::num)));
+            static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_PeriodDuration::num)));
     }
 };
 
@@ -99,9 +99,10 @@ struct __energy_cast<_FromPower, _ToPower, _PeriodPower, _PeriodDuration, true, 
         typedef typename std::common_type<typename _ToPower::power_rep, typename _FromPower::power_rep, intmax_t>::type _Ct;
 
         return _ToPower(static_cast<typename _ToPower::power_rep>(
-            static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_PeriodDuration::den)));
+            static_cast<_Ct>(__fd.count()) / static_cast<_Ct>(_PeriodDuration::den)));
     }
 };
+
 
 template <class _FromPower, class _ToPower, class _PeriodPower, class _PeriodDuration>
 struct __energy_cast<_FromPower, _ToPower, _PeriodPower, _PeriodDuration, false, true, false, true>
@@ -109,10 +110,10 @@ struct __energy_cast<_FromPower, _ToPower, _PeriodPower, _PeriodDuration, false,
     inline
         _ToPower operator()(const _FromPower& __fd) const
     {
-        typedef typename std::common_type<typename _ToPower::power_rep, typename _FromPower::power_rep, intmax_t>::type _Ct;
+    	typedef typename std::common_type<typename _ToPower::power_rep, typename _FromPower::power_rep, intmax_t>::type _Ct;
 
         return _ToPower(static_cast<typename _ToPower::power_rep>(
-        		(static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_PeriodPower::num)) / static_cast<_Ct>(_PeriodDuration::num)));
+        		(static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_PeriodPower::num)) * static_cast<_Ct>(_PeriodDuration::num)));
     }
 };
 
@@ -122,13 +123,14 @@ struct __energy_cast<_FromPower, _ToPower, _PeriodPower, _PeriodDuration, false,
     inline
         _ToPower operator()(const _FromPower& __fd) const
     {
-        typedef typename std::common_type<typename _ToPower::power_rep, typename _FromPower::power_rep, intmax_t>::type _Ct;
+    	typedef typename std::common_type<typename _ToPower::power_rep, typename _FromPower::power_rep, intmax_t>::type _Ct;
 
         return _ToPower(static_cast<typename _ToPower::power_rep>(
             static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_PeriodPower::num)));
     }
 };
 
+/*
 template <class _FromPower, class _ToPower, class _PeriodPower, class _PeriodDuration>
 struct __energy_cast<_FromPower, _ToPower, _PeriodPower, _PeriodDuration, false, false, true, true>
 {
@@ -155,6 +157,37 @@ struct __energy_cast<_FromPower, _ToPower, _PeriodPower, _PeriodDuration, false,
         		(static_cast<_Ct>(__fd.count()) * static_cast<_Ct>(_PeriodPower::num)) * static_cast<_Ct>(_PeriodDuration::den)));
     }
 };
+*/
+
+template <class _FromPower, class _ToPower, class _PeriodPower, class _PeriodDuration>
+struct __energy_cast<_FromPower, _ToPower, _PeriodPower, _PeriodDuration, true, false, false, true>
+{
+    inline
+        _ToPower operator()(const _FromPower& __fd) const
+    {
+    	typedef typename std::common_type<typename _ToPower::power_rep, typename _FromPower::power_rep, intmax_t>::type _Ct;
+
+        return _ToPower(static_cast<typename _ToPower::power_rep>(
+        		(static_cast<_Ct>(__fd.count()) / static_cast<_Ct>(_PeriodPower::den))
+											    * static_cast<_Ct>(_PeriodDuration::num)));
+
+    }
+};
+
+
+template <class _FromPower, class _ToPower, class _PeriodPower, class _PeriodDuration>
+struct __energy_cast<_FromPower, _ToPower, _PeriodPower, _PeriodDuration, true, false, true, true>
+{
+    inline
+        _ToPower operator()(const _FromPower& __fd) const
+    {
+    	typedef typename std::common_type<typename _ToPower::power_rep, typename _FromPower::power_rep, intmax_t>::type _Ct;
+
+        return _ToPower(static_cast<typename _ToPower::power_rep>(
+            static_cast<_Ct>(__fd.count()) / static_cast<_Ct>(_PeriodPower::den)));
+    }
+};
+
 
 template <class _ToPower, class _Vol, class _Period>
 inline
@@ -214,7 +247,7 @@ class energy
 
 public:
     typedef typename _Power::rep		power_rep;
-    typedef typename _Power::period	power_period;
+    typedef typename _Power::period		power_period;
     typedef typename _Time::rep			duration_rep;
     typedef typename _Time::period		duration_period;
 
@@ -287,7 +320,7 @@ struct __energy_divide_result
 
 template <class _Energy, class _Rep2,
     bool = std::is_convertible<_Rep2,
-                          typename std::common_type<typename _Energy::rep, _Rep2>::type>::value>
+                          typename std::common_type<typename _Energy::duration_rep, _Rep2>::type>::value>
 struct __energy_divide_imp
 {
 };
@@ -304,7 +337,7 @@ struct __energy_divide_result<energy<_Rep1, _Period>, _Rep2, false>
 {
 };
 
-template <class _Rep1, class _Period, class _Rep2>
+template <class _Rep1, class _Period, class _Rep2, typename std::enable_if<std::is_arithmetic<_Rep2>::value, int>::type = 0>
 inline
 METRICCONSTEXPR
 typename __energy_divide_result<energy<_Rep1, _Period>, _Rep2>::type
@@ -329,26 +362,27 @@ operator%(const energy<_Rep1, _Period>& __d, const _Rep2& __s)
 }
 
 
-
 typedef energy<microwatt, std::chrono::hours  > microwatthour;
 typedef energy<milliwatt, std::chrono::hours  > milliwatthour;
 typedef energy<     watt, std::chrono::hours  > watthour;
+typedef energy<     watt, std::chrono::seconds> wattsecond;
 typedef energy< kilowatt, std::chrono::hours  > kilowatthour;
 typedef energy< megawatt, std::chrono::hours  > megawatthour;
 typedef energy< gigawatt, std::chrono::hours  > gigawatthour;
 typedef energy< terawatt, std::chrono::hours  > terawatthour;
 typedef energy< petawatt, std::chrono::hours  > petawatthour;
-typedef energy<power<long long, std::ratio<1, 3600>>, std::chrono::hours> joule;		// Un watt-heure vaut 3 600 joules
-typedef energy<power<long long, std::ratio<180, 154800>>, std::chrono::hours> calorie;	// Une calorie vaut 180⁄43 joule
-
-
-// typedef energy<long long, std::ratio<               1000LL, 36000LL>> joule;       TODO
-// typedef energy<long long, std::ratio<               1000LL,  8598LL>> calorie;     TODO
+typedef energy<     watt, std::chrono::seconds> joule;
+typedef energy< kilowatt, std::chrono::seconds> kilojoule;
+typedef energy< megawatt, std::chrono::seconds> megajoule;
+typedef energy< gigawatt, std::chrono::seconds> gigajoule;
+typedef energy<power<long long, std::ratio<   180, 154800>>, std::chrono::hours>     calorie;
+typedef energy<power<long long, std::ratio<180000, 154800>>, std::chrono::hours> kilocalorie;
 
 namespace literals {
 constexpr microwatthour operator ""_uWh(unsigned long long v) { return microwatthour(v); }
 constexpr milliwatthour operator ""_mWh(unsigned long long v) { return milliwatthour(v); }
 constexpr      watthour operator ""_Wh( unsigned long long v) { return      watthour(v); }
+constexpr    wattsecond operator ""_Ws( unsigned long long v) { return    wattsecond(v); }
 constexpr  kilowatthour operator ""_kWh(unsigned long long v) { return  kilowatthour(v); }
 constexpr  megawatthour operator ""_MWh(unsigned long long v) { return  megawatthour(v); }
 constexpr  gigawatthour operator ""_GWh(unsigned long long v) { return  gigawatthour(v); }
@@ -360,44 +394,44 @@ constexpr         joule operator ""_j(  unsigned long long v) { return         j
 
 
 
-// Power = Energy * Time
+// Power = Energy / Time
 template <
 	typename Power,
 	typename DurationRep,
 	typename DurationPer
 >
-inline Power operator*(
-	const energy<Power, std::chrono::duration<DurationRep, DurationPer>>& s,
+inline Power operator/(
+	const energy<Power, std::chrono::duration<DurationRep, DurationPer>>& e,
 	const std::chrono::duration<DurationRep, DurationPer>& d)
 {
-	return Power(s.count() * d.count());
+	return Power(e.count() / d.count());
 }
 
-// Time = Power / Energy
+// Time = Energy / Power
 template <
 	typename Duration,
 	typename PowerRep,
 	typename PowerPer
 >
 inline Duration operator/(
-	const power<PowerRep, PowerPer>& v,
-	const energy<power<PowerRep, PowerPer>, Duration>& f)
+	const energy<power<PowerRep, PowerPer>, Duration>& e,
+	const power<PowerRep, PowerPer>& p)
 {
-	return Duration(v.count() / f.count());
+	return Duration(e.count() / p.count());
 }
 
-// Energy = Power / Time
+// Energy = Power * Time
 template <
 	typename PowerRep,
 	typename PowerPer,
 	typename DurationRep,
 	typename DurationPer
 >
-inline energy<power<PowerRep, PowerPer>, std::chrono::duration<DurationRep, DurationPer>> operator/(
-	const power<PowerRep, PowerPer>& v,
+inline energy<power<PowerRep, PowerPer>, std::chrono::duration<DurationRep, DurationPer>> operator*(
+	const power<PowerRep, PowerPer>& p,
 	const std::chrono::duration<DurationRep, DurationPer>& d)
 {
-	return energy<power<PowerRep, PowerPer>, std::chrono::duration<DurationRep, DurationPer>>(v.count() / d.count());
+	return energy<power<PowerRep, PowerPer>, std::chrono::duration<DurationRep, DurationPer>>(p.count() * d.count());
 }
 
 
