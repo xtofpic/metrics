@@ -61,8 +61,8 @@ TEST_CASE( "Distances conversion (pass)", "[single-file]" )
 	REQUIRE(metric::yard(10000) == metric::metre(9144));
 	REQUIRE(metric::inch(100) == metric::centimetre(254));
 	REQUIRE(metric::inch(1) == metric::micrometre(25400));
-	REQUIRE(metric::nauticalmile(100) == metric::metre(185200));
-	REQUIRE(metric::nauticalmile(1) == metric::metre(1852));
+	REQUIRE(metric::mile(100) == metric::metre(160900));
+	REQUIRE(metric::mile(1) == metric::metre(1609));
 	REQUIRE(metric::foot(10000) == metric::metre(3048));
 }
 
@@ -195,11 +195,14 @@ void checkSpeed(metric::metre distance, std::chrono::minutes duration)
 	metric::kilometre_hour kmh = distance / duration;
 	REQUIRE(kmh.count() == 115);
 
-	// Create a custom speed:
-	typedef metric::distance<long long, std::ratio<1609LL, 1LL>> mile;
-	typedef metric::speed<mile, std::chrono::hours> mph;
-	mph speed = distance / duration;
+	metric::mph speed = distance / duration;
 	REQUIRE(speed.count() == 72);
+
+	// Create a custom speed:
+	typedef metric::distance<long long, std::ratio<1852LL, 1LL>> nauticalmile;
+	typedef metric::speed<nauticalmile, std::chrono::hours> knot;
+	knot kn = distance / duration;
+	REQUIRE(kn.count() == 62);
 }
 
 TEST_CASE( "Speed conversion (pass)", "[single-file]" )

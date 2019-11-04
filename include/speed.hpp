@@ -353,6 +353,7 @@ typedef speed<     metre, std::chrono::seconds> metre_second;
 typedef speed<     metre, std::chrono::minutes> metre_minute;
 typedef speed<     metre, std::chrono::hours  > metre_hour;
 typedef speed< kilometre, std::chrono::hours  > kilometre_hour;
+typedef speed<      mile, std::chrono::hours  > mph;
 
 #if _LIBCPP_STD_VER > 17
 typedef speed<     metre, std::chrono::days   > metre_day;
@@ -373,6 +374,7 @@ constexpr      metre_second operator ""_m_sec(unsigned long long v)  { return   
 constexpr      metre_minute operator ""_m_m(unsigned long long v)    { return   metre_minute(v);      }
 constexpr        metre_hour operator ""_m_h(unsigned long long v)    { return   metre_hour(v);        }
 constexpr    kilometre_hour operator ""_km_h(unsigned long long v)   { return   kilometre_hour(v);    }
+constexpr               mph operator ""_mph(unsigned long long v)    { return   mph(v);               }
 
 #if _LIBCPP_STD_VER > 17
 constexpr    millimetre_day operator ""_mm_d(unsigned long long v)   { return   millimetre_day(v);    }

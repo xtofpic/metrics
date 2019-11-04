@@ -202,8 +202,8 @@ typedef distance<     long,                  std::peta > petametre;
 typedef distance<     long,                  std::exa  > exametre;
 typedef distance<long long, std::ratio<9144LL, 10000LL>> yard;
 typedef distance<long long, std::ratio< 254LL, 10000LL>> inch;
-typedef distance<long long, std::ratio<1852LL,     1LL>> nauticalmile;
 typedef distance<long long, std::ratio<3048LL, 10000LL>> foot;
+typedef distance<long long, std::ratio<1609LL,     1LL>> mile;
 
 namespace literals {
 constexpr    attometre operator ""_am(unsigned long long v)  { return    attometre(v); }
@@ -222,7 +222,7 @@ constexpr    petametre operator ""_Pm(unsigned long long v)  { return    petamet
 constexpr     exametre operator ""_Em(unsigned long long v)  { return     exametre(v); }
 constexpr         yard operator ""_yd(unsigned long long v)  { return         yard(v); }
 constexpr         inch operator ""_in(unsigned long long v)  { return         inch(v); }
-constexpr nauticalmile operator ""_nmi(unsigned long long v) { return nauticalmile(v); }
+constexpr         mile operator ""_mi(unsigned long long v)  { return         mile(v); }
 constexpr         foot operator ""_ft(unsigned long long v)  { return         foot(v); }
 }
 

@@ -51,14 +51,14 @@ An example of strongly typed signature.
 
 void printSpeed(metric::metre distance, std::chrono::minutes duration)
 {
-	metric::kilometre_hour kmh = distance / duration;
-	std::cout << "You are driving at " << kmh.count() << " km/h" << std::endl;
+	metric::mph speed = distance / duration;
+	std::cout << "You're driving at " << speed.count() << " mph" << std::endl;
 
 	// Create a custom speed:
-	typedef metric::distance<long long, std::ratio<1609LL, 1LL>> mile;
-	typedef metric::speed<mile, std::chrono::hours> mph;
-	mph speed = distance / duration;
-	std::cout << "You are driving at " << speed.count() << " mph" << std::endl;
+	typedef metric::distance<long long, std::ratio<1852LL, 1LL>> nauticalmile;
+	typedef metric::speed<nauticalmile, std::chrono::hours> knot;
+	knot speed = distance / duration;
+	std::cout << "You're driving at " << speed.count() << " knots" << std::endl;
 }
 
 int main()
