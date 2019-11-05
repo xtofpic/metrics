@@ -5,7 +5,6 @@ C++ library to handle metric type and conversion
 [![Build status](https://ci.appveyor.com/api/projects/status/github/xtofpic/metrics?svg=true)](https://ci.appveyor.com/project/xtofpic/metrics)
 [![codecov](https://codecov.io/gh/xtofpic/metrics/branch/master/graph/badge.svg)](https://codecov.io/gh/xtofpic/metrics)
 
-
 ## Overview
 
 ### Motivation
@@ -13,24 +12,22 @@ C++ library to handle metric type and conversion
 Metrics library provides strongly typed types to make interfaces and API precise.
 It also provide implicit conversions on similar type.
 
-
 ### Description
 
 This library provide types and conversion for:
- * angular speed
- * distance
- * electric current
- * energy
- * force
- * frequency
- * mass
- * power
- * pressure
- * speed
- * voltage
- * volume
- * flowrate
-
+	* angular speed
+	* distance
+	* electric current
+	* energy
+	* force
+	* frequency
+	* mass
+	* power
+	* pressure
+	* speed
+	* voltage
+	* volume
+	* flowrate
 
 ## User's Guide
 
@@ -40,9 +37,7 @@ This library provide types and conversion for:
 
 The Metrics library is a header's only library. Just copy the necessary metrics (.hpp file) into your code.
 
-
 ### Examples
-
 
 An example of strongly typed signature.
 ```c++
@@ -103,7 +98,6 @@ int main()
     return 0;
 }
 ```
-
 
 ## known types
 
@@ -212,5 +206,4 @@ int main()
 |                       | millilitre/minute |                        | _ml_m
 |                       | millilitre/hour   |                        | _ml_h
 |                       | millilitre/day    |                        | _ml_d
-
 
