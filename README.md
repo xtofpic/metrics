@@ -1,4 +1,5 @@
 # metrics
+
 C++ library to handle metric type and conversion
 
 [![Build Status](https://travis-ci.org/xtofpic/metrics.svg?branch=master)](https://travis-ci.org/xtofpic/metrics)
@@ -15,19 +16,19 @@ It also provide implicit conversions on similar type.
 ### Description
 
 This library provide types and conversion for:
-	* angular speed
-	* distance
-	* electric current
-	* energy
-	* force
-	* frequency
-	* mass
-	* power
-	* pressure
-	* speed
-	* voltage
-	* volume
-	* flowrate
+* angular speed
+* distance
+* electric current
+* energy
+* force
+* frequency
+* mass
+* power
+* pressure
+* speed
+* voltage
+* volume
+* flowrate
 
 ## User's Guide
 
@@ -40,6 +41,7 @@ The Metrics library is a header's only library. Just copy the necessary metrics 
 ### Examples
 
 An example of strongly typed signature.
+
 ```c++
 #include <iostream>
 #include <metrics.hpp>
@@ -64,6 +66,7 @@ int main()
 ```
 
 An example of unit conversion
+
 ```c++
 #include <iostream>
 #include <metrics.hpp>
@@ -206,4 +209,3 @@ int main()
 |                       | millilitre/minute |                        | _ml_m
 |                       | millilitre/hour   |                        | _ml_h
 |                       | millilitre/day    |                        | _ml_d
-
