@@ -183,36 +183,6 @@ class flowrate
     static_assert(_Volume::period::num > 0, "flowrate volume period must be positive");
     static_assert(_Time::period::num > 0, "flowrate duration period must be positive");
 
-    template <class _R1, class _R2>
-    struct __no_overflow
-    {
-    private:
-        static const intmax_t __gcd_n1_n2 = GCD<_R1::num, _R2::num>::value;
-        static const intmax_t __gcd_d1_d2 = GCD<_R1::den, _R2::den>::value;
-        static const intmax_t __n1 = _R1::num / __gcd_n1_n2;
-        static const intmax_t __d1 = _R1::den / __gcd_d1_d2;
-        static const intmax_t __n2 = _R2::num / __gcd_n1_n2;
-        static const intmax_t __d2 = _R2::den / __gcd_d1_d2;
-        static const intmax_t max = -((intmax_t(1) << (sizeof(intmax_t) * CHAR_BIT - 1)) + 1);
-
-        template <intmax_t _Xp, intmax_t _Yp, bool __overflow>
-        struct __mul    // __overflow == false
-        {
-            static const intmax_t value = _Xp * _Yp;
-        };
-
-        template <intmax_t _Xp, intmax_t _Yp>
-        struct __mul<_Xp, _Yp, true>
-        {
-            static const intmax_t value = 1;
-        };
-
-    public:
-        static const bool value = (__n1 <= max / __d2) && (__n2 <= max / __d1);
-        typedef std::ratio<__mul<__n1, __d2, !value>::value,
-                      __mul<__n2, __d1, !value>::value> type;
-    };
-
 public:
     typedef typename _Volume::rep		volume_rep;
     typedef typename _Volume::period	volume_period;
@@ -241,7 +211,7 @@ public:
     // conversions
     template <class _Volume2, class _Time2>
         inline METRICCONSTEXPR
-        flowrate(const flowrate<_Volume2, _Time2>& __d /*,  TODO: Re-activate this
+		flowrate(const flowrate<_Volume2, _Time2>& __d /*,  TODO: Re-activate this
             typename std::enable_if
             <
                 __no_overflow<typename _Volume2::volume_period, volume_period>::value && (

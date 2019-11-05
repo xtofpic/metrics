@@ -44,36 +44,6 @@ class electriccurrent
     static_assert(std::__is_ratio<_Period>::value, "Second template parameter of electriccurrent must be a std::ratio");
     static_assert(_Period::num > 0, "electriccurrent period must be positive");
 
-    template <class _R1, class _R2>
-    struct __no_overflow
-    {
-    private:
-        static const intmax_t __gcd_n1_n2 = GCD<_R1::num, _R2::num>::value;
-        static const intmax_t __gcd_d1_d2 = GCD<_R1::den, _R2::den>::value;
-        static const intmax_t __n1 = _R1::num / __gcd_n1_n2;
-        static const intmax_t __d1 = _R1::den / __gcd_d1_d2;
-        static const intmax_t __n2 = _R2::num / __gcd_n1_n2;
-        static const intmax_t __d2 = _R2::den / __gcd_d1_d2;
-        static const intmax_t max = -((intmax_t(1) << (sizeof(intmax_t) * CHAR_BIT - 1)) + 1);
-
-        template <intmax_t _Xp, intmax_t _Yp, bool __overflow>
-        struct __mul    // __overflow == false
-        {
-            static const intmax_t value = _Xp * _Yp;
-        };
-
-        template <intmax_t _Xp, intmax_t _Yp>
-        struct __mul<_Xp, _Yp, true>
-        {
-            static const intmax_t value = 1;
-        };
-
-    public:
-        static const bool value = (__n1 <= max / __d2) && (__n2 <= max / __d1);
-        typedef std::ratio<__mul<__n1, __d2, !value>::value,
-                      __mul<__n2, __d1, !value>::value> type;
-    };
-
 public:
     typedef _Rep rep;
     typedef _Period period;
@@ -98,7 +68,7 @@ public:
     // conversions
     template <class _Rep2, class _Period2>
         inline METRICCONSTEXPR
-        electriccurrent(const electriccurrent<_Rep2, _Period2>& __d,
+		electriccurrent(const electriccurrent<_Rep2, _Period2>& __d,
             typename std::enable_if
             <
                 __no_overflow<_Period2, period>::value && (
