@@ -16,19 +16,19 @@ It also provide implicit conversions on similar type.
 ### Description
 
 This library provide types and conversion for:
-* angular speed
-* distance
-* electric current
-* energy
-* force
-* frequency
-* mass
-* power
-* pressure
-* speed
-* voltage
-* volume
-* flowrate
+*   angular speed
+*   distance
+*   electric current
+*   energy
+*   force
+*   frequency
+*   mass
+*   power
+*   pressure
+*   speed
+*   voltage
+*   volume
+*   flowrate
 
 ## User's Guide
 
