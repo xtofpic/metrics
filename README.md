@@ -105,7 +105,7 @@ int main()
 ## known types
 
 |                       |                   | ratio                  | literal   
-|-|-|-|- 
+|-                      |-                  |-                       |- 
 | **angularspeed**      | degree / second   | 10/1                   | _degsec  
 |                       | turn / second     | 3600/1                 | _rps  
 |                       | turn / minute     | 60/1                   | _rpm  
