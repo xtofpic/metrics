@@ -7,10 +7,7 @@
 #include "../include/metrics.hpp"
 
 
-
-
 using namespace metric::literals;
-
 
 template<uint8_t Temperature>
 struct waterDensity
@@ -27,8 +24,13 @@ struct mercuryDensity
     static constexpr double value = 13595.1 / (1 + (1.818 * 0.0001 * (Temperature)));
 };
 
+template<typename _Type> struct is_density : std::false_type {};
+template<uint8_t _Temperature> struct is_density<waterDensity<_Temperature>> : std::true_type {};
+template<int8_t _Temperature> struct is_density<mercuryDensity<_Temperature>> : std::true_type {};
+
 template<typename Density, typename MassType, typename MassRatio>
-metric::volume<double, MassRatio> operator/ (const metric::mass<MassType, MassRatio>& m, Density d)
+typename std::enable_if<is_density<Density>::value, metric::volume<double, MassRatio> >::type
+operator/ (const metric::mass<MassType, MassRatio>& m, Density d)
 {
     return metric::volume<double, MassRatio>(m.count() / Density::value);
 }
@@ -45,6 +47,8 @@ TEST_CASE( "Mass conversion (pass)", "[single-file]" )
 	metric::kilogram _kg10plus2(10);
 	_kg10plus2 += metric::kilogram(2);
 	REQUIRE(_kg10plus2 == metric::nanogram(12000000000000));
+	REQUIRE(metric::mass_cast<metric::gram>(_12kg / 2) == metric::gram(6000));
+	REQUIRE((_12kg / 2_kg) == 6);
 }
 
 TEST_CASE( "Distances conversion (pass)", "[single-file]" )
