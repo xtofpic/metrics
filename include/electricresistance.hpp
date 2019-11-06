@@ -107,55 +107,6 @@ public:
 };
 
 
-// ElectricResistance /
-template <class _ElectricResistance, class _Rep, bool = __is_electricresistance<_Rep>::value>
-struct __electricresistance_divide_result
-{
-};
-
-template <class _ElectricResistance, class _Rep2,
-    bool = std::is_convertible<_Rep2,
-                          typename std::common_type<typename _ElectricResistance::rep, _Rep2>::type>::value>
-struct __electricresistance_divide_imp
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __electricresistance_divide_imp<electricresistance<_Rep1, _Period>, _Rep2, true>
-{
-    typedef electricresistance<typename std::common_type<_Rep1, _Rep2>::type, _Period> type;
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __electricresistance_divide_result<electricresistance<_Rep1, _Period>, _Rep2, false>
-    : __electricresistance_divide_imp<electricresistance<_Rep1, _Period>, _Rep2>
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename __electricresistance_divide_result<electricresistance<_Rep1, _Period>, _Rep2>::type
-operator/(const electricresistance<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef electricresistance<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
-}
-
-
-// ElectricResistance %
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename __electricresistance_divide_result<electricresistance<_Rep1, _Period>, _Rep2>::type
-operator%(const electricresistance<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef electricresistance<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
-}
-
 typedef electricresistance<long long, std::nano > abohm;
 typedef electricresistance<long long, std::micro> microohm;
 typedef electricresistance<long long, std::milli> milliohm;

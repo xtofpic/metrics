@@ -250,57 +250,6 @@ public:
 };
 
 
-// Flowrate /
-template <class _Flowrate, class _Rep, bool = __is_flowrate<_Rep>::value>
-struct __flowrate_divide_result
-{
-};
-
-template <class _Flowrate, class _Rep2,
-    bool = std::is_convertible<_Rep2,
-                          typename std::common_type<typename _Flowrate::rep, _Rep2>::type>::value>
-struct __flowrate_divide_imp
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __flowrate_divide_imp<flowrate<_Rep1, _Period>, _Rep2, true>
-{
-    typedef flowrate<typename std::common_type<_Rep1, _Rep2>::type, _Period> type;
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __flowrate_divide_result<flowrate<_Rep1, _Period>, _Rep2, false>
-    : __flowrate_divide_imp<flowrate<_Rep1, _Period>, _Rep2>
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename __flowrate_divide_result<flowrate<_Rep1, _Period>, _Rep2>::type
-operator/(const flowrate<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef flowrate<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
-}
-
-
-// Flowrate %
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename __flowrate_divide_result<flowrate<_Rep1, _Period>, _Rep2>::type
-operator%(const flowrate<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef flowrate<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
-}
-
-
-
 typedef flowrate<millilitre, std::chrono::seconds> millilitre_second;
 typedef flowrate<millilitre, std::chrono::minutes> millilitre_minute;
 typedef flowrate<millilitre, std::chrono::hours>   millilitre_hour;

@@ -262,56 +262,6 @@ public:
 };
 
 
-// Speed /
-template <class _Speed, class _Rep, bool = __is_speed<_Rep>::value>
-struct __speed_divide_result
-{
-};
-
-template <class _Speed, class _Rep2,
-    bool = std::is_convertible<_Rep2,
-                          typename std::common_type<typename _Speed::rep, _Rep2>::type>::value>
-struct __speed_divide_imp
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __speed_divide_imp<speed<_Rep1, _Period>, _Rep2, true>
-{
-    typedef speed<typename std::common_type<_Rep1, _Rep2>::type, _Period> type;
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __speed_divide_result<speed<_Rep1, _Period>, _Rep2, false>
-    : __speed_divide_imp<speed<_Rep1, _Period>, _Rep2>
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename __speed_divide_result<speed<_Rep1, _Period>, _Rep2>::type
-operator/(const speed<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef speed<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
-}
-
-
-// Speed %
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename __speed_divide_result<speed<_Rep1, _Period>, _Rep2>::type
-operator%(const speed<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef speed<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
-}
-
-
 // typedef speed<millilitre, std::chrono::seconds> millilitre_second;
 typedef speed<micrometre, std::chrono::seconds> micrometre_second;
 typedef speed<micrometre, std::chrono::minutes> micrometre_minute;

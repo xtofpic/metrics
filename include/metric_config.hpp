@@ -340,6 +340,32 @@ operator*(const _Rep1& __s, const _Master<_Rep2, _Period>& __d)
     return __d * __s;
 }
 
+
+template <template <typename...> class _Master, class _Distance, class _Rep, bool = __is_specialization<_Rep, _Master>::value>
+struct __distance_divide_result
+{
+};
+
+template <class _Distance, class _Rep2,
+    bool = std::is_convertible<_Rep2,
+                          typename std::common_type<typename _Distance::rep, _Rep2>::type>::value>
+struct __distance_divide_imp
+{
+};
+
+template <template <typename...> class _Master, class _Rep1, class _Period, class _Rep2>
+struct __distance_divide_imp<_Master<_Rep1, _Period>, _Rep2, true>
+{
+    typedef _Master<typename std::common_type<_Rep1, _Rep2>::type, _Period> type;
+};
+
+template <template <class, class> class _Master, class _Rep1, class _Period, class _Rep2>
+struct __distance_divide_result<_Master, _Master<_Rep1, _Period>, _Rep2, false>
+    : __distance_divide_imp<_Master<_Rep1, _Period>, _Rep2>
+{
+};
+
+
 // Metric /
 template <template <typename...> class _Master, class _Rep1, class _Period1, class _Rep2, class _Period2>
 inline
@@ -350,6 +376,19 @@ operator/(const _Master<_Rep1, _Period1>& __lhs, const _Master<_Rep2, _Period2>&
     typedef typename std::common_type<_Master<_Rep1, _Period1>, _Master<_Rep2, _Period2> >::type _Ct;
     return _Ct(__lhs).count() / _Ct(__rhs).count();
 }
+
+
+template <template <typename...> class _Master, class _Rep1, class _Period, class _Rep2, typename std::enable_if<std::is_arithmetic<_Rep2>::value, int>::type = 0>
+inline
+METRICCONSTEXPR
+typename __distance_divide_result<_Master, _Master<_Rep1, _Period>, _Rep2>::type
+operator/(const _Master<_Rep1, _Period>& __d, const _Rep2& __s)
+{
+    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
+    typedef _Master<_Cr, _Period> _Cd;
+    return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
+}
+
 
 // Metric %
 template <template <typename...> class _Master, class _Rep1, class _Period1, class _Rep2, class _Period2>

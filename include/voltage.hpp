@@ -107,56 +107,6 @@ public:
 };
 
 
-// Voltage /
-template <class _Voltage, class _Rep, bool = __is_voltage<_Rep>::value>
-struct __voltage_divide_result
-{
-};
-
-template <class _Voltage, class _Rep2,
-    bool = std::is_convertible<_Rep2,
-                          typename std::common_type<typename _Voltage::rep, _Rep2>::type>::value>
-struct __voltage_divide_imp
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __voltage_divide_imp<voltage<_Rep1, _Period>, _Rep2, true>
-{
-    typedef voltage<typename std::common_type<_Rep1, _Rep2>::type, _Period> type;
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __voltage_divide_result<voltage<_Rep1, _Period>, _Rep2, false>
-    : __voltage_divide_imp<voltage<_Rep1, _Period>, _Rep2>
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename __voltage_divide_result<voltage<_Rep1, _Period>, _Rep2>::type
-operator/(const voltage<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef voltage<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
-}
-
-
-// Voltage %
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename __voltage_divide_result<voltage<_Rep1, _Period>, _Rep2>::type
-operator%(const voltage<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef voltage<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
-}
-
-
 typedef voltage<long long, std::nano > nanovolt;
 typedef voltage<long long, std::micro> microvolt;
 typedef voltage<long long, std::milli> millivolt;

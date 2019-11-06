@@ -107,55 +107,6 @@ public:
 };
 
 
-// Power /
-template <class _Power, class _Rep, bool = __is_power<_Rep>::value>
-struct __power_divide_result
-{
-};
-
-template <class _Power, class _Rep2,
-    bool = std::is_convertible<_Rep2,
-                          typename std::common_type<typename _Power::rep, _Rep2>::type>::value>
-struct __power_divide_imp
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __power_divide_imp<power<_Rep1, _Period>, _Rep2, true>
-{
-    typedef power<typename std::common_type<_Rep1, _Rep2>::type, _Period> type;
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __power_divide_result<power<_Rep1, _Period>, _Rep2, false>
-    : __power_divide_imp<power<_Rep1, _Period>, _Rep2>
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename __power_divide_result<power<_Rep1, _Period>, _Rep2>::type
-operator/(const power<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef power<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
-}
-
-
-// Power %
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename __power_divide_result<power<_Rep1, _Period>, _Rep2>::type
-operator%(const power<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef power<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
-}
-
 typedef power<long long, std::nano > nanowatt;
 typedef power<long long, std::micro> microwatt;
 typedef power<long long, std::milli> milliwatt;

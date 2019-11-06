@@ -108,56 +108,6 @@ public:
 };
 
 
-// Volume /
-template <class _Volume, class _Rep, bool = __is_volume<_Rep>::value>
-struct __volume_divide_result
-{
-};
-
-template <class _Volume, class _Rep2,
-    bool = std::is_convertible<_Rep2,
-                          typename std::common_type<typename _Volume::rep, _Rep2>::type>::value>
-struct __volume_divide_imp
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __volume_divide_imp<volume<_Rep1, _Period>, _Rep2, true>
-{
-    typedef volume<typename std::common_type<_Rep1, _Rep2>::type, _Period> type;
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __volume_divide_result<volume<_Rep1, _Period>, _Rep2, false>
-    : __volume_divide_imp<volume<_Rep1, _Period>, _Rep2>
-{
-};
-
-
-template <class _Rep1, class _Period, class _Rep2, typename std::enable_if<std::is_arithmetic<_Rep2>::value, int>::type = 0>
-inline
-METRICCONSTEXPR
-typename __volume_divide_result<volume<_Rep1, _Period>, _Rep2>::type
-operator/(const volume<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef volume<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
-}
-
-
-// Volume %
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename __volume_divide_result<volume<_Rep1, _Period>, _Rep2>::type
-operator%(const volume<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef volume<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
-}
-
 typedef volume<long long, std::nano > nanolitre;
 typedef volume<long long, std::micro> microlitre;
 typedef volume<long long, std::milli> millilitre;

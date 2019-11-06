@@ -107,55 +107,6 @@ public:
 };
 
 
-// Force /
-template <class _Force, class _Rep, bool = __is_force<_Rep>::value>
-struct __force_divide_result
-{
-};
-
-template <class _Force, class _Rep2,
-    bool = std::is_convertible<_Rep2,
-                          typename std::common_type<typename _Force::rep, _Rep2>::type>::value>
-struct __force_divide_imp
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __force_divide_imp<force<_Rep1, _Period>, _Rep2, true>
-{
-    typedef force<typename std::common_type<_Rep1, _Rep2>::type, _Period> type;
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __force_divide_result<force<_Rep1, _Period>, _Rep2, false>
-    : __force_divide_imp<force<_Rep1, _Period>, _Rep2>
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename __force_divide_result<force<_Rep1, _Period>, _Rep2>::type
-operator/(const force<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef force<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
-}
-
-
-// Force %
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename __force_divide_result<force<_Rep1, _Period>, _Rep2>::type
-operator%(const force<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef force<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
-}
-
 typedef force<long long, std::milli                    > millinewton;
 typedef force<long long                                > newton;
 typedef force<long long, std::deca                     > decanewton;

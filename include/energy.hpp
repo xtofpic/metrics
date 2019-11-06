@@ -282,56 +282,6 @@ public:
 };
 
 
-// Energy /
-template <class _Energy, class _Rep, bool = __is_energy<_Rep>::value>
-struct __energy_divide_result
-{
-};
-
-template <class _Energy, class _Rep2,
-    bool = std::is_convertible<_Rep2,
-                          typename std::common_type<typename _Energy::duration_rep, _Rep2>::type>::value>
-struct __energy_divide_imp
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __energy_divide_imp<energy<_Rep1, _Period>, _Rep2, true>
-{
-    typedef energy<typename std::common_type<_Rep1, _Rep2>::type, _Period> type;
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __energy_divide_result<energy<_Rep1, _Period>, _Rep2, false>
-    : __energy_divide_imp<energy<_Rep1, _Period>, _Rep2>
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2, typename std::enable_if<std::is_arithmetic<_Rep2>::value, int>::type = 0>
-inline
-METRICCONSTEXPR
-typename __energy_divide_result<energy<_Rep1, _Period>, _Rep2>::type
-operator/(const energy<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef energy<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
-}
-
-
-// Energy %
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename __energy_divide_result<energy<_Rep1, _Period>, _Rep2>::type
-operator%(const energy<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef energy<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
-}
-
-
 typedef energy<microwatt, std::chrono::hours  > microwatthour;
 typedef energy<milliwatt, std::chrono::hours  > milliwatthour;
 typedef energy<     watt, std::chrono::hours  > watthour;
@@ -361,7 +311,6 @@ constexpr  petawatthour operator ""_PWh(unsigned long long v) { return  petawatt
 constexpr         joule operator ""_j(  unsigned long long v) { return         joule(v); }
 // constexpr       calorie operator ""_c(  unsigned long long v) { return       calorie(v); } TODO
 }
-
 
 
 // Power = Energy / Time

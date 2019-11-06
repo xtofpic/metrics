@@ -107,55 +107,6 @@ public:
 };
 
 
-// Pressure /
-template <class _Pressure, class _Rep, bool = __is_pressure<_Rep>::value>
-struct __pressure_divide_result
-{
-};
-
-template <class _Pressure, class _Rep2,
-    bool = std::is_convertible<_Rep2,
-                          typename std::common_type<typename _Pressure::rep, _Rep2>::type>::value>
-struct __pressure_divide_imp
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __pressure_divide_imp<pressure<_Rep1, _Period>, _Rep2, true>
-{
-    typedef pressure<typename std::common_type<_Rep1, _Rep2>::type, _Period> type;
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __pressure_divide_result<pressure<_Rep1, _Period>, _Rep2, false>
-    : __pressure_divide_imp<pressure<_Rep1, _Period>, _Rep2>
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename __pressure_divide_result<pressure<_Rep1, _Period>, _Rep2>::type
-operator/(const pressure<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef pressure<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
-}
-
-
-// Pressure %
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename __pressure_divide_result<pressure<_Rep1, _Period>, _Rep2>::type
-operator%(const pressure<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef pressure<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
-}
-
 typedef pressure<long long, std::ratio<            1,     760> > millimetremercury; // Torr ou mmHg;
 #ifdef _WIN32
 typedef pressure<long long, std::ratio<            1,  101325> > pascl;

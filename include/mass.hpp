@@ -107,56 +107,6 @@ public:
 };
 
 
-// Mass /
-template <class _Mass, class _Rep, bool = __is_mass<_Rep>::value>
-struct __mass_divide_result
-{
-};
-
-template <class _Mass, class _Rep2,
-    bool = std::is_convertible<_Rep2,
-                          typename std::common_type<typename _Mass::rep, _Rep2>::type>::value>
-struct __mass_divide_imp
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __mass_divide_imp<mass<_Rep1, _Period>, _Rep2, true>
-{
-    typedef mass<typename std::common_type<_Rep1, _Rep2>::type, _Period> type;
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __mass_divide_result<mass<_Rep1, _Period>, _Rep2, false>
-    : __mass_divide_imp<mass<_Rep1, _Period>, _Rep2>
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2, typename std::enable_if<std::is_arithmetic<_Rep2>::value, int>::type = 0>
-inline
-METRICCONSTEXPR
-typename __mass_divide_result<mass<_Rep1, _Period>, _Rep2>::type
-operator/(const mass<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef mass<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
-}
-
-
-// Mass %
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename __mass_divide_result<mass<_Rep1, _Period>, _Rep2>::type
-operator%(const mass<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef mass<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
-}
-
-
 typedef mass<long long, std::nano > nanogram;
 typedef mass<long long, std::micro> microgram;
 typedef mass<long long, std::milli> milligram;

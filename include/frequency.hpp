@@ -107,55 +107,6 @@ public:
 };
 
 
-// Frequency /
-template <class _Frequency, class _Rep, bool = __is_frequency<_Rep>::value>
-struct __frequency_divide_result
-{
-};
-
-template <class _Frequency, class _Rep2,
-    bool = std::is_convertible<_Rep2,
-                          typename std::common_type<typename _Frequency::rep, _Rep2>::type>::value>
-struct __frequency_divide_imp
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __frequency_divide_imp<frequency<_Rep1, _Period>, _Rep2, true>
-{
-    typedef frequency<typename std::common_type<_Rep1, _Rep2>::type, _Period> type;
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __frequency_divide_result<frequency<_Rep1, _Period>, _Rep2, false>
-    : __frequency_divide_imp<frequency<_Rep1, _Period>, _Rep2>
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename __frequency_divide_result<frequency<_Rep1, _Period>, _Rep2>::type
-operator/(const frequency<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef frequency<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
-}
-
-
-// Frequency %
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename __frequency_divide_result<frequency<_Rep1, _Period>, _Rep2>::type
-operator%(const frequency<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef frequency<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
-}
-
 typedef frequency<long long, std::milli> millihertz;
 typedef frequency<long long            > hertz;
 typedef frequency<long long, std::kilo > kilohertz;

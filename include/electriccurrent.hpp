@@ -107,55 +107,6 @@ public:
 };
 
 
-// ElectricCurrent /
-template <class _ElectricCurrent, class _Rep, bool = __is_electriccurrent<_Rep>::value>
-struct __electriccurrent_divide_result
-{
-};
-
-template <class _ElectricCurrent, class _Rep2,
-    bool = std::is_convertible<_Rep2,
-                          typename std::common_type<typename _ElectricCurrent::rep, _Rep2>::type>::value>
-struct __electriccurrent_divide_imp
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __electriccurrent_divide_imp<electriccurrent<_Rep1, _Period>, _Rep2, true>
-{
-    typedef electriccurrent<typename std::common_type<_Rep1, _Rep2>::type, _Period> type;
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __electriccurrent_divide_result<electriccurrent<_Rep1, _Period>, _Rep2, false>
-    : __electriccurrent_divide_imp<electriccurrent<_Rep1, _Period>, _Rep2>
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename __electriccurrent_divide_result<electriccurrent<_Rep1, _Period>, _Rep2>::type
-operator/(const electriccurrent<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef electriccurrent<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
-}
-
-
-// ElectricCurrent %
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename __electriccurrent_divide_result<electriccurrent<_Rep1, _Period>, _Rep2>::type
-operator%(const electriccurrent<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef electriccurrent<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
-}
-
 typedef electriccurrent<long long, std::femto> femtoampere;
 typedef electriccurrent<long long, std::pico > picoampere;
 typedef electriccurrent<long long, std::nano > nanoampere;

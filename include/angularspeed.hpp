@@ -107,61 +107,10 @@ public:
 };
 
 
-// AngularSpeed /
-template <class _AngularSpeed, class _Rep, bool = __is_angularspeed<_Rep>::value>
-struct __angularspeed_divide_result
-{
-};
-
-template <class _AngularSpeed, class _Rep2,
-    bool = std::is_convertible<_Rep2,
-                          typename std::common_type<typename _AngularSpeed::rep, _Rep2>::type>::value>
-struct __angularspeed_divide_imp
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __angularspeed_divide_imp<angularspeed<_Rep1, _Period>, _Rep2, true>
-{
-    typedef angularspeed<typename std::common_type<_Rep1, _Rep2>::type, _Period> type;
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-struct __angularspeed_divide_result<angularspeed<_Rep1, _Period>, _Rep2, false>
-    : __angularspeed_divide_imp<angularspeed<_Rep1, _Period>, _Rep2>
-{
-};
-
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename __angularspeed_divide_result<angularspeed<_Rep1, _Period>, _Rep2>::type
-operator/(const angularspeed<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef angularspeed<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() / static_cast<_Cr>(__s));
-}
-
-
-// AngularSpeed %
-template <class _Rep1, class _Period, class _Rep2>
-inline
-METRICCONSTEXPR
-typename __angularspeed_divide_result<angularspeed<_Rep1, _Period>, _Rep2>::type
-operator%(const angularspeed<_Rep1, _Period>& __d, const _Rep2& __s)
-{
-    typedef typename std::common_type<_Rep1, _Rep2>::type _Cr;
-    typedef angularspeed<_Cr, _Period> _Cd;
-    return _Cd(_Cd(__d).count() % static_cast<_Cr>(__s));
-}
-
-
-// typedef angularspeed<long long, std::ratio<3600, 360> > degree_second;  // Not fan.
-typedef angularspeed<long long, std::ratio<  10, 1> > degree_second;  // Not fan.
+typedef angularspeed<long long, std::ratio<  10, 1> > degree_second;
 typedef angularspeed<long long, std::ratio<3600, 1> > turn_second;
 typedef angularspeed<long long, std::ratio<  60, 1> > turn_minute;
-typedef angularspeed<long long                        > turn_hour;
+typedef angularspeed<long long                      > turn_hour;
 
 namespace literals {
 constexpr degree_second operator ""_degsec(unsigned long long v) { return degree_second(v); }
