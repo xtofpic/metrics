@@ -31,4 +31,6 @@
 #include "flowrate.hpp"
 #include "electricresistance.hpp"
 
+#include "electric_conversion.hpp"
+
 #endif // METRICS_ALL_HPP

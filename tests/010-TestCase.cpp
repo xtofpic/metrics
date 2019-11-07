@@ -51,6 +51,69 @@ TEST_CASE( "Mass conversion (pass)", "[single-file]" )
 	REQUIRE((_12kg / 2_kg) == 6);
 }
 
+TEST_CASE( "Electricity conversion (pass)", "[single-file]" )
+{
+	// U = R * I
+	REQUIRE(metric::kiloohm(10) * metric::ampere(2)          == metric::volt(20000));
+	REQUIRE(metric::kiloohm(2)  * metric::ampere(10)         == metric::volt(20000));
+	REQUIRE(metric::kiloohm(2)  * metric::ampere(10)         == metric::kilovolt(20));
+	REQUIRE(metric::kiloohm(2)  * metric::milliampere(10000) == metric::kilovolt(20));
+	REQUIRE(metric::kiloohm(2)  * metric::kiloampere(3)      == metric::kilovolt(6000));
+
+	// R = U / I
+	REQUIRE(metric::kiloohm(10) == metric::volt(20000)    / metric::ampere(2));
+	REQUIRE(metric::kiloohm(2)  == metric::volt(20000)    / metric::ampere(10));
+	REQUIRE(metric::kiloohm(2)  == metric::kilovolt(20)   / metric::ampere(10));
+	REQUIRE(metric::kiloohm(2)  == metric::kilovolt(20)   / metric::milliampere(10000));
+	REQUIRE(metric::kiloohm(2)  == metric::kilovolt(6000) / metric::kiloampere(3));
+
+	// I = U / R
+	REQUIRE(metric::volt(20000)    / metric::kiloohm(10) == metric::ampere(2));
+	REQUIRE(metric::volt(20000)    / metric::kiloohm(2)  == metric::ampere(10));
+	REQUIRE(metric::kilovolt(20)   / metric::ohm(2000)   == metric::ampere(10));
+	REQUIRE(metric::kilovolt(20)   / metric::ohm(2000)   == metric::milliampere(10000));
+	REQUIRE(metric::kilovolt(6000) / metric::kiloohm(2)  == metric::kiloampere(3));
+
+	// P = U * I
+	REQUIRE(metric::kilovolt(10) * metric::ampere(2)          == metric::watt(20000));
+	REQUIRE(metric::kilovolt(2)  * metric::ampere(10)         == metric::watt(20000));
+	REQUIRE(metric::kilovolt(2)  * metric::ampere(10)         == metric::kilowatt(20));
+	REQUIRE(metric::kilovolt(2)  * metric::milliampere(10000) == metric::kilowatt(20));
+	REQUIRE(metric::kilovolt(2)  * metric::kiloampere(3)      == metric::kilowatt(6000));
+
+	// I = P / U
+	REQUIRE(metric::ampere(2)          == metric::watt(20000)    / metric::kilovolt(10));
+	REQUIRE(metric::ampere(10)         == metric::watt(20000)    / metric::kilovolt(2));
+	REQUIRE(metric::ampere(10)         == metric::kilowatt(20)   / metric::volt(2000));
+	REQUIRE(metric::milliampere(10000) == metric::kilowatt(20)   / metric::millivolt(2000000));
+	REQUIRE(metric::kiloampere(3)      == metric::kilowatt(6000) / metric::kilovolt(2));
+
+	// U = P / I
+	REQUIRE(metric::kilovolt(10)       == metric::watt(20000)    / metric::ampere(2));
+	REQUIRE(metric::kilovolt(2)        == metric::watt(20000)    / metric::ampere(10));
+	REQUIRE(metric::volt(2000)         == metric::kilowatt(20)   / metric::ampere(10));
+	REQUIRE(metric::millivolt(2000000) == metric::kilowatt(20)   / metric::milliampere(10000));
+	REQUIRE(metric::kilovolt(2)        == metric::kilowatt(6000) / metric::kiloampere(3));
+
+
+	/*
+	auto result2 = metric::ohm(100) * metric::milliampere(2000);
+	std::cout << "100ohm * 2000milliampere: " << result2.count() << ", " << result2.num() << "/" << result2.den() << std::endl;
+	REQUIRE(metric::ohm(100) * metric::milliampere(2000) == metric::volt(200));
+
+	auto result3 = metric::ohm(100) * metric::ampere(2);
+	std::cout << "100ohm * 2ampere: " << result3.count() << ", " << result3.num() << "/" << result3.den() << std::endl;
+	REQUIRE(metric::ohm(100) * metric::ampere(2) == metric::volt(200));
+	*/
+
+	// P = U * I
+	/*
+	metric::volt v(15);
+	metric::ampere a(10);
+	auto puissance = v * a;
+	*/
+}
+
 TEST_CASE( "Distances conversion (pass)", "[single-file]" )
 {
 	metric::kilometre _12km(12);
