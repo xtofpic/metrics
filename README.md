@@ -5,6 +5,8 @@ C++ library to handle metric type and conversion
 [![Build Status](https://travis-ci.org/xtofpic/metrics.svg?branch=master)](https://travis-ci.org/xtofpic/metrics)
 [![Build status](https://ci.appveyor.com/api/projects/status/github/xtofpic/metrics?svg=true)](https://ci.appveyor.com/project/xtofpic/metrics)
 [![codecov](https://codecov.io/gh/xtofpic/metrics/branch/master/graph/badge.svg)](https://codecov.io/gh/xtofpic/metrics)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/17136e673c9c4af9a6d7034bb332515c)](https://www.codacy.com/manual/xtofpic/metrics?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=xtofpic/metrics&amp;utm_campaign=Badge_Grade)
+
 
 ## Overview
 
