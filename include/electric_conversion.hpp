@@ -12,6 +12,7 @@
 #ifndef METRICS_ELECTRIC_CONVERSION_HPP
 #define METRICS_ELECTRIC_CONVERSION_HPP
 
+#include "metric_config.hpp"
 #include "voltage.hpp"
 #include "electricresistance.hpp"
 #include "electriccurrent.hpp"

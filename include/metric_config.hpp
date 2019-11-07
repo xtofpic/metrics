@@ -53,6 +53,8 @@ template <intmax_t _Num, intmax_t _Den> struct __is_ratio<std::ratio<_Num, _Den>
 
 } // namespace std
 
+#define LCM std::LCM
+
 #endif
 
 
