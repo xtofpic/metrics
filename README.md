@@ -13,7 +13,7 @@ C++ library to handle metric type and conversion
 ### Motivation
 
 Metrics library provides strongly typed types to make interfaces and API precise.
-It also provide implicit conversions on similar type.
+It also provide implicit conversions on similar types, and explicit conversions on arithmetic.
 
 ### Description
 
@@ -48,7 +48,7 @@ An example of strongly typed signature.
 #include <iostream>
 #include <metrics.hpp>
 
-void printSpeed(metric::metre distance, std::chrono::minutes duration)
+void printSpeed(metric::metre distance, std::chrono::minutes duration) // Enforce type used.
 {
 	metric::mph speed = distance / duration;
 	std::cout << "You're driving at " << speed.count() << " mph" << std::endl;
@@ -62,7 +62,7 @@ void printSpeed(metric::metre distance, std::chrono::minutes duration)
 
 int main()
 {
-	printSpeed(metric::metre(247530), std::chrono::minutes(128)); // Enforce type used.
+	printSpeed(metric::metre(247530), std::chrono::minutes(128));
 	return 0;
 }
 ```
